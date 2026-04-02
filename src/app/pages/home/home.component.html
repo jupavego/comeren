@@ -1,0 +1,106 @@
+<section
+  class="carrusel"
+  *ngIf="slides.length"
+  [class.carrusel--oculto]="!mostrarCarrusel"
+>
+  <div class="slide" [class.slide--intro]="slideActual.tipo === 'intro'">
+    <div
+      class="slide__bg slide__bg--prev"
+      [style.background-image]="obtenerFondo(slideAnterior)"
+    ></div>
+
+    <div
+      class="slide__bg slide__bg--current"
+      [style.background-image]="obtenerFondo(slideActual)"
+      [class.fade-in]="animando"
+    ></div>
+
+    <div class="slide__overlay"></div>
+
+    <div class="slide__contenido" [class.fade-in-text]="animando">
+      <ng-container *ngIf="slideActual.tipo === 'intro'; else slideNegocio">
+        <div class="intro-slide">
+          <h1>{{ slideActual.titulo || '' }}</h1>
+          <p>{{ slideActual.descripcion || '' }}</p>
+
+          <div class="slide__botones">
+            <button class="btn-principal" (click)="irAListado()">
+              {{ slideActual.botonPrincipal || '' }}
+            </button>
+
+            <button class="btn-secundario" (click)="verDestacados()">
+              {{ slideActual.botonSecundario || '' }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #slideNegocio>
+        <div class="negocio-slide">
+          <span class="badge">{{ slideActual.data?.categoria || '' }}</span>
+          <h1>{{ slideActual.data?.nombre || '' }}</h1>
+          <p>
+            {{ slideActual.data?.slogan || slideActual.data?.descripcion || '' }}
+          </p>
+
+          <div class="slide__botones">
+            <a
+              [routerLink]="['/establecimiento', slideActual.data?.id]"
+              class="btn-principal"
+            >
+              Ver establecimiento
+            </a>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+
+    <button class="nav prev" (click)="anterior()">‹</button>
+    <button class="nav next" (click)="siguiente()">›</button>
+  </div>
+
+  <div class="indicadores">
+    <button
+      *ngFor="let item of slides; let i = index"
+      [class.activo]="indiceCarrusel === i"
+      (click)="irSlide(i)"
+    ></button>
+  </div>
+</section>
+
+<section class="accesos-rapidos" *ngIf="mostrarAccesosRapidos">
+  <div class="acceso">Negocios destacados</div>
+  <div class="acceso">Nuevos registros</div>
+  <div class="acceso">Promociones</div>
+  <div class="acceso">Comida rápida</div>
+  <div class="acceso">Cafeterías</div>
+  <div class="acceso">Postres</div>
+</section>
+
+<section
+  class="contenedor-listado"
+  id="listado-negocios"
+  [class.fade-in-listado]="animandoListado"
+>
+  <div class="encabezado-lista">
+    <h2>Negocios registrados</h2>
+    <p>{{ establecimientosFiltrados.length }} resultados</p>
+  </div>
+
+  <div class="grid-tarjetas">
+    <article class="tarjeta" *ngFor="let item of establecimientosFiltrados">
+      <a [routerLink]="['/establecimiento', item.id]">
+        <div class="tarjeta__imagen">
+          <img [src]="item.imagen" [alt]="item.nombre" />
+          <span class="badge">{{ item.categoria }}</span>
+        </div>
+
+        <div class="tarjeta__contenido">
+          <h3>{{ item.nombre }}</h3>
+          <p>{{ item.descripcion }}</p>
+          <small>{{ item.zona }} · {{ item.horario }}</small>
+        </div>
+      </a>
+    </article>
+  </div>
+</section>

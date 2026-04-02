@@ -1,0 +1,337 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+/* =========================
+   FRANJA SUPERIOR
+========================= */
+.topbar__contenedor {
+  background: linear-gradient(135deg, #5e49d6 0%, #674fe6 45%, #7662ec 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.topbar__inner {
+  width: 100%;
+  margin: 0;
+  padding: 1rem clamp(1rem, 2vw, 2rem);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns:
+    minmax(2rem, 1fr)
+    max-content
+    minmax(320px, 650px)
+    minmax(1rem, 1fr)
+    max-content;
+  align-items: center;
+  column-gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+/* Logo */
+.logo {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+}
+
+.logo a {
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+   font-family: 'Poppins', sans-serif;
+}
+
+/* Buscador */
+.busqueda-header {
+  grid-column: 3;
+  width: 100%;
+  min-width: 0;
+}
+
+.busqueda-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #f4f6f5;
+  border: 1px solid rgba(16, 34, 47, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.busqueda-box input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.95rem 1rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #34495a;
+}
+
+.busqueda-box input::placeholder {
+  color: #66757f;
+}
+
+.busqueda-box,
+.busqueda-box input,
+.busqueda-box input::placeholder,
+.acciones-header,
+.acciones-header a,
+.menu-categorias button,
+.menu-categorias .link-subbarra {
+  font-family: 'Manrope', sans-serif;
+}
+
+.btn-buscar {
+  width: 52px;
+  min-width: 52px;
+  height: 50px;
+  border: none;
+  border-left: 1px solid rgba(16, 34, 47, 0.08);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.btn-buscar:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.icono-buscar {
+  width: 19px;
+  height: 19px;
+  display: block;
+  stroke: #5c6872;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Acciones derecha */
+.acciones-header {
+  grid-column: 5;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  white-space: nowrap;
+
+  a {
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 0.98rem;
+  }
+  
+  .separador {
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 400;
+  }
+}
+
+/* =========================
+   FRANJA INFERIOR
+========================= */
+.subbarra {
+  background: linear-gradient(135deg, #cfc3f3 0%, #d9ccf8 45%, #e3dafb 100%);
+}
+
+.subbarra__inner {
+  width: 100%;
+  margin: 0;
+  padding: 0.8rem clamp(1rem, 2vw, 2rem);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns:
+    minmax(1rem, 1fr)
+    auto
+    minmax(1rem, 1fr)
+    max-content;
+  align-items: center;
+  column-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+}
+
+/* Menú categorías centrado */
+.menu-categorias {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #10222f;
+    transition: all 0.2s ease;
+  }
+
+  button:hover {
+    background: rgba(160, 137, 243, 0.808);
+  }
+
+  button.activa {
+    background: #ffffff;
+    color: #10222f;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .link-subbarra {
+    display: inline-block;
+    text-decoration: none;
+    color: #10222f;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+  }
+
+  .link-subbarra:hover {
+    background: rgba(160, 137, 243, 0.808);
+  }
+}
+
+/* Ubicación derecha */
+.ubicacion-subbarra {
+  font-family: 'Poppins', sans-serif;
+  grid-column: 4;
+  justify-self: end;
+  font-weight: 800;
+  color: #e25232;
+  white-space: nowrap;
+  font-size: 1rem;
+  text-align: right;
+}
+
+/* =========================
+   TABLET
+========================= */
+@media (max-width: 1100px) {
+  .topbar__inner {
+    grid-template-columns:
+      minmax(0, 1fr)
+      max-content
+      minmax(420px, 1fr)
+      max-content;
+    padding: 0.95rem 1.25rem;
+    column-gap: 0.85rem;
+  }
+
+  .logo {
+    grid-column: 1 / 3;
+    justify-self: center;
+  }
+
+  .busqueda-header {
+    grid-column: 3;
+    width: 100%;
+    min-width: 420px;
+    max-width: none;
+  }
+
+  .acciones-header {
+    grid-column: 4;
+    justify-self: end;
+    gap: 0.65rem;
+
+    a {
+      font-size: 0.92rem;
+    }
+  }
+
+  .logo a {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .subbarra__inner {
+    grid-template-columns: 1fr;
+    row-gap: 0.65rem;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .menu-categorias {
+    grid-column: auto;
+    justify-content: center;
+  }
+
+  .ubicacion-subbarra {
+    grid-column: auto;
+    justify-self: center;
+    text-align: center;
+  }
+}
+
+/* =========================
+   MÓVIL
+========================= */
+@media (max-width: 768px) {
+  .topbar__inner {
+    grid-template-columns: 1fr;
+    row-gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .logo,
+  .busqueda-header,
+  .acciones-header {
+    grid-column: auto;
+  }
+
+  .logo {
+    justify-self: center;
+  }
+
+  .logo a {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .busqueda-header {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .acciones-header {
+    justify-self: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .subbarra__inner {
+    grid-template-columns: 1fr;
+    row-gap: 0.6rem;
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .menu-categorias {
+    justify-content: center;
+  }
+
+  .ubicacion-subbarra {
+    justify-self: center;
+    text-align: center;
+  }
+}

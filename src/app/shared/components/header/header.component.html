@@ -1,0 +1,57 @@
+<header class="topbar">
+  <div class="topbar__contenedor">
+    <div class="topbar__inner">
+      <div class="logo">
+        <a routerLink="/">Come en Girardota</a>
+      </div>
+
+      <div class="busqueda-header">
+        <div class="busqueda-box">
+          <input
+  type="text"
+  placeholder="Buscar negocios, categorías o zonas..."
+  [(ngModel)]="textoBusqueda"
+  (input)="onBuscar()"
+/>
+
+          <button type="button" class="btn-buscar" aria-label="Buscar">
+            <svg
+              class="icono-buscar"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="acciones-header">
+        <a routerLink="/">Ingresa</a>
+        <span class="separador">|</span>
+        <a href="#">Registrarte</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="subbarra">
+    <div class="subbarra__inner">
+      <nav class="menu-categorias">
+        <button
+          *ngFor="let categoria of categorias"
+          [class.activa]="categoriaActiva === categoria"
+          (click)="seleccionarCategoria(categoria)"
+        >
+          {{ categoria }}
+          
+        </button>
+<a href="#" class="link-subbarra">Contacto</a>
+        
+      </nav>
+
+      <div class="ubicacion-subbarra">Girardota, Antioquia</div>
+    </div>
+  </div>
+</header>
