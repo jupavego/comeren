@@ -1,0 +1,234 @@
+@use '../../directory.styles' as *;
+@use 'styles/breakpoints' as *;
+
+:host { display: block; }
+
+// ── Carrusel ──────────────────────────────────────────────────────────────────
+.carousel {
+  width: 100%;
+  overflow: hidden;
+  min-height: 440px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-top: 4px solid var(--color-brand-accent);
+}
+
+.carousel__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.54) 0%,
+    rgba(0,0,0,0.26) 45%,
+    rgba(0,0,0,0.40) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.carousel__content {
+  position: relative;
+  z-index: 3;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+  color: white;
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s, transform 0.4s;
+
+  &--animating {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.carousel__intro {
+  max-width: 700px;
+  width: 100%;
+
+  h1 {
+    font-size: clamp(2.1rem, 4.8vw, 3.8rem);
+    margin: 0.6rem 0;
+    max-width: 620px;
+    line-height: 1.05;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 0 1.4rem;
+    max-width: 720px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 500;
+  }
+}
+
+.carousel__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.carousel__business {
+  max-width: 760px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  h2 {
+    font-size: clamp(2.1rem, 4.8vw, 3.8rem);
+    margin: 0.6rem 0;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+  }
+
+  p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 0 1.4rem;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 500;
+  }
+}
+
+// Badge de categoría naranja sobre el carrusel
+.carousel__category {
+  display: inline-block;
+  background: #FF5630;
+  color: white;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+// ── Botones propios del carrusel — sobre fondo oscuro ─────────────────────────
+// No usan btn-primary/btn-secondary global porque tienen colores distintos
+.carousel__btn-cta {
+  display: inline-block;
+  background: #f0b23d;
+  color: #2c241d;
+  text-decoration: none;
+  padding: 0.95rem 1.35rem;
+  border-radius: 18px;
+  font-weight: 800;
+  font-family: 'Manrope', sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.9; }
+}
+
+.carousel__btn-outline {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  text-decoration: none;
+  padding: 0.95rem 1.35rem;
+  border-radius: 18px;
+  font-weight: 700;
+  font-family: 'Manrope', sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.25); }
+}
+
+// ── Controles de navegación ───────────────────────────────────────────────────
+.carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 50%;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+
+  svg { width: 18px; height: 18px; }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.55);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+  }
+
+  &--prev {
+    left: 18px;
+    &:hover { transform: translateY(-50%) translateX(-1px); }
+  }
+
+  &--next {
+    right: 18px;
+    &:hover { transform: translateY(-50%) translateX(1px); }
+  }
+}
+
+.carousel__dots {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 4;
+}
+
+.carousel__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+
+  &--active {
+    background: #ffffff;
+    transform: scale(1.25);
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@include respond-to($bp-sm) {
+  .carousel {
+    min-height: 340px;
+  }
+
+  .carousel__content {
+    min-height: 340px;
+    padding: 2rem 1.25rem 3.5rem;
+  }
+
+  .carousel__intro h1 {
+    font-size: clamp(1.9rem, 8vw, 3rem);
+    max-width: 100%;
+  }
+}

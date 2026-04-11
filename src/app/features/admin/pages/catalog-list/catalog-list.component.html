@@ -1,0 +1,231 @@
+<div class="admin-page">
+  <div class="admin-page__header">
+    <h1 class="admin-page__title">Catálogo de productos</h1>
+    <div class="admin-page__header-actions">
+      <a routerLink="/admin/dashboard" class="btn-back">Volver</a>
+      <button class="btn-primary" (click)="openCreate()">+ Agregar producto</button>
+    </div>
+  </div>
+
+  @if (successMsg()) {
+    <div class="field-alert field-alert--success">{{ successMsg() }}</div>
+  }
+  @if (errorMsg() && !showForm()) {
+    <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+  }
+
+  <!-- Filtros -->
+  <div class="admin-filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Buscar por nombre, negocio o descripción..."
+      [value]="searchText()"
+      (input)="searchText.set($any($event.target).value)"
+    />
+    <select
+      class="filter-select"
+      [value]="accountFilter()"
+      (change)="accountFilter.set($any($event.target).value)"
+    >
+      <option value="all">Todos los negocios</option>
+      @for (acc of accounts(); track acc.id) {
+        <option [value]="acc.id">{{ acc.name }}</option>
+      }
+    </select>
+    <select
+      class="filter-select"
+      [value]="statusFilter()"
+      (change)="statusFilter.set($any($event.target).value)"
+    >
+      <option value="all">Todos</option>
+      <option value="active">Activos</option>
+      <option value="inactive">Inactivos</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="admin-loading"><span class="spinner"></span></div>
+  } @else {
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Negocio</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filtered(); track item.id) {
+            <tr [class.row--inactive]="!item.active">
+              <td>
+                <div class="product-cell">
+                  @if (item.image_url) {
+                    <img class="product-cell__img" [src]="item.image_url" [alt]="item.name" />
+                  } @else {
+                    <div class="product-cell__no-img">—</div>
+                  }
+                  <div>
+                    <span class="product-cell__name">{{ item.name }}</span>
+                    @if (item.description) {
+                      <span class="product-cell__desc">{{ item.description }}</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="product-cell__account">{{ item.account_name || '—' }}</span>
+                @if (item.account_category) {
+                  <span class="product-cell__cat">{{ item.account_category }}</span>
+                }
+              </td>
+              <td>{{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td>
+                <span class="badge" [class]="item.active ? 'badge--success' : 'badge--neutral'">
+                  {{ item.active ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button
+                    class="btn-icon"
+                    title="Editar"
+                    [disabled]="processingId() === item.id"
+                    (click)="openEdit(item)"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button
+                    class="btn-icon"
+                    [title]="item.active ? 'Desactivar' : 'Activar'"
+                    [disabled]="processingId() === item.id"
+                    (click)="onToggle(item)"
+                  >
+                    @if (item.active) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    }
+                  </button>
+                  <button
+                    class="btn-icon btn-icon--danger"
+                    title="Eliminar"
+                    [disabled]="processingId() === item.id"
+                    (click)="onDelete(item)"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="admin-table__empty">No se encontraron productos</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="admin-count">{{ filtered().length }} producto{{ filtered().length !== 1 ? 's' : '' }}</p>
+  }
+</div>
+
+<!-- Modal formulario -->
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2 class="modal-title">
+          {{ editingItem() ? 'Editar producto' : 'Nuevo producto' }}
+        </h2>
+        <button class="modal-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+
+        <!-- Negocio -->
+        <div class="field-group">
+          <label class="field-label">Negocio <span class="required">*</span></label>
+          <select formControlName="account_id" class="field-input"
+            [class.field-input--error]="accountId.invalid && accountId.touched">
+            <option value="">Selecciona un negocio</option>
+            @for (acc of accounts(); track acc.id) {
+              <option [value]="acc.id">{{ acc.name }}</option>
+            }
+          </select>
+          @if (accountId.invalid && accountId.touched) {
+            <span class="field-error">Selecciona un negocio</span>
+          }
+        </div>
+
+        <!-- Imagen -->
+        <div class="field-group">
+          <label class="field-label">Imagen</label>
+          <div class="image-preview-sm">
+            @if (imagePreview()) {
+              <img [src]="imagePreview()!" alt="Preview" />
+            } @else {
+              <span class="image-preview-sm__placeholder">Sin imagen</span>
+            }
+          </div>
+          <label class="btn-upload">
+            {{ imagePreview() ? 'Cambiar imagen' : 'Subir imagen' }}
+            <input type="file" accept="image/*" hidden (change)="onImageChange($event)" />
+          </label>
+        </div>
+
+        <!-- Nombre -->
+        <div class="field-group">
+          <label class="field-label">Nombre <span class="required">*</span></label>
+          <input formControlName="name" type="text" class="field-input"
+            [class.field-input--error]="name.invalid && name.touched"
+            placeholder="Ej: Bandeja paisa" />
+          @if (name.invalid && name.touched) {
+            <span class="field-error">El nombre es obligatorio</span>
+          }
+        </div>
+
+        <!-- Descripción -->
+        <div class="field-group">
+          <label class="field-label">Descripción</label>
+          <textarea formControlName="description" class="field-input field-input--textarea"
+            rows="2" placeholder="Ingredientes, detalles..."></textarea>
+        </div>
+
+        <!-- Precio -->
+        <div class="field-group">
+          <label class="field-label">Precio (COP) <span class="required">*</span></label>
+          <input formControlName="price" type="number" class="field-input"
+            [class.field-input--error]="price.invalid && price.touched"
+            placeholder="28000" min="0" />
+          @if (price.invalid && price.touched) {
+            <span class="field-error">Ingresa un precio válido</span>
+          }
+        </div>
+
+        <!-- Activo -->
+        <div class="field-group field-group--inline">
+          <label class="field-label">Visible en directorio</label>
+          <input formControlName="active" type="checkbox" class="field-checkbox" />
+        </div>
+
+        @if (errorMsg()) {
+          <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeForm()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) { <span class="btn-spinner"></span> Guardando... }
+            @else { {{ editingItem() ? 'Guardar cambios' : 'Crear producto' }} }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

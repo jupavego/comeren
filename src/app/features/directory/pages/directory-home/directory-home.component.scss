@@ -1,0 +1,75 @@
+@use '../../directory.styles' as *;
+@use 'styles/breakpoints' as *;
+
+:host {
+  display: block;
+  background: var(--color-page-bg);
+  font-family: 'Manrope', sans-serif;
+}
+
+.directory-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.home-directory-showcase {
+  padding: 1.5rem 1rem 3rem;
+}
+
+.home-directory-showcase__shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 1.5rem;
+  border-radius: 28px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.82) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.06),
+    0 6px 18px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.home-directory-showcase__header {
+  margin-bottom: 1.15rem;
+  padding: 0 0.25rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.home-directory-showcase__eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+}
+
+.home-directory-showcase__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.1vw, 2rem);
+  line-height: 1.1;
+  color: var(--color-text-dark);
+  font-weight: 800;
+}
+
+@include respond-to($bp-sm) {
+  .home-directory-showcase {
+    padding: 1rem 0.75rem 2.25rem;
+  }
+
+  .home-directory-showcase__shell {
+    padding: 1rem 1rem 1.15rem;
+    border-radius: 22px;
+  }
+
+  .home-directory-showcase__header {
+    margin-bottom: 0.95rem;
+    padding-bottom: 0.85rem;
+  }
+}

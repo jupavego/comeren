@@ -1,0 +1,99 @@
+<div class="admin-page">
+  <div class="admin-page__header">
+    <h1 class="admin-page__title">Negocios</h1>
+    <a routerLink="/admin/dashboard" class="btn-back">Volver</a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="admin-filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Buscar por nombre, categoría, zona..."
+      [value]="searchText()"
+      (input)="searchText.set($any($event.target).value)"
+    />
+    <select
+      class="filter-select"
+      [value]="statusFilter()"
+      (change)="statusFilter.set($any($event.target).value)"
+    >
+      <option value="all">Todos los estados</option>
+      <option value="pending">En revisión</option>
+      <option value="approved">Aprobados</option>
+      <option value="rejected">Rechazados</option>
+      <option value="suspended">Suspendidos</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="admin-loading"><span class="spinner"></span></div>
+  } @else {
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Negocio</th>
+            <th>Categoría</th>
+            <th>Zona</th>
+            <th>Estado</th>
+            <th>Registrado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (account of filtered(); track account.id) {
+            <tr>
+              <td>
+                <div class="account-cell">
+                  @if (account.logo_url) {
+                    <img class="account-cell__logo" [src]="account.logo_url" [alt]="account.name" />
+                  }
+                  <span>{{ account.name }}</span>
+                </div>
+              </td>
+              <td>{{ account.category || '—' }}</td>
+              <td>{{ account.zone || '—' }}</td>
+              <td>
+                <span class="badge" [class]="statusBadgeClass(account.status)">
+                  {{ statusLabel(account.status) }}
+                </span>
+              </td>
+              <td>{{ account.created_at | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <div class="action-btns">
+                  @if (account.status !== 'approved') {
+                    <button
+                      class="btn-action btn-action--approve"
+                      [disabled]="processingId() === account.id"
+                      (click)="updateStatus(account, 'approved')"
+                    >Aprobar</button>
+                  }
+                  @if (account.status !== 'rejected') {
+                    <button
+                      class="btn-action btn-action--reject"
+                      [disabled]="processingId() === account.id"
+                      (click)="updateStatus(account, 'rejected')"
+                    >Rechazar</button>
+                  }
+                  @if (account.status === 'approved') {
+                    <button
+                      class="btn-action btn-action--suspend"
+                      [disabled]="processingId() === account.id"
+                      (click)="updateStatus(account, 'suspended')"
+                    >Suspender</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="admin-table__empty">No se encontraron negocios</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="admin-count">{{ filtered().length }} negocio{{ filtered().length !== 1 ? 's' : '' }}</p>
+  }
+</div>

@@ -1,0 +1,172 @@
+<div class="panel">
+  <div class="panel-header">
+    <h1 class="panel-title">Mis productos</h1>
+    <div class="panel-header__actions">
+      <a routerLink="/business/dashboard" class="btn-back">Volver</a>
+      <button class="btn-primary" (click)="openCreate()">+ Agregar producto</button>
+    </div>
+  </div>
+
+  @if (successMsg()) {
+    <div class="field-alert field-alert--success">{{ successMsg() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="panel-loading"><span class="spinner"></span></div>
+  } @else {
+
+    @if (items().length === 0) {
+      <div class="catalog-empty">
+        <p>Aún no tienes productos registrados.</p>
+        <button class="btn-primary" (click)="openCreate()">Agregar primer producto</button>
+      </div>
+    } @else {
+      <div class="catalog-list">
+        @for (item of items(); track item.id) {
+          <div class="edit-section product-row" [class.product-row--inactive]="!item.active">
+
+              <!-- Imagen -->
+              <div class="product-row__image">
+                @if (item.image_url) {
+                  <img [src]="item.image_url" [alt]="item.name" loading="lazy" />
+                } @else {
+                  <div class="product-row__no-image">Sin imagen</div>
+                }
+              </div>
+
+              <!-- Info: solo nombre -->
+              <div class="product-row__body">
+                <h3 class="product-row__name">{{ item.name }}</h3>
+              </div>
+
+              <!-- Acciones + meta info debajo -->
+              <div class="product-row__actions">
+                <div class="product-row__meta">
+                  <span class="status-badge" [class.status-badge--active]="item.active" [class.status-badge--inactive]="!item.active">
+                    <span class="status-badge__dot"></span>
+                    {{ item.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                  @if (item.description) {
+                    <p class="product-row__desc">{{ item.description }}</p>
+                  }
+                  <span class="product-row__price">
+                    {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </span>
+                </div>
+                <div class="product-row__btns">
+                  <!-- Editar -->
+                  <button class="btn-icon" (click)="openEdit(item)" title="Editar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <!-- Activar / Desactivar -->
+                  <button class="btn-icon" (click)="onToggleActive(item)"
+                    [title]="item.active ? 'Desactivar' : 'Activar'">
+                    @if (item.active) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    }
+                  </button>
+                  <!-- Eliminar -->
+                  <button class="btn-icon btn-icon--danger" (click)="onDelete(item)" title="Eliminar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          }
+        </div>
+    }
+  }
+</div>
+
+<!-- Modal formulario -->
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2 class="modal-title">{{ editingItem() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+        <button class="modal-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+
+        <!-- Imagen -->
+        <div class="field-group">
+          <label class="field-label">Imagen del producto</label>
+          <div class="image-preview-sm">
+            @if (imagePreview()) {
+              <img [src]="imagePreview()!" alt="Preview" />
+            } @else {
+              <span class="image-preview-sm__placeholder">Sin imagen</span>
+            }
+          </div>
+          <label class="btn-upload">
+            {{ imagePreview() ? 'Cambiar imagen' : 'Subir imagen' }}
+            <input type="file" accept="image/*" hidden (change)="onImageChange($event)" />
+          </label>
+        </div>
+
+        <!-- Nombre -->
+        <div class="field-group">
+          <label class="field-label">Nombre <span class="required">*</span></label>
+          <input formControlName="name" type="text" class="field-input"
+            [class.field-input--error]="name.invalid && name.touched"
+            placeholder="Ej: Bandeja paisa" />
+          @if (name.invalid && name.touched) {
+            <span class="field-error">El nombre es obligatorio</span>
+          }
+        </div>
+
+        <!-- Descripción -->
+        <div class="field-group">
+          <label class="field-label">Descripción</label>
+          <textarea formControlName="description" class="field-input field-input--textarea"
+            rows="2" placeholder="Ingredientes, detalles del producto..."></textarea>
+        </div>
+
+        <!-- Precio -->
+        <div class="field-group">
+          <label class="field-label">Precio (COP) <span class="required">*</span></label>
+          <input formControlName="price" type="number" class="field-input"
+            [class.field-input--error]="price.invalid && price.touched"
+            placeholder="28000" min="0" />
+          @if (price.invalid && price.touched) {
+            <span class="field-error">Ingresa un precio válido</span>
+          }
+        </div>
+
+        <!-- Activo -->
+        <div class="field-group field-group--inline">
+          <label class="field-label">Visible en el directorio</label>
+          <input formControlName="active" type="checkbox" class="field-checkbox" />
+        </div>
+
+        @if (errorMsg()) {
+          <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeForm()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving() || uploading()">
+            @if (saving() || uploading()) { <span class="btn-spinner"></span> Guardando... }
+            @else { {{ editingItem() ? 'Guardar cambios' : 'Crear producto' }} }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

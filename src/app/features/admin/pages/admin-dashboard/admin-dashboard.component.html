@@ -1,0 +1,104 @@
+@if (loading()) {
+  <div class="admin-loading"><span class="spinner"></span></div>
+} @else {
+  @if (stats(); as s) {
+
+    <div class="admin-page">
+
+      <!-- Hero -->
+      <div class="admin-hero">
+        <div class="admin-hero__cover"></div>
+        <div class="admin-hero__body">
+          <div class="admin-hero__identity">
+            <div class="admin-hero__icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            </div>
+            <div>
+              <h1 class="admin-hero__title">Panel de administración</h1>
+              <span class="admin-hero__subtitle">Come en Girardota</span>
+            </div>
+          </div>
+          <div class="admin-hero__badge">Administrador</div>
+        </div>
+      </div>
+
+      <!-- Métricas -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-card__value">{{ s.totalUsers }}</span>
+          <span class="stat-card__label">Usuarios totales</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value">{{ s.totalClients }}</span>
+          <span class="stat-card__label">Clientes</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value">{{ s.totalBusinesses }}</span>
+          <span class="stat-card__label">Negocios registrados</span>
+        </div>
+        <div class="stat-card stat-card--warning">
+          <span class="stat-card__value">{{ s.pendingAccounts }}</span>
+          <span class="stat-card__label">Negocios en revisión</span>
+        </div>
+        <div class="stat-card stat-card--success">
+          <span class="stat-card__value">{{ s.approvedAccounts }}</span>
+          <span class="stat-card__label">Negocios aprobados</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value">{{ s.totalProducts }}</span>
+          <span class="stat-card__label">Productos publicados</span>
+        </div>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <div class="admin-actions">
+        <a routerLink="/admin/accounts" class="admin-action-card">
+          <span class="admin-action-card__icon admin-action-card__icon--orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>
+          <div class="admin-action-card__content">
+            <span class="admin-action-card__label">Gestionar negocios</span>
+            <span class="admin-action-card__desc">
+              {{ s.pendingAccounts }} pendiente{{ s.pendingAccounts !== 1 ? 's' : '' }} de revisión
+            </span>
+          </div>
+          <span class="admin-action-card__arrow">→</span>
+        </a>
+        <a routerLink="/admin/catalog" class="admin-action-card">
+          <span class="admin-action-card__icon admin-action-card__icon--teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </span>
+          <div class="admin-action-card__content">
+            <span class="admin-action-card__label">Catálogo de productos</span>
+            <span class="admin-action-card__desc">
+              {{ s.totalProducts }} producto{{ s.totalProducts !== 1 ? 's' : '' }} registrados
+            </span>
+          </div>
+          <span class="admin-action-card__arrow">→</span>
+        </a>
+        <a routerLink="/admin/users" class="admin-action-card">
+          <span class="admin-action-card__icon admin-action-card__icon--purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <div class="admin-action-card__content">
+            <span class="admin-action-card__label">Gestionar usuarios</span>
+            <span class="admin-action-card__desc">{{ s.totalUsers }} usuarios registrados</span>
+          </div>
+          <span class="admin-action-card__arrow">→</span>
+        </a>
+        <a routerLink="/admin/reports" class="admin-action-card">
+          <span class="admin-action-card__icon admin-action-card__icon--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </span>
+          <div class="admin-action-card__content">
+            <span class="admin-action-card__label">Reportes y exportación</span>
+            <span class="admin-action-card__desc">Exportar datos en CSV</span>
+          </div>
+          <span class="admin-action-card__arrow">→</span>
+        </a>
+      </div>
+
+    </div>
+
+  }
+}

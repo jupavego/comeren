@@ -1,26 +1,24 @@
-<header class="topbar">
+<header class="topbar" [class.topbar--hidden]="hidden()">
+
+  <!-- ── Franja superior ─────────────────────────────────────────────────── -->
   <div class="topbar__contenedor">
     <div class="topbar__inner">
+
       <div class="logo">
-        <a routerLink="/">Come en Girardota</a>
+        <a routerLink="/" (click)="cerrarMenu()">Come en Girardota</a>
       </div>
 
       <div class="busqueda-header">
         <div class="busqueda-box">
           <input
-  type="text"
-  placeholder="Buscar negocios, categorías o zonas..."
-  [(ngModel)]="textoBusqueda"
-  (input)="onBuscar()"
-/>
-
-          <button type="button" class="btn-buscar" aria-label="Buscar">
-            <svg
-              class="icono-buscar"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
+            type="text"
+            placeholder="Buscar negocios, categorías o zonas..."
+            [(ngModel)]="searchText"
+            (input)="onSearchInput()"
+            (keyup.enter)="onSearch()"
+          />
+          <button type="button" class="btn-buscar" aria-label="Buscar" (click)="onSearch()">
+            <svg class="icono-buscar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
             </svg>
@@ -29,29 +27,136 @@
       </div>
 
       <div class="acciones-header">
-        <a routerLink="/">Ingresa</a>
-        <span class="separador">|</span>
-        <a href="#">Registrarte</a>
+        @if (session.isLoggedIn()) {
+          @if (session.isBusiness()) {
+            <a routerLink="/business/dashboard">Mi negocio</a>
+            <span class="separador">|</span>
+          }
+          @if (session.isAdmin()) {
+            <a routerLink="/admin/dashboard">Admin</a>
+            <span class="separador">|</span>
+          }
+          <app-user-widget />
+        } @else {
+          <a routerLink="/auth/login">Ingresar</a>
+          <span class="separador">|</span>
+          <a routerLink="/auth/register">Registrarse</a>
+        }
       </div>
+
+      <!-- Hamburguesa con círculo borde (patrón óptica) -->
+      <button
+        class="btn-hamburguesa"
+        [class.btn-hamburguesa--abierto]="menuAbierto()"
+        (click)="toggleMenu()"
+        [attr.aria-label]="menuAbierto() ? 'Cerrar menú' : 'Abrir menú'"
+        [attr.aria-expanded]="menuAbierto()"
+      >
+        <span class="hamburguesa-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+
     </div>
   </div>
 
+  <!-- ── Subbarra (desktop) ──────────────────────────────────────────────── -->
   <div class="subbarra">
     <div class="subbarra__inner">
       <nav class="menu-categorias">
-        <button
-          *ngFor="let categoria of categorias"
-          [class.activa]="categoriaActiva === categoria"
-          (click)="seleccionarCategoria(categoria)"
-        >
-          {{ categoria }}
-          
-        </button>
-<a href="#" class="link-subbarra">Contacto</a>
-        
+        @for (cat of state.categories; track cat) {
+          <button
+            [class.activa]="state.category() === cat && isOnDirectory()"
+            (click)="selectCategory(cat)"
+          >{{ cat }}</button>
+        }
+        <a routerLink="/contacto" class="link-subbarra" (click)="cerrarMenu()">Contacto</a>
       </nav>
-
       <div class="ubicacion-subbarra">Girardota, Antioquia</div>
     </div>
   </div>
+
+  <!-- ── Menú móvil (opacity + translateX, delay escalonado) ────────────── -->
+  <div class="menu-movil" [class.menu-movil--abierto]="menuAbierto()">
+    <div class="menu-movil__scroll">
+
+      <!-- Buscador -->
+      <div
+        class="menu-movil__item menu-movil__busqueda"
+        [style.opacity]="menuAbierto() ? '1' : '0'"
+        [style.transform]="menuAbierto() ? 'translateX(0)' : 'translateX(-12px)'"
+        [style.transition-delay]="menuAbierto() ? '0ms' : '0ms'"
+      >
+        <div class="busqueda-box">
+          <input
+            type="text"
+            placeholder="Buscar negocios..."
+            [(ngModel)]="searchText"
+            (input)="onSearchInput()"
+            (keyup.enter)="onSearch()"
+          />
+          <button type="button" class="btn-buscar" aria-label="Buscar" (click)="onSearch()">
+            <svg class="icono-buscar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categorías con delay escalonado -->
+      <div
+        class="menu-movil__item menu-movil__categorias"
+        [style.opacity]="menuAbierto() ? '1' : '0'"
+        [style.transform]="menuAbierto() ? 'translateX(0)' : 'translateX(-12px)'"
+        [style.transition-delay]="menuAbierto() ? '45ms' : '0ms'"
+      >
+        @for (cat of state.categories; track cat) {
+          <button
+            [class.activa]="state.category() === cat && isOnDirectory()"
+            (click)="selectCategory(cat)"
+          >{{ cat }}</button>
+        }
+      </div>
+
+      <!-- Acciones -->
+      <div
+        class="menu-movil__item menu-movil__acciones"
+        [style.opacity]="menuAbierto() ? '1' : '0'"
+        [style.transform]="menuAbierto() ? 'translateX(0)' : 'translateX(-12px)'"
+        [style.transition-delay]="menuAbierto() ? '90ms' : '0ms'"
+      >
+        <a routerLink="/" (click)="cerrarMenu()">Inicio</a>
+        @if (session.isLoggedIn()) {
+          @if (session.isBusiness()) {
+            <a routerLink="/business/dashboard" (click)="cerrarMenu()">Mi negocio</a>
+          }
+          @if (session.isAdmin()) {
+            <a routerLink="/admin/dashboard" (click)="cerrarMenu()">Admin</a>
+          }
+          <app-user-widget />
+        } @else {
+          <a routerLink="/auth/login" (click)="cerrarMenu()">Ingresar</a>
+          <a routerLink="/auth/register" class="btn-registro" (click)="cerrarMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Registrarse
+          </a>
+        }
+      </div>
+
+      <!-- Ubicación -->
+      <div
+        class="menu-movil__item menu-movil__ubicacion"
+        [style.opacity]="menuAbierto() ? '1' : '0'"
+        [style.transform]="menuAbierto() ? 'translateX(0)' : 'translateX(-12px)'"
+        [style.transition-delay]="menuAbierto() ? '135ms' : '0ms'"
+      >
+        Girardota, Antioquia
+      </div>
+
+    </div>
+  </div>
+
 </header>

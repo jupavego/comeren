@@ -1,119 +1,106 @@
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 20;
-  margin: 0;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  width: 100%;
+  max-width: 100%;
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &--hidden {
+    transform: translateY(-100%);
+  }
 }
 
-/* =========================
-   FRANJA SUPERIOR
-========================= */
+// Contiene el desborde horizontal sin bloquear el menú móvil (position:absolute)
+.topbar__contenedor,
+.topbar__nav {
+  overflow-x: clip;
+}
+
+// ── Franja superior ───────────────────────────────────────────────────────────
 .topbar__contenedor {
   background: linear-gradient(135deg, #5e49d6 0%, #674fe6 45%, #7662ec 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 .topbar__inner {
   width: 100%;
-  margin: 0;
-  padding: 1rem clamp(1rem, 2vw, 2rem);
-  box-sizing: border-box;
+  padding: 0.45rem clamp(1rem, 2vw, 2rem);
   display: grid;
   grid-template-columns:
     minmax(2rem, 1fr)
     max-content
-    minmax(320px, 650px)
+    minmax(0, 650px)
     minmax(1rem, 1fr)
     max-content;
   align-items: center;
   column-gap: clamp(0.75rem, 1.4vw, 1.25rem);
 }
 
-/* Logo */
+// ── Logo ──────────────────────────────────────────────────────────────────────
 .logo {
   grid-column: 2;
   display: flex;
   align-items: center;
-  justify-self: center;
+
+  a {
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    font-family: 'Poppins', sans-serif;
+  }
 }
 
-.logo a {
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: #ffffff;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-   font-family: 'Poppins', sans-serif;
-}
-
-/* Buscador */
-.busqueda-header {
-  grid-column: 3;
-  width: 100%;
-  min-width: 0;
-}
+// ── Buscador ──────────────────────────────────────────────────────────────────
+.busqueda-header { grid-column: 3; width: 100%; min-width: 0; }
 
 .busqueda-box {
   display: flex;
   align-items: center;
   width: 100%;
   background: #f4f6f5;
-  border: 1px solid rgba(16, 34, 47, 0.08);
+  border: 1px solid rgba(16,34,47,0.08);
   border-radius: 10px;
   overflow: hidden;
-}
 
-.busqueda-box input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.95rem 1rem;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 1rem;
-  color: #34495a;
-}
-
-.busqueda-box input::placeholder {
-  color: #66757f;
-}
-
-.busqueda-box,
-.busqueda-box input,
-.busqueda-box input::placeholder,
-.acciones-header,
-.acciones-header a,
-.menu-categorias button,
-.menu-categorias .link-subbarra {
-  font-family: 'Manrope', sans-serif;
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 1rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: clamp(0.75rem, 1.1vw, 1rem);
+    color: #34495a;
+    font-family: 'Manrope', sans-serif;
+    &::placeholder { color: #66757f; }
+  }
 }
 
 .btn-buscar {
-  width: 52px;
-  min-width: 52px;
-  height: 50px;
+  width: 44px;
+  min-width: 44px;
+  height: 34px;
   border: none;
-  border-left: 1px solid rgba(16, 34, 47, 0.08);
+  border-left: 1px solid rgba(16,34,47,0.08);
   background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-}
-
-.btn-buscar:hover {
-  background: rgba(255, 255, 255, 0.28);
+  transition: background 0.2s;
+  &:hover { background: rgba(255,255,255,0.28); }
 }
 
 .icono-buscar {
   width: 19px;
   height: 19px;
-  display: block;
   stroke: #5c6872;
   stroke-width: 2;
   fill: none;
@@ -121,7 +108,7 @@
   stroke-linejoin: round;
 }
 
-/* Acciones derecha */
+// ── Acciones desktop ──────────────────────────────────────────────────────────
 .acciones-header {
   grid-column: 5;
   justify-self: end;
@@ -129,6 +116,7 @@
   align-items: center;
   gap: 0.9rem;
   white-space: nowrap;
+  font-family: 'Manrope', sans-serif;
 
   a {
     text-decoration: none;
@@ -136,65 +124,95 @@
     font-weight: 500;
     font-size: 0.98rem;
   }
-  
-  .separador {
-    color: rgba(255, 255, 255, 0.65);
-    font-weight: 400;
+  .separador { color: rgba(255,255,255,0.5); }
+}
+
+// ── Botón hamburguesa ─────────────────────────────────────────────────────────
+.btn-hamburguesa {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 38px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  grid-column: 3;  // en móvil la grid cambia
+  justify-self: end;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: rgba(255,255,255,0.7); }
+
+  // Contenedor de las 3 líneas
+  .hamburguesa-icon {
+    position: relative;
+    width: 18px;
+    height: 12px;
+
+    span {
+      position: absolute;
+      left: 0;
+      height: 2px;
+      width: 18px;
+      background: #ffffff;
+      border-radius: 2px;
+      transform-origin: center;
+      transition: transform 0.28s ease, opacity 0.28s ease;
+
+      &:nth-child(1) { top: 0; }
+      &:nth-child(2) { top: 5px; }
+      &:nth-child(3) { top: 10px; }
+    }
+  }
+
+  // X cuando abierto
+  &--abierto .hamburguesa-icon {
+    span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+    span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
   }
 }
 
-/* =========================
-   FRANJA INFERIOR
-========================= */
+// ── Subbarra (desktop) ────────────────────────────────────────────────────────
 .subbarra {
   background: linear-gradient(135deg, #cfc3f3 0%, #d9ccf8 45%, #e3dafb 100%);
 }
 
 .subbarra__inner {
   width: 100%;
-  margin: 0;
-  padding: 0.8rem clamp(1rem, 2vw, 2rem);
-  box-sizing: border-box;
+  padding: 0.54rem clamp(0.75rem, 2vw, 2rem);
   display: grid;
-  grid-template-columns:
-    minmax(1rem, 1fr)
-    auto
-    minmax(1rem, 1fr)
-    max-content;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  column-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  column-gap: clamp(0.5rem, 1.5vw, 1.5rem);
 }
 
-/* Menú categorías centrado */
 .menu-categorias {
   grid-column: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
-  flex-wrap: wrap;
+  gap: clamp(0rem, 0.4vw, 0.2rem);
+  flex-wrap: nowrap;           // nunca hace wrap — el font-size se encoge antes
+  overflow: hidden;
+  font-family: 'Manrope', sans-serif;
 
   button {
     border: none;
     background: transparent;
-    padding: 0.55rem 0.8rem;
+    // font-size fluido: 0.72rem en pantallas angostas → 0.95rem en anchas
+    font-size: clamp(0.72rem, 1.1vw, 0.95rem);
+    padding: clamp(0.35rem, 0.6vw, 0.55rem) clamp(0.4rem, 0.7vw, 0.8rem);
     border-radius: 999px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.95rem;
     color: #10222f;
-    transition: all 0.2s ease;
-  }
-
-  button:hover {
-    background: rgba(160, 137, 243, 0.808);
-  }
-
-  button.activa {
-    background: #ffffff;
-    color: #10222f;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    font-family: inherit;
+    transition: background 0.2s;
+    &:hover  { background: rgba(160,137,243,0.5); }
+    &.activa { background: #ffffff; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   }
 
   .link-subbarra {
@@ -202,136 +220,154 @@
     text-decoration: none;
     color: #10222f;
     font-weight: 500;
-    font-size: 0.95rem;
-    padding: 0.55rem 0.8rem;
+    white-space: nowrap;
+    font-size: clamp(0.72rem, 1.1vw, 0.95rem);
+    padding: clamp(0.35rem, 0.6vw, 0.55rem) clamp(0.4rem, 0.7vw, 0.8rem);
     border-radius: 999px;
-    transition: all 0.2s ease;
-  }
-
-  .link-subbarra:hover {
-    background: rgba(160, 137, 243, 0.808);
+    transition: background 0.2s;
+    &:hover { background: rgba(160,137,243,0.5); }
   }
 }
 
-/* Ubicación derecha */
 .ubicacion-subbarra {
-  font-family: 'Poppins', sans-serif;
-  grid-column: 4;
+  grid-column: 3;
   justify-self: end;
+  font-family: 'Poppins', sans-serif;
   font-weight: 800;
   color: #e25232;
   white-space: nowrap;
-  font-size: 1rem;
-  text-align: right;
+  font-size: clamp(0.75rem, 1.1vw, 1rem);
 }
 
-/* =========================
-   TABLET
-========================= */
-@media (max-width: 1100px) {
-  .topbar__inner {
-    grid-template-columns:
-      minmax(0, 1fr)
-      max-content
-      minmax(420px, 1fr)
-      max-content;
-    padding: 0.95rem 1.25rem;
-    column-gap: 0.85rem;
+// ── Menú móvil ────────────────────────────────────────────────────────────────
+// Usa opacity + translateX igual que la óptica — animación más suave que max-height
+.menu-movil {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background: #3d2bbf;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.2);
+  z-index: 99;
+
+  // Estado cerrado
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // Estado abierto
+  &--abierto {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
   }
 
-  .logo {
-    grid-column: 1 / 3;
-    justify-self: center;
+  // Scroll interno si el contenido es largo
+  &__scroll {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 0.5rem 0 1rem;
   }
 
-  .busqueda-header {
-    grid-column: 3;
-    width: 100%;
-    min-width: 420px;
-    max-width: none;
+  &__busqueda {
+    padding: 1rem 1.25rem 0.75rem;
   }
 
-  .acciones-header {
-    grid-column: 4;
-    justify-self: end;
-    gap: 0.65rem;
+  // Cada ítem entra con delay escalonado (controlado desde el TS via style)
+  &__item {
+    transition:
+      opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
-    a {
-      font-size: 0.92rem;
+    .menu-movil--abierto & {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 
-  .logo a {
-    font-size: 1rem;
-    text-align: center;
-  }
-
-  .subbarra__inner {
-    grid-template-columns: 1fr;
-    row-gap: 0.65rem;
+  &__categorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
     padding: 0.75rem 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+
+    button {
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-family: 'Manrope', sans-serif;
+      transition: background 0.2s;
+      &:hover { background: rgba(255,255,255,0.2); }
+      &.activa { background: #ffffff; color: #3d2bbf; font-weight: 700; }
+    }
   }
 
-  .menu-categorias {
-    grid-column: auto;
-    justify-content: center;
+  &__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Manrope', sans-serif;
+
+    a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+      &:hover { color: #ffffff; }
+    }
+
+    .btn-registro {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f0b23d;
+      color: #ffffff;
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
+    }
   }
 
-  .ubicacion-subbarra {
-    grid-column: auto;
-    justify-self: center;
-    text-align: center;
+  &__ubicacion {
+    padding: 0.65rem 1.25rem 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 0.875rem;
+    color: #e25232;
   }
 }
 
-/* =========================
-   MÓVIL
-========================= */
-@media (max-width: 768px) {
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
   .topbar__inner {
-    grid-template-columns: 1fr;
-    row-gap: 0.85rem;
-    padding: 1rem;
+    grid-template-columns: max-content 1fr max-content;
+    column-gap: 0.75rem;
+    padding: 0.4rem 1.25rem;
   }
 
-  .logo,
-  .busqueda-header,
-  .acciones-header {
-    grid-column: auto;
+  .logo            { grid-column: 1; }
+  .busqueda-header { display: none; }
+  .acciones-header { display: none; }
+
+  .btn-hamburguesa {
+    display: flex;
+    grid-column: 3;
   }
 
-  .logo {
-    justify-self: center;
-  }
-
-  .logo a {
-    white-space: normal;
-    text-align: center;
-  }
-
-  .busqueda-header {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .acciones-header {
-    justify-self: center;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .subbarra__inner {
-    grid-template-columns: 1fr;
-    row-gap: 0.6rem;
-    padding: 0.85rem 1rem 1rem;
-  }
-
-  .menu-categorias {
-    justify-content: center;
-  }
-
-  .ubicacion-subbarra {
-    justify-self: center;
-    text-align: center;
-  }
+  .subbarra { display: none; }
 }

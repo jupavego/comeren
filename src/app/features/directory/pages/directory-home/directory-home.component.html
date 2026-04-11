@@ -1,0 +1,33 @@
+@if (loading()) {
+  <div class="directory-loading">
+    <span class="spinner"></span>
+  </div>
+} @else {
+
+  @if (state.showCarousel()) {
+    <app-carousel
+      [slides]="carouselSlides()"
+      [autoplayMs]="9000"
+    />
+  }
+
+  <section class="home-directory-showcase">
+    <div class="home-directory-showcase__shell">
+      <div class="home-directory-showcase__header">
+        <p class="home-directory-showcase__eyebrow">Directorio local</p>
+        <h2 class="home-directory-showcase__title">
+          Negocios para descubrir en Girardota
+        </h2>
+      </div>
+
+      <app-directory-list
+        [accounts]="accounts()"
+        [hasMore]="hasMore()"
+        [loadingMore]="loadingMore()"
+        (loadMoreClick)="onLoadMore()"
+        (clearFilters)="onClearFilters()"
+      />
+    </div>
+  </section>
+
+}

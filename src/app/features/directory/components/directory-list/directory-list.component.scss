@@ -1,0 +1,71 @@
+@use '../../directory.styles' as *;
+@use 'styles/breakpoints' as *;
+
+:host {
+  display: block;
+}
+
+.directory-list {
+  background: transparent;
+  padding: 0;
+}
+
+.directory-list__grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+
+  &--animating {
+    animation: fadeIn 1.05s ease;
+  }
+}
+
+.directory-empty {
+  color: #6b655c;
+}
+
+.directory-load-more {
+  margin: 1.75rem 0 0;
+  text-align: center;
+}
+
+.btn-load-more {
+  background: white;
+  border: 1.5px solid #d4cfc8;
+  color: var(--color-text-dark);
+  padding: 0.8rem 2rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-family: 'Manrope', sans-serif;
+
+  &:hover:not(:disabled) {
+    border-color: #9e9890;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__spinner {
+    border-color: rgba(0, 0, 0, 0.15);
+    border-top-color: var(--color-brand-primary);
+  }
+}
+
+@include respond-to($bp-md) {
+  .directory-list__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@include respond-to($bp-sm) {
+  .directory-list__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@include respond-to($bp-xs) {
+  .directory-list__grid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+}

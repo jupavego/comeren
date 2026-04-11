@@ -1,0 +1,290 @@
+@if (loading()) {
+  <div class="panel-loading"><span class="spinner"></span></div>
+} @else {
+
+  <div class="panel">
+    <div class="panel-header">
+      <h1 class="panel-title">Editar perfil del negocio</h1>
+      <a routerLink="/business/dashboard" class="btn-back">Volver</a>
+    </div>
+
+    <!-- Imágenes -->
+    <section class="edit-section">
+      <div class="edit-section__header">
+        <h2 class="edit-section__title">Imágenes</h2>
+      </div>
+      <div class="image-col">
+
+        <!-- Logo -->
+        <div class="image-upload image-upload--row">
+          <div class="image-upload__preview image-upload__preview--square">
+            @if (previewLogo()) {
+              <img [src]="previewLogo()!" alt="Logo preview" />
+            } @else if (account()?.logo_url) {
+              <img [src]="account()!.logo_url!" alt="Logo" />
+            } @else {
+              <span class="image-upload__placeholder">Logo</span>
+            }
+            @if (savingImg() && pendingLogo()) {
+              <div class="image-upload__loading"><span class="spinner spinner--sm"></span></div>
+            }
+          </div>
+          <div class="image-upload__meta">
+            <p class="image-upload__name">Logo</p>
+            <label class="btn-upload">
+              Cambiar logo
+              <input type="file" accept="image/*" hidden (change)="onLogoChange($event)" />
+            </label>
+            <span class="image-upload__hint">Cuadrada, mín. 200x200px</span>
+            @if (pendingLogo()) {
+              <span class="image-upload__pending">Imagen seleccionada — pendiente de guardar</span>
+            }
+          </div>
+        </div>
+
+        <!-- Separador horizontal -->
+        <div class="image-col__divider"></div>
+
+        <!-- Portada -->
+        <div class="image-upload image-upload--row">
+          <div class="image-upload__preview image-upload__preview--wide">
+            @if (previewCover()) {
+              <img [src]="previewCover()!" alt="Portada preview" />
+            } @else if (account()?.cover_url) {
+              <img [src]="account()!.cover_url!" alt="Portada" />
+            } @else {
+              <span class="image-upload__placeholder">Portada</span>
+            }
+            @if (savingImg() && pendingCover()) {
+              <div class="image-upload__loading"><span class="spinner spinner--sm"></span></div>
+            }
+          </div>
+          <div class="image-upload__meta">
+            <p class="image-upload__name">Portada</p>
+            <label class="btn-upload">
+              Cambiar portada
+              <input type="file" accept="image/*" hidden (change)="onCoverChange($event)" />
+            </label>
+            <span class="image-upload__hint">Horizontal, mín. 1200x400px</span>
+            @if (pendingCover()) {
+              <span class="image-upload__pending">Imagen seleccionada — pendiente de guardar</span>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      @if (hasPendingImages()) {
+        <div class="edit-section__actions">
+          @if (imgSuccessMsg()) {
+            <div class="field-alert field-alert--success">{{ imgSuccessMsg() }}</div>
+          }
+          @if (imgErrorMsg()) {
+            <div class="field-alert field-alert--error">{{ imgErrorMsg() }}</div>
+          }
+          <button type="button" class="btn-primary" (click)="onSaveImages()" [disabled]="savingImg()">
+            @if (savingImg()) { <span class="btn-spinner"></span> Guardando... }
+            @else { Guardar imágenes }
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- Formulario -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="panel-form" novalidate>
+
+      <!-- ── Información general ───────────────────────────────────────────── -->
+      <section class="edit-section" [class.edit-section--active]="isEditing('general')">
+        <div class="edit-section__header">
+          <h2 class="edit-section__title">Información general</h2>
+          <button type="button"
+            class="edit-section__toggle"
+            [class.edit-section__toggle--active]="isEditing('general')"
+            (click)="toggleSection('general')"
+            [attr.aria-label]="isEditing('general') ? 'Cerrar edición' : 'Editar sección'">
+            @if (isEditing('general')) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <div class="edit-section__body">
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Nombre <span class="required">*</span></label>
+              <input formControlName="name" type="text" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Categoría <span class="required">*</span></label>
+              <select formControlName="category" class="field-input">
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Slogan</label>
+            <input formControlName="slogan" type="text" class="field-input"
+              placeholder="Una frase que identifique tu negocio" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Descripción <span class="required">*</span></label>
+            <textarea formControlName="description" class="field-input field-input--textarea" rows="3"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Historia</label>
+            <textarea formControlName="history" class="field-input field-input--textarea" rows="4"
+              placeholder="Cuéntanos la historia de tu negocio..."></textarea>
+          </div>
+        </div>
+
+        @if (isEditing('general')) {
+          <div class="edit-section__actions">
+            @if (successMsg()) {
+              <div class="field-alert field-alert--success">{{ successMsg() }}</div>
+            }
+            @if (errorMsg()) {
+              <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              @if (saving()) { <span class="btn-spinner"></span> Guardando... }
+              @else { Guardar cambios }
+            </button>
+          </div>
+        }
+      </section>
+
+      <!-- ── Ubicación y contacto ─────────────────────────────────────────── -->
+      <section class="edit-section" [class.edit-section--active]="isEditing('location')">
+        <div class="edit-section__header">
+          <h2 class="edit-section__title">Ubicación y contacto</h2>
+          <button type="button"
+            class="edit-section__toggle"
+            [class.edit-section__toggle--active]="isEditing('location')"
+            (click)="toggleSection('location')"
+            [attr.aria-label]="isEditing('location') ? 'Cerrar edición' : 'Editar sección'">
+            @if (isEditing('location')) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <div class="edit-section__body">
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Dirección <span class="required">*</span></label>
+              <input formControlName="address" type="text" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Zona</label>
+              <input formControlName="zone" type="text" class="field-input"
+                placeholder="Centro, Zona rural..." />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Teléfono <span class="required">*</span></label>
+              <input formControlName="phone" type="tel" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Horario</label>
+              <input formControlName="schedule" type="text" class="field-input"
+                placeholder="8:00 AM - 8:00 PM" />
+            </div>
+          </div>
+        </div>
+
+        @if (isEditing('location')) {
+          <div class="edit-section__actions">
+            @if (successMsg()) {
+              <div class="field-alert field-alert--success">{{ successMsg() }}</div>
+            }
+            @if (errorMsg()) {
+              <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              @if (saving()) { <span class="btn-spinner"></span> Guardando... }
+              @else { Guardar cambios }
+            </button>
+          </div>
+        }
+      </section>
+
+      <!-- ── Redes sociales ──────────────────────────────────────────────── -->
+      <section class="edit-section" [class.edit-section--active]="isEditing('social')">
+        <div class="edit-section__header">
+          <h2 class="edit-section__title">Redes sociales</h2>
+          <button type="button"
+            class="edit-section__toggle"
+            [class.edit-section__toggle--active]="isEditing('social')"
+            (click)="toggleSection('social')"
+            [attr.aria-label]="isEditing('social') ? 'Cerrar edición' : 'Editar sección'">
+            @if (isEditing('social')) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <div class="edit-section__body">
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Numero de WhatsApp</label>
+              <input formControlName="whatsapp" type="tel" class="field-input"
+                placeholder="3001234567" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Enlace de Instagram</label>
+              <input formControlName="instagram" type="url" class="field-input" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Enlace de Facebook</label>
+            <input formControlName="facebook" type="url" class="field-input" />
+          </div>
+        </div>
+
+        @if (isEditing('social')) {
+          <div class="edit-section__actions">
+            @if (successMsg()) {
+              <div class="field-alert field-alert--success">{{ successMsg() }}</div>
+            }
+            @if (errorMsg()) {
+              <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              @if (saving()) { <span class="btn-spinner"></span> Guardando... }
+              @else { Guardar cambios }
+            </button>
+          </div>
+        }
+      </section>
+
+    </form>
+  </div>
+}

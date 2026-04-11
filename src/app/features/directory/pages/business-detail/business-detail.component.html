@@ -1,0 +1,159 @@
+@if (loading()) {
+  <div class="detail-loading">
+    <span class="spinner"></span>
+  </div>
+
+} @else if (notFound()) {
+  <div class="detail-not-found">
+    <h2>Negocio no encontrado</h2>
+    <p>El negocio que buscas no existe o no está disponible.</p>
+    <a routerLink="/" class="btn-primary">Volver al directorio</a>
+  </div>
+
+} @else {
+  @if (account(); as a) {
+
+    <!-- Volver al directorio (top) -->
+    <div class="detail-back-top">
+      <a routerLink="/" class="btn-back">Volver al directorio</a>
+    </div>
+
+    <!-- Portada -->
+    <div class="detail-cover" [style.background-image]="'url(' + (a.cover_url || a.logo_url) + ')'">
+      <div class="detail-cover__overlay"></div>
+      <div class="detail-cover__content">
+        @if (a.logo_url) {
+          <img class="detail-logo" [src]="a.logo_url" [alt]="a.name" />
+        }
+        <div class="detail-cover__text">
+          <span class="detail-category">{{ a.category }}</span>
+          <h1 class="detail-name">{{ a.name }}</h1>
+          @if (a.slogan) {
+            <p class="detail-slogan">{{ a.slogan }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-body">
+
+      <!-- Info principal -->
+      <section class="detail-section">
+        @if (a.description) {
+          <h2 class="detail-section__title">Quienes somos</h2>
+          <p class="detail-description">{{ a.description }}</p>
+        }
+        @if (a.history) {
+          <p class="detail-history">{{ a.history }}</p>
+        }
+      </section>
+
+      <!-- Datos de contacto -->
+      <section class="detail-section detail-info">
+        @if (a.address) {
+          <div class="detail-info__item">
+            <span class="detail-info__label">Dirección</span>
+            <span>{{ a.address }}{{ a.zone ? ' · ' + a.zone : '' }}</span>
+          </div>
+        }
+        @if (a.schedule) {
+          <div class="detail-info__item">
+            <span class="detail-info__label">Horario</span>
+            <span>{{ a.schedule }}</span>
+          </div>
+        }
+        @if (a.phone) {
+          <div class="detail-info__item">
+            <span class="detail-info__label">Teléfono</span>
+            <span>{{ a.phone }}</span>
+          </div>
+        }
+      </section>
+
+
+
+      <!-- Productos -->
+      @if (a.catalog_items && a.catalog_items.length > 0) {
+        <section class="detail-section">
+          <h2 class="detail-section__title">Nuestros productos</h2>
+          <div class="products-grid">
+            @for (item of a.catalog_items; track item.id) {
+              <div class="product-card">
+                @if (item.image_url) {
+                  <div class="product-card__image">
+                    <img [src]="item.image_url" [alt]="item.name" loading="lazy" />
+                  </div>
+                }
+                <div class="product-card__body">
+                  <h3 class="product-card__name">{{ item.name }}</h3>
+                  @if (item.description) {
+                    <p class="product-card__desc">{{ item.description }}</p>
+                  }
+                  <span class="product-card__price">
+                    {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+
+      <!-- Redes sociales -->
+      @if (a.whatsapp || a.instagram || a.facebook) {
+        <section class="detail-section">
+          <h2 class="detail-section__title">Encuéntranos en</h2>
+          <div class="detail-social">
+
+            @if (a.whatsapp) {
+              <button class="btn-social btn-social--whatsapp"
+                      (click)="openWhatsapp(a.whatsapp)">
+                <span class="btn-social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 12a8 8 0 0 1-11.7 7l-4.3 1.1 1.2-4.1A8 8 0 1 1 20 12zm-4.6 2.1-.7-.4c-.2-.1-1.1-.5-1.3-.6-.2-.1-.3-.1-.5.1-.1.2-.5.6-.6.7-.1.1-.2.2-.4.1-1-.5-1.8-1.1-2.5-2-.2-.2 0-.3.1-.4l.3-.3.2-.3c.1-.1.1-.2 0-.4l-.6-1.4c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.1 1 2.2c.1.1 1.5 2.3 3.7 3.1 2.1.8 2.1.5 2.5.5.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1 0-.1-.2-.1-.4-.2z"/>
+                  </svg>
+                </span>
+                <span>WhatsApp</span>
+              </button>
+            }
+
+            @if (a.instagram) {
+              <a [href]="a.instagram" target="_blank" rel="noopener noreferrer"
+                 class="btn-social btn-social--instagram">
+                <span class="btn-social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <circle cx="17.3" cy="6.7" r="1"/>
+                  </svg>
+                </span>
+                <span>Instagram</span>
+              </a>
+            }
+
+            @if (a.facebook) {
+              <a [href]="a.facebook" target="_blank" rel="noopener noreferrer"
+                 class="btn-social btn-social--facebook">
+                <span class="btn-social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13.5 21v-8.2h2.8l.4-3.2h-3.2V7.6c0-.9.3-1.5 1.6-1.5h1.7V3.2c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2v2.3H8v3.2h2.4V21h3.1z"/>
+                  </svg>
+                </span>
+                <span>Facebook</span>
+              </a>
+            }
+
+          </div>
+        </section>
+      }
+
+
+
+      <a routerLink="/" class="btn-back">Volver al directorio</a>
+
+    </div>
+
+  }
+}

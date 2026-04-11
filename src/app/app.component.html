@@ -1,2 +1,9 @@
-<app-header></app-header>
-<router-outlet></router-outlet>
+@if (showChrome()) {
+  <app-header />
+}
+
+<router-outlet />
+
+@if (showChrome()) {
+  <app-footer />
+}

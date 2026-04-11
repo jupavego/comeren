@@ -1,0 +1,59 @@
+-- ============================================================
+-- seed.sql
+-- Datos iniciales — Come en Girardota
+-- IMPORTANTE: ejecutar SOLO en desarrollo o proyecto nuevo.
+-- NO ejecutar en producción si ya existen usuarios.
+-- ============================================================
+
+-- ── Crear usuario admin inicial ──────────────────────────────
+-- Este bloque crea un usuario admin de prueba directamente en
+-- auth.users. En producción, el primer admin debe crearse
+-- desde el dashboard de Supabase → Authentication → Users.
+--
+-- Credenciales de prueba (cambiar antes de cualquier deploy):
+--   email:    admin@comengirardota.com
+--   password: Admin1234!
+--
+-- NOTA: Supabase hashea las contraseñas internamente.
+-- Este INSERT usa la función crypt() disponible en pgcrypto.
+
+-- (Descomentar solo si se necesita seed de usuario admin)
+-- INSERT INTO auth.users (
+--   id,
+--   email,
+--   encrypted_password,
+--   email_confirmed_at,
+--   raw_user_meta_data,
+--   raw_app_meta_data,
+--   created_at,
+--   updated_at
+-- ) VALUES (
+--   uuid_generate_v4(),
+--   'admin@comengirardota.com',
+--   crypt('Admin1234!', gen_salt('bf')),
+--   NOW(),
+--   '{"role": "admin", "full_name": "Administrador"}'::jsonb,
+--   '{"role": "admin"}'::jsonb,
+--   NOW(),
+--   NOW()
+-- ) ON CONFLICT (email) DO NOTHING;
+
+-- ── Categorías de referencia ─────────────────────────────────
+-- No se almacenan en la base de datos — están hardcodeadas en
+-- account.model.ts como DIRECTORY_CATEGORIES.
+-- Si se decide moverlas a la DB, crear una tabla aquí:
+--
+-- CREATE TABLE public.categories (
+--   id    SERIAL PRIMARY KEY,
+--   name  TEXT NOT NULL UNIQUE,
+--   order INT  NOT NULL DEFAULT 0
+-- );
+-- INSERT INTO public.categories (name, order) VALUES
+--   ('Restaurante',  1),
+--   ('Comida rápida',2),
+--   ('Panadería',    3),
+--   ('Cafetería',    4),
+--   ('Heladería',    5),
+--   ('Asadero',      6),
+--   ('Frutería',     7),
+--   ('Postres',      8);

@@ -1,0 +1,118 @@
+.contact-page {
+  min-height: 80vh;
+  padding: 3rem 1rem;
+  font-family: 'Manrope', sans-serif;
+  background: #f7f4ef;
+}
+
+.contact-page__inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.contact-hero {
+  text-align: center;
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: #2c241d;
+    margin: 0 0 1rem;
+  }
+
+  &__sub {
+    font-size: 1.1rem;
+    color: #5f5a52;
+    line-height: 1.7;
+    margin: 0;
+  }
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.contact-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__icon  { font-size: 2rem; line-height: 1; }
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c241d;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 0.9375rem;
+    color: #5f5a52;
+    margin: 0;
+  }
+
+  &__link {
+    font-size: 0.9375rem;
+    color: #5e49d6;
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.contact-cta {
+  background: linear-gradient(135deg, #5e49d6 0%, #7662ec 100%);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 1rem;
+    opacity: 0.85;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 500px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    padding: 0.8rem 1.75rem;
+    background: #ffffff;
+    color: #5e49d6;
+    text-decoration: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.9; }
+  }
+}

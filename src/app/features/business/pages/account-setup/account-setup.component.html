@@ -1,0 +1,142 @@
+<section class="setup-container">
+  <div class="setup-card">
+
+    <div class="setup-header">
+      <h1 class="setup-title">Configura tu negocio</h1>
+      <p class="setup-subtitle">Completa la información básica. Podrás editarla después.</p>
+      <div class="setup-notice">
+        Tu negocio quedará en revisión hasta que sea aprobado por el administrador.
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="setup-form" novalidate>
+
+      <!-- Nombre -->
+      <div class="field-group">
+        <label class="field-label">Nombre del negocio <span class="required">*</span></label>
+        <input formControlName="name" type="text" class="field-input"
+          [class.field-input--error]="name.invalid && name.touched"
+          placeholder="Ej: Restaurante El Rincón Paisa" />
+        @if (name.invalid && name.touched) {
+          <span class="field-error">
+            @if (name.errors?.['required'])  { El nombre es obligatorio }
+            @if (name.errors?.['minlength']) { Mínimo 3 caracteres }
+          </span>
+        }
+      </div>
+
+      <!-- Categoría -->
+      <div class="field-group">
+        <label class="field-label">Categoría <span class="required">*</span></label>
+        <select formControlName="category" class="field-input"
+          [class.field-input--error]="category.invalid && category.touched">
+          <option value="">Selecciona una categoría</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+        @if (category.invalid && category.touched) {
+          <span class="field-error">Selecciona una categoría</span>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="field-group">
+        <label class="field-label">Descripción <span class="required">*</span></label>
+        <textarea formControlName="description" class="field-input field-input--textarea"
+          [class.field-input--error]="description.invalid && description.touched"
+          placeholder="Describe brevemente tu negocio (mínimo 20 caracteres)"
+          rows="3"></textarea>
+        @if (description.invalid && description.touched) {
+          <span class="field-error">
+            @if (description.errors?.['required'])  { La descripción es obligatoria }
+            @if (description.errors?.['minlength']) { Mínimo 20 caracteres }
+          </span>
+        }
+      </div>
+
+      <!-- Dirección y Zona -->
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Dirección <span class="required">*</span></label>
+          <input formControlName="address" type="text" class="field-input"
+            [class.field-input--error]="address.invalid && address.touched"
+            placeholder="Cra 15 # 9-24" />
+          @if (address.invalid && address.touched) {
+            <span class="field-error">La dirección es obligatoria</span>
+          }
+        </div>
+        <div class="field-group">
+          <label class="field-label">Zona</label>
+          <input formControlName="zone" type="text" class="field-input"
+            placeholder="Ej: Centro, Zona rural" />
+        </div>
+      </div>
+
+      <!-- Teléfono y Horario -->
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Teléfono <span class="required">*</span></label>
+          <input formControlName="phone" type="tel" class="field-input"
+            [class.field-input--error]="phone.invalid && phone.touched"
+            placeholder="3001234567" />
+          @if (phone.invalid && phone.touched) {
+            <span class="field-error">El teléfono es obligatorio</span>
+          }
+        </div>
+        <div class="field-group">
+          <label class="field-label">Horario</label>
+          <input formControlName="schedule" type="text" class="field-input"
+            placeholder="Ej: 8:00 AM - 8:00 PM" />
+        </div>
+      </div>
+
+      <!-- Slogan -->
+      <div class="field-group">
+        <label class="field-label">Slogan</label>
+        <input formControlName="slogan" type="text" class="field-input"
+          placeholder="Una frase que identifique tu negocio" />
+      </div>
+
+      <!-- Historia -->
+      <div class="field-group">
+        <label class="field-label">Historia del negocio</label>
+        <textarea formControlName="history" class="field-input field-input--textarea"
+          placeholder="Cuéntanos la historia de tu negocio..." rows="4"></textarea>
+      </div>
+
+      <!-- Redes sociales -->
+      <div class="setup-section-title">Redes sociales (opcional)</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">WhatsApp</label>
+          <input formControlName="whatsapp" type="tel" class="field-input"
+            placeholder="3001234567" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Instagram</label>
+          <input formControlName="instagram" type="url" class="field-input"
+            placeholder="https://instagram.com/tunegocio" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Facebook</label>
+        <input formControlName="facebook" type="url" class="field-input"
+          placeholder="https://facebook.com/tunegocio" />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="field-alert field-alert--error">{{ errorMessage() }}</div>
+      }
+
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        @if (loading()) {
+          <span class="btn-spinner"></span> Creando negocio...
+        } @else {
+          Crear mi negocio
+        }
+      </button>
+
+    </form>
+  </div>
+</section>

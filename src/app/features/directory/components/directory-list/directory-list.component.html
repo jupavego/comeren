@@ -1,0 +1,69 @@
+<section class="directory-list" id="listado-negocios">
+
+  <div class="directory-list__grid">
+
+    @if (accounts.length === 0) {
+      <div class="directory-empty">
+        <p>No encontramos negocios con ese criterio.</p>
+        <button class="btn-link" (click)="clearFilters.emit()">Ver todos</button>
+      </div>
+    } @else {
+      @for (account of accounts; track account.id) {
+        <a [routerLink]="['/negocio', account.id]" class="business-card">
+          <div class="business-card__image">
+            <img
+              [src]="account.logo_url || 'assets/images/placeholder.jpg'"
+              [alt]="account.name"
+              loading="lazy"
+            />
+          </div>
+          <div class="business-card__body">
+            <span class="business-card__category">{{ account.category }}</span>
+            <h3 class="business-card__name">{{ account.name }}</h3>
+            @if (account.slogan) {
+              <p class="business-card__slogan">{{ account.slogan }}</p>
+            }
+            <p class="business-card__description">{{ account.description }}</p>
+            <div class="business-card__meta">
+              @if (account.address || account.zone) {
+                <span class="business-card__zone">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21s-6-5.2-6-10a6 6 0 0112 0c0 4.8-6 10-6 10z"/><circle cx="12" cy="11" r="2.5"/>
+                  </svg>
+                  {{ account.address }}{{ account.address && account.zone ? ' · ' + account.zone : account.zone }}
+                </span>
+              }
+              @if (account.schedule) {
+                <span class="business-card__schedule">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {{ account.schedule }}
+                </span>
+              }
+            </div>
+          </div>
+        </a>
+      }
+    }
+
+  </div>
+
+  @if (hasMore) {
+    <div class="directory-load-more">
+      <button
+        class="btn-load-more"
+        [disabled]="loadingMore"
+        (click)="loadMoreClick.emit()"
+      >
+        @if (loadingMore) {
+          <span class="btn-load-more__spinner"></span>
+          Cargando...
+        } @else {
+          Ver más negocios
+        }
+      </button>
+    </div>
+  }
+
+</section>
