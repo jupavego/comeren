@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../../../../app/core/services/supabase.service';
 import { Profile, UserRole } from '../../../../app/core/models/profile.model';
-import { Account, AccountStatus, CatalogItem } from '../../../../app/features/directory/models/account.model';
+import { Account, AccountStatus, CatalogApprovalStatus, CatalogItem } from '../../../../app/features/directory/models/account.model';
 import { StorageService } from '../../../core/services/storage.service';
 
 export interface AdminStats {
@@ -210,6 +210,14 @@ export class AdminService {
     const { error } = await this.supabase
       .from('catalog_items')
       .update({ active })
+      .eq('id', id);
+    return !error;
+  }
+
+  async setCatalogApproval(id: string, status: CatalogApprovalStatus): Promise<boolean> {
+    const { error } = await this.supabase
+      .from('catalog_items')
+      .update({ approval_status: status })
       .eq('id', id);
     return !error;
   }

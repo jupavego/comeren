@@ -38,6 +38,20 @@
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-page__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: var(--color-background-warning);
+  color: var(--color-text-warning);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .admin-loading {

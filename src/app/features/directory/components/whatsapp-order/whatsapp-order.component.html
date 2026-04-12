@@ -1,0 +1,75 @@
+<div class="wa-order-backdrop" (click)="close()"></div>
+
+<aside class="wa-order">
+
+  <!-- Header -->
+  <div class="wa-order__header">
+    <div class="wa-order__header-text">
+      <span class="wa-order__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+          <path d="M20 12a8 8 0 0 1-11.7 7l-4.3 1.1 1.2-4.1A8 8 0 1 1 20 12zm-4.6 2.1-.7-.4c-.2-.1-1.1-.5-1.3-.6-.2-.1-.3-.1-.5.1-.1.2-.5.6-.6.7-.1.1-.2.2-.4.1-1-.5-1.8-1.1-2.5-2-.2-.2 0-.3.1-.4l.3-.3.2-.3c.1-.1.1-.2 0-.4l-.6-1.4c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.1 1 2.2c.1.1 1.5 2.3 3.7 3.1 2.1.8 2.1.5 2.5.5.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1 0-.1-.2-.1-.4-.2z"/>
+        </svg>
+      </span>
+      <h3>Armar pedido</h3>
+    </div>
+    <button class="wa-order__close" (click)="close()" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Catálogo -->
+  <div class="wa-order__catalog">
+    @for (item of catalog(); track item.id) {
+      <div class="wa-order__row">
+        <div class="wa-order__row-info">
+          @if (item.image_url) {
+            <img class="wa-order__row-img" [src]="item.image_url" [alt]="item.name" loading="lazy" />
+          }
+          <div>
+            <p class="wa-order__row-name">{{ item.name }}</p>
+            <p class="wa-order__row-price">
+              {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </p>
+          </div>
+        </div>
+        <div class="wa-order__counter">
+          <button class="wa-order__counter-btn" (click)="remove(item)" [disabled]="qty(item.id) === 0">−</button>
+          <span class="wa-order__counter-qty">{{ qty(item.id) }}</span>
+          <button class="wa-order__counter-btn" (click)="add(item)">+</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Resumen + enviar -->
+  <div class="wa-order__footer">
+    @if (hasItems()) {
+      <div class="wa-order__summary">
+        @for (line of orderLines(); track line.item.id) {
+          <div class="wa-order__summary-line">
+            <span>{{ line.qty }}× {{ line.item.name }}</span>
+            <span>{{ line.item.price * line.qty | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+        }
+        <div class="wa-order__summary-total">
+          <span>Total</span>
+          <strong>{{ total() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+        </div>
+      </div>
+    }
+    <button
+      class="wa-order__send-btn"
+      [disabled]="!hasItems()"
+      (click)="send()"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+        <path d="M20 12a8 8 0 0 1-11.7 7l-4.3 1.1 1.2-4.1A8 8 0 1 1 20 12zm-4.6 2.1-.7-.4c-.2-.1-1.1-.5-1.3-.6-.2-.1-.3-.1-.5.1-.1.2-.5.6-.6.7-.1.1-.2.2-.4.1-1-.5-1.8-1.1-2.5-2-.2-.2 0-.3.1-.4l.3-.3.2-.3c.1-.1.1-.2 0-.4l-.6-1.4c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.1 1 2.2c.1.1 1.5 2.3 3.7 3.1 2.1.8 2.1.5 2.5.5.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1 0-.1-.2-.1-.4-.2z"/>
+      </svg>
+      Enviar pedido por WhatsApp
+    </button>
+  </div>
+
+</aside>

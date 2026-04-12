@@ -7,6 +7,7 @@ import {
   AdminCatalogItem,
   AdminCatalogFormData,
 } from '../../services/admin.service';
+import { CatalogApprovalStatus } from '../../../directory/models/account.model';
 
 @Component({
   selector: 'app-catalog-list',
@@ -29,9 +30,10 @@ export class CatalogListComponent implements OnInit {
   successMsg   = signal<string | null>(null);
 
   // Filtros
-  searchText    = signal('');
-  accountFilter = signal('all');
-  statusFilter  = signal<'all' | 'active' | 'inactive'>('all');
+  searchText      = signal('');
+  accountFilter   = signal('all');
+  statusFilter    = signal<'all' | 'active' | 'inactive'>('all');
+  approvalFilter  = signal<'all' | CatalogApprovalStatus>('all');
 
   // Modal
   showForm    = signal(false);
@@ -52,23 +54,30 @@ export class CatalogListComponent implements OnInit {
   get accountId() { return this.form.controls.account_id; }
 
   filtered = computed(() => {
-    const text    = this.searchText().toLowerCase().trim();
-    const account = this.accountFilter();
-    const status  = this.statusFilter();
+    const text     = this.searchText().toLowerCase().trim();
+    const account  = this.accountFilter();
+    const status   = this.statusFilter();
+    const approval = this.approvalFilter();
 
     return this.products().filter(p => {
-      const matchesText    = !text ||
+      const matchesText     = !text ||
         p.name.toLowerCase().includes(text) ||
         p.account_name?.toLowerCase().includes(text) ||
         p.description?.toLowerCase().includes(text);
-      const matchesAccount = account === 'all' || p.account_id === account;
-      const matchesStatus  =
+      const matchesAccount  = account === 'all' || p.account_id === account;
+      const matchesStatus   =
         status === 'all' ||
         (status === 'active'   && p.active) ||
         (status === 'inactive' && !p.active);
-      return matchesText && matchesAccount && matchesStatus;
+      const matchesApproval =
+        approval === 'all' || p.approval_status === approval;
+      return matchesText && matchesAccount && matchesStatus && matchesApproval;
     });
   });
+
+  pendingCount = computed(() =>
+    this.products().filter(p => p.approval_status === 'pending').length
+  );
 
   async ngOnInit(): Promise<void> {
     const [products, accounts] = await Promise.all([
@@ -181,6 +190,30 @@ export class CatalogListComponent implements OnInit {
       this.products.update(items =>
         items.map(i => i.id === item.id ? { ...i, active: !i.active } : i)
       );
+    }
+    this.processingId.set(null);
+  }
+
+  async onApprove(item: AdminCatalogItem): Promise<void> {
+    this.processingId.set(item.id);
+    const ok = await this.adminService.setCatalogApproval(item.id, 'approved');
+    if (ok) {
+      this.products.update(items =>
+        items.map(i => i.id === item.id ? { ...i, approval_status: 'approved' as CatalogApprovalStatus } : i)
+      );
+      this.showSuccess('Producto aprobado');
+    }
+    this.processingId.set(null);
+  }
+
+  async onReject(item: AdminCatalogItem): Promise<void> {
+    this.processingId.set(item.id);
+    const ok = await this.adminService.setCatalogApproval(item.id, 'rejected');
+    if (ok) {
+      this.products.update(items =>
+        items.map(i => i.id === item.id ? { ...i, approval_status: 'rejected' as CatalogApprovalStatus } : i)
+      );
+      this.showSuccess('Producto rechazado');
     }
     this.processingId.set(null);
   }

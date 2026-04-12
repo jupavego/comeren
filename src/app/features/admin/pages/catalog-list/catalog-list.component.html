@@ -1,6 +1,11 @@
 <div class="admin-page">
   <div class="admin-page__header">
-    <h1 class="admin-page__title">Catálogo de productos</h1>
+    <h1 class="admin-page__title">
+      Catálogo de productos
+      @if (pendingCount() > 0) {
+        <span class="admin-page__badge">{{ pendingCount() }} pendiente{{ pendingCount() !== 1 ? 's' : '' }}</span>
+      }
+    </h1>
     <div class="admin-page__header-actions">
       <a routerLink="/admin/dashboard" class="btn-back">Volver</a>
       <button class="btn-primary" (click)="openCreate()">+ Agregar producto</button>
@@ -42,6 +47,16 @@
       <option value="active">Activos</option>
       <option value="inactive">Inactivos</option>
     </select>
+    <select
+      class="filter-select"
+      [value]="approvalFilter()"
+      (change)="approvalFilter.set($any($event.target).value)"
+    >
+      <option value="all">Todas las revisiones</option>
+      <option value="pending">Pendientes</option>
+      <option value="approved">Aprobados</option>
+      <option value="rejected">Rechazados</option>
+    </select>
   </div>
 
   @if (loading()) {
@@ -55,6 +70,7 @@
             <th>Negocio</th>
             <th>Precio</th>
             <th>Estado</th>
+            <th>Revisión</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -89,7 +105,35 @@
                 </span>
               </td>
               <td>
+                <span class="badge"
+                  [class]="item.approval_status === 'approved' ? 'badge--success' :
+                           item.approval_status === 'rejected' ? 'badge--danger' : 'badge--warning'">
+                  {{ item.approval_status === 'approved' ? 'Aprobado' :
+                     item.approval_status === 'rejected' ? 'Rechazado' : 'Pendiente' }}
+                </span>
+              </td>
+              <td>
                 <div class="action-btns">
+                  @if (item.approval_status !== 'approved') {
+                    <button
+                      class="btn-icon btn-icon--success"
+                      title="Aprobar"
+                      [disabled]="processingId() === item.id"
+                      (click)="onApprove(item)"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                  }
+                  @if (item.approval_status !== 'rejected') {
+                    <button
+                      class="btn-icon btn-icon--danger"
+                      title="Rechazar"
+                      [disabled]="processingId() === item.id"
+                      (click)="onReject(item)"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  }
                   <button
                     class="btn-icon"
                     title="Editar"

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SITE } from '../../../data/site.data';
 
 @Component({
   selector: 'app-footer',
@@ -10,4 +11,5 @@ import { RouterModule } from '@angular/router';
 })
 export class FooterComponent {
   readonly year = new Date().getFullYear();
+  readonly site = SITE;
 }

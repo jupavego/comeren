@@ -1,0 +1,114 @@
+<div class="reviews">
+
+  <!-- Encabezado + promedio -->
+  <div class="reviews__header">
+    <div class="reviews__summary">
+      @if (count() > 0) {
+        <span class="reviews__score reviews__score--{{ ratingClass(average()) }}">
+          {{ average() }}
+        </span>
+        <div class="reviews__meta">
+          <strong>{{ ratingLabel(average()) }}</strong>
+          <span>{{ count() }} {{ count() === 1 ? 'reseña' : 'reseñas' }}</span>
+        </div>
+      } @else {
+        <span class="reviews__empty-score">–</span>
+        <div class="reviews__meta">
+          <strong>Sin reseñas aún</strong>
+          <span>Sé el primero en opinar</span>
+        </div>
+      }
+    </div>
+
+    <button class="reviews__add-btn" (click)="toggleForm()">
+      {{ showForm() ? 'Cancelar' : 'Escribir reseña' }}
+    </button>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  @if (successMsg()) {
+    <div class="reviews__success">{{ successMsg() }}</div>
+  }
+
+  <!-- Formulario -->
+  @if (showForm()) {
+    <div class="reviews__form">
+
+      <div class="reviews__form-field">
+        <label class="reviews__form-label">Tu nombre</label>
+        <input
+          type="text"
+          class="reviews__form-input"
+          placeholder="¿Cómo te llamas?"
+          [value]="authorName()"
+          (input)="authorName.set($any($event.target).value)"
+          maxlength="60"
+        />
+      </div>
+
+      <div class="reviews__form-field">
+        <label class="reviews__form-label">Calificación</label>
+        <div class="reviews__rating-picker">
+          @for (n of ratingOptions; track n) {
+            <button
+              type="button"
+              class="reviews__rating-btn"
+              [class.reviews__rating-btn--active]="rating() === n"
+              [class]="'reviews__rating-btn reviews__rating-btn--' + ratingClass(n) + (rating() === n ? ' reviews__rating-btn--active' : '')"
+              (click)="setRating(n)"
+            >{{ n }}</button>
+          }
+        </div>
+        <span class="reviews__rating-label">{{ ratingLabel(rating()) }}</span>
+      </div>
+
+      <div class="reviews__form-field">
+        <label class="reviews__form-label">Comentario <span class="reviews__optional">(opcional)</span></label>
+        <textarea
+          class="reviews__form-textarea"
+          rows="3"
+          placeholder="Cuéntanos tu experiencia..."
+          [value]="comment()"
+          (input)="comment.set($any($event.target).value)"
+          maxlength="400"
+        ></textarea>
+      </div>
+
+      @if (errorMsg()) {
+        <p class="reviews__form-error">{{ errorMsg() }}</p>
+      }
+
+      <button class="reviews__form-submit" (click)="submit()" [disabled]="saving()">
+        {{ saving() ? 'Enviando…' : 'Publicar reseña' }}
+      </button>
+
+    </div>
+  }
+
+  <!-- Lista de reseñas -->
+  @if (loading()) {
+    <div class="reviews__loading">
+      <span class="spinner spinner--sm"></span>
+    </div>
+  } @else if (reviews().length > 0) {
+    <ul class="reviews__list">
+      @for (r of reviews(); track r.id) {
+        <li class="reviews__item">
+          <div class="reviews__item-header">
+            <span class="reviews__item-author">{{ r.author_name }}</span>
+            <span
+              class="reviews__item-score reviews__item-score--{{ ratingClass(r.rating) }}"
+            >{{ r.rating }}/10</span>
+            <time class="reviews__item-date">
+              {{ r.created_at | date:'d MMM yyyy' }}
+            </time>
+          </div>
+          @if (r.comment) {
+            <p class="reviews__item-comment">{{ r.comment }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+</div>

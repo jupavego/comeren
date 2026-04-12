@@ -89,7 +89,7 @@
     font-weight: 700;
     color: #ffffff;
 
-    max-width: 130px;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -176,14 +176,18 @@
 }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
-// En móvil se oculta el bloque de texto (nombre + rol) — el avatar alcanza
+// En tablet/móvil se reduce el ancho máximo y el tamaño del texto
+// pero se mantiene visible la info y el chevron
+@include respond-to($bp-md) {
+  .user-widget {
+    &__name { max-width: 140px; font-size: 0.8125rem; }
+  }
+}
+
 @include respond-to($bp-sm) {
   .user-widget {
-    gap: 0;
-    padding: 0.3rem;
-
-    &__info    { display: none; }
-    &__chevron { display: none; }
+    &__name { max-width: 90px; font-size: 0.75rem; }
+    &__role { font-size: 0.625rem; }
   }
 }
 

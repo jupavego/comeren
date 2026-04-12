@@ -13,13 +13,14 @@ import { DirectoryService } from '../../services/directory.service';
 import { DirectoryStateService } from '../../services/directory-state.service';
 import { CarouselComponent, CarouselSlide } from '../../components/carousel/carousel.component';
 import { DirectoryListComponent } from '../../components/directory-list/directory-list.component';
+import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
 
 const PAGE_SIZE = 12;
 
 @Component({
   selector: 'app-directory-home',
   standalone: true,
-  imports: [CommonModule, CarouselComponent, DirectoryListComponent],
+  imports: [CommonModule, CarouselComponent, DirectoryListComponent, SectionHeaderComponent],
   templateUrl: './directory-home.component.html',
   styleUrl: './directory-home.component.scss',
 })

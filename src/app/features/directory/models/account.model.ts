@@ -1,5 +1,7 @@
 export type AccountStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 
+export type CatalogApprovalStatus = 'pending' | 'approved' | 'rejected';
+
 export interface CatalogItem {
   id: string;
   account_id: string;
@@ -8,6 +10,7 @@ export interface CatalogItem {
   price: number;
   image_url: string | null;
   active: boolean;
+  approval_status: CatalogApprovalStatus;
   created_at: string;
 }
 

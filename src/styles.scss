@@ -31,6 +31,34 @@
   --color-brand-accent:   #e25232;
   --color-page-bg:        #f7f4ef;
   --color-text-dark:      #2c241d;
+
+  // Fondos semánticos
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f7f4ef;
+  --color-background-tertiary:  #f0eee9;
+  --color-background-warning:   #fef9c3;
+
+  // Textos semánticos
+  --color-text-primary:   #2c241d;
+  --color-text-secondary: #6b5e54;
+  --color-text-tertiary:  #9e9089;
+  --color-text-info:      #2563eb;
+  --color-text-warning:   #92400e;
+
+  // Semánticos — éxito
+  --color-background-success: #dcfce7;
+  --color-text-success:       #166534;
+
+  // Semánticos — peligro / error
+  --color-background-danger:  #fee2e2;
+  --color-text-danger:        #991b1b;
+
+  // Semánticos — info
+  --color-background-info:    #dbeafe;
+
+  // Bordes semánticos
+  --color-border-tertiary: #e4ddd8;
+  --color-border-warning:  #fde68a;
 }
 
 
@@ -220,8 +248,9 @@ html, body {
 
   svg { width: 18px; height: 18px; }
 
-  &:hover         { background: var(--color-background-secondary); }
-  &--danger:hover { background: var(--color-background-danger); }
+  &:hover          { background: var(--color-background-secondary); }
+  &--danger:hover  { background: var(--color-background-danger);  color: var(--color-text-danger); }
+  &--success:hover { background: var(--color-background-success); color: var(--color-text-success); }
 }
 
 .btn-spinner {
@@ -342,23 +371,28 @@ html, body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(30, 20, 60, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  animation: fadeIn 0.18s ease;
 }
 
 .modal {
-  background: var(--color-background-primary);
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 20px;
   width: 100%;
   max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
   z-index: 1001;
+  box-shadow: 0 24px 64px rgba(30, 20, 60, 0.22), 0 4px 16px rgba(94, 73, 214, 0.12);
+  border-top: 4px solid var(--color-brand-primary);
 }
 
 .modal-header {
@@ -366,7 +400,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--color-border-tertiary);
+  background: linear-gradient(135deg, var(--color-brand-surface) 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--color-brand-border);
+  border-radius: 16px 16px 0 0;
 }
 
 .modal-title {

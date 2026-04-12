@@ -13,10 +13,6 @@
 } @else {
   @if (account(); as a) {
 
-    <!-- Volver al directorio (top) -->
-    <div class="detail-back-top">
-      <a routerLink="/" class="btn-back">Volver al directorio</a>
-    </div>
 
     <!-- Portada -->
     <div class="detail-cover" [style.background-image]="'url(' + (a.cover_url || a.logo_url) + ')'">
@@ -72,10 +68,37 @@
 
 
 
+      <!-- Ubicación -->
+      @if (mapUrl()) {
+        <section class="detail-section">
+          <h2 class="detail-section__title">Ubicación</h2>
+          <div class="detail-map">
+            <iframe
+              [src]="mapUrl()!"
+              class="detail-map__iframe"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Mapa de ubicación"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </section>
+      }
+
       <!-- Productos -->
       @if (a.catalog_items && a.catalog_items.length > 0) {
         <section class="detail-section">
-          <h2 class="detail-section__title">Nuestros productos</h2>
+          <div class="detail-section__title-row">
+            <h2 class="detail-section__title">Nuestros productos</h2>
+            @if (a.whatsapp) {
+              <button class="btn-order-wa" (click)="showOrder.set(true)">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M20 12a8 8 0 0 1-11.7 7l-4.3 1.1 1.2-4.1A8 8 0 1 1 20 12zm-4.6 2.1-.7-.4c-.2-.1-1.1-.5-1.3-.6-.2-.1-.3-.1-.5.1-.1.2-.5.6-.6.7-.1.1-.2.2-.4.1-1-.5-1.8-1.1-2.5-2-.2-.2 0-.3.1-.4l.3-.3.2-.3c.1-.1.1-.2 0-.4l-.6-1.4c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.1 1 2.2c.1.1 1.5 2.3 3.7 3.1 2.1.8 2.1.5 2.5.5.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1 0-.1-.2-.1-.4-.2z"/>
+                </svg>
+                Pedir por WhatsApp
+              </button>
+            }
+          </div>
           <div class="products-grid">
             @for (item of a.catalog_items; track item.id) {
               <div class="product-card">
@@ -151,9 +174,25 @@
 
 
 
+      <!-- Reseñas -->
+      <section class="detail-section">
+        <h2 class="detail-section__title">Reseñas</h2>
+        <app-reviews [accountId]="a.id" />
+      </section>
+
       <a routerLink="/" class="btn-back">Volver al directorio</a>
 
     </div>
+
+    <!-- WhatsApp order builder -->
+    @if (showOrder() && a.whatsapp && a.catalog_items?.length) {
+      <app-whatsapp-order
+        [whatsapp]="a.whatsapp"
+        [businessName]="a.name"
+        [catalog]="a.catalog_items!"
+        (closed)="showOrder.set(false)"
+      />
+    }
 
   }
 }
