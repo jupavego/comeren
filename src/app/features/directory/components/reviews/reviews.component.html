@@ -30,7 +30,7 @@
     <div class="reviews__success">{{ successMsg() }}</div>
   }
 
-  <!-- Formulario -->
+  <!-- Formulario nueva reseña -->
   @if (showForm()) {
     <div class="reviews__form">
 
@@ -52,8 +52,6 @@
           @for (n of ratingOptions; track n) {
             <button
               type="button"
-              class="reviews__rating-btn"
-              [class.reviews__rating-btn--active]="rating() === n"
               [class]="'reviews__rating-btn reviews__rating-btn--' + ratingClass(n) + (rating() === n ? ' reviews__rating-btn--active' : '')"
               (click)="setRating(n)"
             >{{ n }}</button>
@@ -94,18 +92,86 @@
     <ul class="reviews__list">
       @for (r of reviews(); track r.id) {
         <li class="reviews__item">
-          <div class="reviews__item-header">
-            <span class="reviews__item-author">{{ r.author_name }}</span>
-            <span
-              class="reviews__item-score reviews__item-score--{{ ratingClass(r.rating) }}"
-            >{{ r.rating }}/10</span>
-            <time class="reviews__item-date">
-              {{ r.created_at | date:'d MMM yyyy' }}
-            </time>
-          </div>
-          @if (r.comment) {
-            <p class="reviews__item-comment">{{ r.comment }}</p>
+
+          @if (editingId() === r.id) {
+
+            <!-- Formulario de edición inline -->
+            <div class="reviews__edit-form">
+              <div class="reviews__form-field">
+                <label class="reviews__form-label">Calificación</label>
+                <div class="reviews__rating-picker">
+                  @for (n of ratingOptions; track n) {
+                    <button
+                      type="button"
+                      [class]="'reviews__rating-btn reviews__rating-btn--' + ratingClass(n) + (editRating() === n ? ' reviews__rating-btn--active' : '')"
+                      (click)="setEditRating(n)"
+                    >{{ n }}</button>
+                  }
+                </div>
+                <span class="reviews__rating-label">{{ ratingLabel(editRating()) }}</span>
+              </div>
+
+              <div class="reviews__form-field">
+                <label class="reviews__form-label">Comentario <span class="reviews__optional">(opcional)</span></label>
+                <textarea
+                  class="reviews__form-textarea"
+                  rows="2"
+                  [value]="editComment()"
+                  (input)="editComment.set($any($event.target).value)"
+                  maxlength="400"
+                ></textarea>
+              </div>
+
+              @if (editErrorMsg()) {
+                <p class="reviews__form-error">{{ editErrorMsg() }}</p>
+              }
+
+              <div class="reviews__edit-actions">
+                <button class="reviews__form-submit reviews__form-submit--sm"
+                  (click)="saveEdit(r)" [disabled]="editSaving()">
+                  {{ editSaving() ? 'Guardando…' : 'Guardar' }}
+                </button>
+                <button class="reviews__cancel-btn" (click)="cancelEdit()">Cancelar</button>
+              </div>
+            </div>
+
+          } @else {
+
+            <!-- Vista normal de la reseña -->
+            <div class="reviews__item-header">
+              <span class="reviews__item-author">{{ r.author_name }}</span>
+              <span class="reviews__item-score reviews__item-score--{{ ratingClass(r.rating) }}">
+                {{ r.rating }}/10
+              </span>
+              <time class="reviews__item-date">{{ r.created_at | date:'d MMM yyyy' }}</time>
+
+              @if (canManage(r)) {
+                <div class="reviews__item-actions">
+                  <button class="reviews__action-btn" title="Editar" (click)="startEdit(r)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button class="reviews__action-btn reviews__action-btn--danger"
+                          title="Eliminar" (click)="deleteReview(r)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+
+            @if (r.comment) {
+              <p class="reviews__item-comment">{{ r.comment }}</p>
+            }
+
           }
+
         </li>
       }
     </ul>

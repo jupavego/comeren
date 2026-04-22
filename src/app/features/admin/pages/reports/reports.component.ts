@@ -1,7 +1,9 @@
-import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
+import { ReviewService } from '../../../directory/services/review.service';
+import { ProductRatingRow } from '../../../directory/models/review.model';
 
 @Component({
   selector: 'app-reports',
@@ -11,12 +13,21 @@ import { AdminService } from '../../services/admin.service';
   styleUrl: './reports.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class ReportsComponent {
-  private adminService = inject(AdminService);
+export class ReportsComponent implements OnInit {
+  private adminService  = inject(AdminService);
+  private reviewService = inject(ReviewService);
 
   exportingUsers    = signal(false);
   exportingAccounts = signal(false);
   successMsg        = signal<string | null>(null);
+  ratings           = signal<ProductRatingRow[]>([]);
+  loadingRatings    = signal(true);
+
+  async ngOnInit(): Promise<void> {
+    const data = await this.reviewService.getAllProductRatings();
+    this.ratings.set(data);
+    this.loadingRatings.set(false);
+  }
 
   async exportUsers(): Promise<void> {
     this.exportingUsers.set(true);

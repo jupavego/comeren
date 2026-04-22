@@ -1,0 +1,223 @@
+// ── Backdrop ──────────────────────────────────────────────────────────────────
+.pr-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 24, 0.52);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 200;
+  animation: prFadeIn 0.18s ease;
+}
+
+// ── Popup card ────────────────────────────────────────────────────────────────
+.pr-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  width: min(92vw, 380px);
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 1.75rem 1.75rem;
+  box-shadow:
+    0 32px 80px rgba(8, 6, 24, 0.28),
+    0 12px 28px rgba(8, 6, 24, 0.16);
+  animation: prSlideUp 0.22s cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid #e0dded;
+    background: transparent;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+      background: #f0edf8;
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+    }
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+
+  // Encabezado
+  &__header {
+    margin-bottom: 1.25rem;
+  }
+
+  &__product {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  &__avg {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+
+    strong {
+      color: var(--color-brand-primary);
+      font-weight: 700;
+    }
+  }
+
+  &__instruction {
+    margin: 0 0 0.875rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+  }
+
+  // Picker numérico
+  &__picker {
+    display: flex;
+    gap: 0.35rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  &__num {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid #e0dded;
+    background: #fafafa;
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.14s;
+    color: var(--color-text-primary);
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      transform: scale(1.10);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    // Colores semánticos al hover según valor
+    &--low:hover:not(:disabled)  { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+    &--mid:hover:not(:disabled)  { border-color: #d97706; color: #d97706; background: #fffbeb; }
+    &--high:hover:not(:disabled) {
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+      background: #f0edf8;
+    }
+
+    // Estado seleccionado — color semántico según valor
+    &--selected {
+      transform: scale(1.12);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+      border-color: transparent;
+      color: white;
+    }
+
+    &--selected#{&}--low  { background: #dc2626; }
+    &--selected#{&}--mid  { background: #d97706; }
+    &--selected#{&}--high { background: var(--color-brand-primary); }
+
+    &:disabled { opacity: 0.55; cursor: default; transform: none; }
+  }
+
+  // Botón guardar
+  &__submit {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: none;
+    background: var(--color-brand-primary);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &:hover:not(:disabled) { opacity: 0.88; }
+
+    &:disabled {
+      background: #d0cedd;
+      color: #9e99b0;
+      cursor: default;
+    }
+  }
+
+  &__scale-hint {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    font-size: 0.68rem;
+    color: #b0a9c8;
+    font-weight: 600;
+    padding: 0 2px;
+  }
+
+  // Estado éxito
+  &__done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.25rem;
+    text-align: center;
+  }
+
+  &__done-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-light, #7662ec));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 0.25rem;
+    animation: prPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &__done-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-text-primary);
+  }
+
+  &__done-sub {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+
+    strong { color: var(--color-brand-primary); }
+  }
+}
+
+// ── Animaciones ───────────────────────────────────────────────────────────────
+@keyframes prFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes prSlideUp { from { opacity: 0; transform: translate(-50%, -44%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+@keyframes prPop     { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }

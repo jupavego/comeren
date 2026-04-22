@@ -25,6 +25,460 @@
   to { transform: rotate(360deg); }
 }
 
+// ── Horarios de atención — diseño de círculos ─────────────────────────────────
+.schedule-week {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.25rem;
+}
+
+.schedule-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0; // permite que el flex item se encoja
+}
+
+// Círculo del día
+.schedule-day-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--color-brand-primary);
+  background: transparent;
+  color: var(--color-brand-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  flex-shrink: 0;
+  line-height: 1;
+
+  &--active {
+    background: var(--color-brand-primary);
+    color: #fff;
+  }
+
+  &:not(:disabled):hover {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    cursor: default;
+    transform: none;
+  }
+}
+
+// Columna de inputs de hora bajo el círculo
+.schedule-times-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.schedule-time-input {
+  width: 100%;
+  border: 1.5px solid #d0cedd;
+  border-radius: 6px;
+  padding: 0.28rem 0.25rem;
+  font-size: 0.7rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  background: white;
+  cursor: pointer;
+
+  // Ocultar el spinner nativo en Chrome/Safari
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
+  &:disabled {
+    background: #e8e7ef;
+    cursor: default;
+    color: var(--color-text-primary);
+  }
+}
+
+// Texto "Cerrado" bajo los días desactivados
+.schedule-closed-lbl {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.1rem;
+}
+
+// ── Placeholder del mapa (cuando la sección no está en edición) ───────────────
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 120px;
+  border: 2px dashed #d0cedd;
+  border-radius: 12px;
+  background: #f7f6fb;
+  padding: 1.5rem 1rem;
+  text-align: center;
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    color: #b0a9c8;
+    margin-bottom: 0.25rem;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+
+    strong {
+      color: var(--color-brand-primary);
+    }
+  }
+}
+
+// ── Color pickers compartidos (hero + catálogo) ───────────────────────────────
+.brand-colors {
+  &__row {
+    display: flex;
+    gap: 0.875rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__swatch {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__picker-wrap {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px solid var(--color-brand-border);
+    display: block;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:hover { border-color: var(--color-brand-light); box-shadow: 0 0 0 3px rgba(118,98,236,0.12); }
+  }
+
+  &__input {
+    position: absolute;
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+
+    &:disabled { cursor: default; pointer-events: none; }
+  }
+
+  &__preview {
+    position: absolute;
+    inset: 0;
+    border-radius: 11px;
+    pointer-events: none;
+  }
+
+  &__remove {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: var(--color-text-primary);
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.15s;
+
+    &:hover { background: var(--color-brand-accent); }
+  }
+
+  &__add {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    border: 2px dashed var(--color-brand-border);
+    background: var(--color-brand-surface);
+    color: var(--color-brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      border-color: var(--color-brand-light);
+      background: #ddd6ff;
+      box-shadow: 0 0 0 3px rgba(118,98,236,0.12);
+    }
+  }
+
+  &__empty {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin: 0;
+  }
+}
+
+// ── Subsecciones de personalización ──────────────────────────────────────────
+.custom-subsection {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border-secondary);
+
+  &:first-child { margin-top: 0.25rem; border-top: none; padding-top: 0; }
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__hint {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 1rem;
+    line-height: 1.55;
+  }
+
+  &--album { padding-bottom: 0.25rem; }
+}
+
+.album-counter {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--color-brand-surface);
+  color: var(--color-brand-primary);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-family: 'Manrope', sans-serif;
+}
+
+// ── Par de picker de color con label + hex ────────────────────────────────────
+.color-pair-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.color-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.02em;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  &__hex {
+    font-size: 0.7rem;
+    font-family: monospace;
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.04em;
+  }
+}
+
+// ── Preview en vivo del panel del hero ────────────────────────────────────────
+.hero-panel-preview {
+  flex: 1;
+  min-width: 140px;
+  max-width: 220px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: background 0.2s, color 0.2s;
+
+  &__name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  &__desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+}
+
+// ── Preview tarjeta de producto ───────────────────────────────────────────────
+.catalog-card-preview {
+  flex: 1;
+  min-width: 140px;
+  max-width: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+
+  &__band {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  &__name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  &__desc {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+}
+
+// ── Álbum: grid de miniaturas ─────────────────────────────────────────────────
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+
+  &--pending { margin-top: 0.75rem; }
+}
+
+.album-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--color-border-secondary);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.7);
+    background: rgba(20,10,0,0.65);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+    transition: background 0.15s;
+
+    &:hover { background: rgba(220,30,30,0.85); }
+  }
+
+  &__badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(94,73,214,0.82);
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 3px 4px;
+    letter-spacing: 0.04em;
+  }
+
+  &--pending {
+    border-color: var(--color-brand-border);
+    border-style: dashed;
+  }
+}
+
+// ── Botón de agregar fotos ────────────────────────────────────────────────────
+.album-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 2px dashed var(--color-brand-border);
+  background: var(--color-brand-surface);
+  color: var(--color-brand-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 0.75rem;
+
+  &:hover {
+    border-color: var(--color-brand-light);
+    background: #ddd6ff;
+  }
+}
+
+.edit-section__actions--album {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
 // ── Inputs en modo bloqueado (read-only visual) ───────────────────────────────
 // Definido aquí porque solo aplica en la vista de edición
 .field-input[disabled] {

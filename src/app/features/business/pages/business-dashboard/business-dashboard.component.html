@@ -72,11 +72,9 @@
       <div class="dashboard-grid">
 
         <!-- Métricas -->
-        <div class="edit-section dashboard-metrics">
-          <div class="edit-section__header">
-            <h2 class="edit-section__title">Resumen</h2>
-          </div>
+        <div class="dashboard-metrics">
           <div class="metrics-row">
+
             <div class="metric-card metric-card--accent metric-card--row">
               <div class="metric-card__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -112,14 +110,12 @@
                 <span class="metric-card__label">Dirección y zona</span>
               </div>
             </div>
+
           </div>
         </div>
 
         <!-- Acciones rápidas -->
-        <div class="edit-section dashboard-actions-col">
-          <div class="edit-section__header">
-            <h2 class="edit-section__title">Acciones rápidas</h2>
-          </div>
+        <div class="dashboard-actions-col">
           <div class="dashboard-actions">
             <a routerLink="/business/account" class="action-card">
               <div class="action-card__icon-wrap action-card__icon-wrap--purple">
@@ -142,7 +138,20 @@
               </div>
               <div class="action-card__content">
                 <span class="action-card__label">Gestionar productos</span>
-                <span class="action-card__desc">{{ totalProducts }} productos registrados</span>
+                <span class="action-card__desc">{{ totalProducts }} producto{{ totalProducts !== 1 ? 's' : '' }} registrados</span>
+              </div>
+              <span class="action-card__arrow">→</span>
+            </a>
+
+            <a routerLink="/business/ratings" class="action-card">
+              <div class="action-card__icon-wrap action-card__icon-wrap--purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div class="action-card__content">
+                <span class="action-card__label">Valoraciones de productos</span>
+                <span class="action-card__desc">{{ ratings().length }} valoración{{ ratings().length !== 1 ? 'es' : '' }} recibidas</span>
               </div>
               <span class="action-card__arrow">→</span>
             </a>

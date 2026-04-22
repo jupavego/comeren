@@ -25,37 +25,48 @@ export class ReviewsComponent implements OnInit {
 
   accountId = input.required<string>();
 
-  reviews   = signal<Review[]>([]);
-  loading   = signal(true);
-  saving    = signal(false);
-  showForm  = signal(false);
-  errorMsg  = signal<string | null>(null);
+  reviews    = signal<Review[]>([]);
+  loading    = signal(true);
+  saving     = signal(false);
+  showForm   = signal(false);
+  errorMsg   = signal<string | null>(null);
   successMsg = signal<string | null>(null);
 
-  // Form state
+  // Form — crear nueva reseña
   authorName = signal('');
   rating     = signal(8);
   comment    = signal('');
 
-  average  = computed(() => this.reviewService.average(this.reviews()));
-  count    = computed(() => this.reviews().length);
-  stars    = computed(() => Math.round(this.average() / 2)); // /10 → /5 visual
+  // Edición inline
+  editingId      = signal<string | null>(null);
+  editRating     = signal(8);
+  editComment    = signal('');
+  editSaving     = signal(false);
+  editErrorMsg   = signal<string | null>(null);
+
+  average = computed(() => this.reviewService.average(this.reviews()));
+  count   = computed(() => this.reviews().length);
 
   async ngOnInit(): Promise<void> {
     const data = await this.reviewService.getByAccount(this.accountId());
     this.reviews.set(data);
     this.loading.set(false);
 
-    // Prellenar nombre si el usuario está autenticado
     const profile = this.session.profile();
     if (profile?.full_name) {
       this.authorName.set(profile.full_name);
     }
   }
 
-  setRating(value: number): void {
-    this.rating.set(value);
+  // ── Permisos ──────────────────────────────────────────────────────────────
+  canManage(review: Review): boolean {
+    if (this.session.isAdmin()) return true;
+    const uid = this.session.user()?.id;
+    return !!uid && uid === review.user_id;
   }
+
+  // ── Crear ─────────────────────────────────────────────────────────────────
+  setRating(value: number): void { this.rating.set(value); }
 
   toggleForm(): void {
     this.showForm.update(v => !v);
@@ -71,7 +82,6 @@ export class ReviewsComponent implements OnInit {
     this.errorMsg.set(null);
 
     const userId = this.session.user()?.id ?? null;
-
     const result = await this.reviewService.create(
       this.accountId(),
       userId,
@@ -85,16 +95,71 @@ export class ReviewsComponent implements OnInit {
       return;
     }
 
-    if (result.data) {
-      this.reviews.update(prev => [result.data!, ...prev]);
-    }
+    if (result.data) this.reviews.update(prev => [result.data!, ...prev]);
     this.comment.set('');
     this.showForm.set(false);
     this.successMsg.set('¡Gracias por tu reseña!');
     setTimeout(() => this.successMsg.set(null), 3000);
   }
 
-  /** Devuelve los valores para el selector 1–10 */
+  // ── Editar ────────────────────────────────────────────────────────────────
+  startEdit(review: Review): void {
+    this.editingId.set(review.id);
+    this.editRating.set(review.rating);
+    this.editComment.set(review.comment ?? '');
+    this.editErrorMsg.set(null);
+  }
+
+  cancelEdit(): void {
+    this.editingId.set(null);
+    this.editErrorMsg.set(null);
+  }
+
+  setEditRating(value: number): void { this.editRating.set(value); }
+
+  async saveEdit(review: Review): Promise<void> {
+    if (this.editRating() < 1 || this.editRating() > 10) return;
+
+    this.editSaving.set(true);
+    this.editErrorMsg.set(null);
+
+    const result = await this.reviewService.update(review.id, {
+      rating:  this.editRating(),
+      comment: this.editComment(),
+    });
+
+    this.editSaving.set(false);
+
+    if (!result.success) {
+      this.editErrorMsg.set(result.error ?? 'Error al guardar.');
+      return;
+    }
+
+    this.reviews.update(prev =>
+      prev.map(r => r.id === review.id ? result.data! : r)
+    );
+    this.editingId.set(null);
+    this.successMsg.set('Reseña actualizada');
+    setTimeout(() => this.successMsg.set(null), 2500);
+  }
+
+  // ── Eliminar ──────────────────────────────────────────────────────────────
+  async deleteReview(review: Review): Promise<void> {
+    if (!confirm(`¿Eliminar la reseña de "${review.author_name}"?`)) return;
+
+    const result = await this.reviewService.delete(review.id);
+
+    if (!result.success) {
+      this.successMsg.set(null);
+      return;
+    }
+
+    this.reviews.update(prev => prev.filter(r => r.id !== review.id));
+    this.successMsg.set('Reseña eliminada');
+    setTimeout(() => this.successMsg.set(null), 2500);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
   readonly ratingOptions = Array.from({ length: 10 }, (_, i) => i + 1);
 
   ratingLabel(n: number): string {

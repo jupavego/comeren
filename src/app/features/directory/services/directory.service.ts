@@ -110,13 +110,15 @@ export class DirectoryService {
           description,
           price,
           image_url,
-          active
+          active,
+          approval_status
         )
       `)
       .eq('id', id)
       .eq('active', true)
       .eq('status', 'approved')
       .eq('catalog_items.active', true)
+      .eq('catalog_items.approval_status', 'approved')
       .single();
 
     if (error) {

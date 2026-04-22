@@ -511,6 +511,110 @@
   }
 }
 
+// ── Sección interna de página ────────────────────────────────────────────────
+.admin-page__section {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-page__section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-page__section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-text-primary);
+}
+
+.admin-page__loading {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.admin-page__empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+// ── Badge de conteo ───────────────────────────────────────────────────────────
+.panel-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--color-brand-primary);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+}
+
+// ── Tabla de valoraciones (compartida: admin + business dashboard) ────────────
+.ratings-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1.5px solid #ede9f8;
+}
+
+.ratings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  thead tr { background: #f7f6fb; }
+
+  th {
+    padding: 0.65rem 1rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    border-bottom: 1.5px solid #ede9f8;
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #f0edf8;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #faf9fd; }
+}
+
+.rating-pill {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+
+  &--high { background: #16a34a; }
+  &--mid  { background: #d97706; }
+  &--low  { background: #dc2626; }
+}
+
 // Botón de exportar (exclusivo de admin)
 .btn-export {
   display: inline-flex;

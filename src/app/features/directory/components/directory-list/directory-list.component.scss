@@ -5,6 +5,19 @@
   display: block;
 }
 
+// Asegura que la imagen sea el contenedor del badge
+.business-card__image {
+  position: relative;
+}
+
+// Posición del badge — esquina superior izquierda
+.business-card__status {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+}
+
 .directory-list {
   background: transparent;
   padding: 0;

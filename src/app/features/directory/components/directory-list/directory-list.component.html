@@ -16,6 +16,9 @@
               [alt]="account.name"
               loading="lazy"
             />
+            <div class="business-card__status">
+              <app-business-status-badge [scheduleJson]="account.schedule_json" />
+            </div>
           </div>
           <div class="business-card__body">
             <span class="business-card__category">{{ account.category }}</span>

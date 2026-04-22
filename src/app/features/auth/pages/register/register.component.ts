@@ -80,6 +80,13 @@ export class RegisterComponent {
     this.success.set(true);
   }
 
+  async loginWithGoogle(): Promise<void> {
+    this.loading.set(true);
+    this.errorMessage.set(null);
+    await this.auth.loginWithGoogle();
+    // El navegador redirige a Google — no se necesita manejo posterior
+  }
+
   togglePassword(): void {
     this.showPassword.update(v => !v);
   }

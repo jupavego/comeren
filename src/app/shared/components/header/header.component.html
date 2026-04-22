@@ -1,11 +1,14 @@
 <header class="topbar" [class.topbar--hidden]="hidden()">
 
+  <!-- ── Píldora de cristal (topbar + subbarra; menú móvil fuera del clip) ── -->
+  <div class="topbar__glass">
+
   <!-- ── Franja superior ─────────────────────────────────────────────────── -->
   <div class="topbar__contenedor">
     <div class="topbar__inner">
 
       <div class="logo">
-        <a routerLink="/" (click)="cerrarMenu()">Come en Girardota</a>
+        <a routerLink="/" (click)="irInicio()">Come en Girardota</a>
       </div>
 
       <div class="busqueda-header">
@@ -64,6 +67,7 @@
 
   <!-- ── Subbarra (desktop) ──────────────────────────────────────────────── -->
   <div class="subbarra">
+
     <div class="subbarra__inner">
       <nav class="menu-categorias">
         @for (cat of state.categories; track cat) {
@@ -77,6 +81,8 @@
       <div class="ubicacion-subbarra">Girardota, Antioquia</div>
     </div>
   </div>
+
+  </div><!-- /.topbar__glass -->
 
   <!-- ── Menú móvil (opacity + translateX, delay escalonado) ────────────── -->
   <div class="menu-movil" [class.menu-movil--abierto]="menuAbierto()">
@@ -128,7 +134,7 @@
         [style.transform]="menuAbierto() ? 'translateX(0)' : 'translateX(-12px)'"
         [style.transition-delay]="menuAbierto() ? '90ms' : '0ms'"
       >
-        <a routerLink="/" (click)="cerrarMenu()">Inicio</a>
+        <a routerLink="/" (click)="irInicio()">Inicio</a>
         @if (session.isLoggedIn()) {
           @if (session.isBusiness()) {
             <a routerLink="/business/dashboard" (click)="cerrarMenu()">Mi negocio</a>

@@ -259,6 +259,61 @@
     color: var(--color-text-tertiary);
   }
 
+  // ── Acciones editar / eliminar ───────────────────────────────────────────
+  &__item-actions {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &__action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    color: var(--color-text-tertiary);
+    transition: background 0.12s, color 0.12s;
+
+    &:hover { background: var(--color-background-tertiary); color: var(--color-text-primary); }
+
+    &--danger:hover { background: var(--color-background-danger); color: var(--color-text-danger); }
+  }
+
+  // ── Formulario de edición inline ─────────────────────────────────────────
+  &__edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  &__edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__form-submit--sm {
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  &__cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    padding: 0.45rem 0.5rem;
+    border-radius: 8px;
+    transition: background 0.12s;
+
+    &:hover { background: var(--color-background-tertiary); }
+  }
+
   &__item-comment {
     font-size: 0.9rem;
     color: var(--color-text-secondary);

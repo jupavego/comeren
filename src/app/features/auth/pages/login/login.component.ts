@@ -64,6 +64,12 @@ export class LoginComponent {
     this.auth.redirectByRole(this.session.role() ?? '');
   }
 
+  async loginWithGoogle(): Promise<void> {
+    this.loading.set(true);
+    this.errorMessage.set(null);
+    await this.auth.loginWithGoogle();
+  }
+
   togglePassword(): void {
     this.showPassword.update(v => !v);
   }

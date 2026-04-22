@@ -1,3 +1,10 @@
 :host {
   display: block;
+  // Header flotante: top:3px + altura píldora (~106px) + borde (2px) = ~111px
+  padding-top: 114px;
+
+  @media (max-width: 900px) {
+    // Móvil: sólo franja superior (~55px) + top:3px + borde (2px) = ~60px
+    padding-top: 64px;
+  }
 }

@@ -114,6 +114,12 @@ export const routes: Routes = [
           import('./features/business/pages/catalog/catalog.component')
             .then(m => m.CatalogComponent),
       },
+      {
+        path: 'ratings',
+        loadComponent: () =>
+          import('./features/business/pages/business-ratings/business-ratings.component')
+            .then(m => m.BusinessRatingsComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
@@ -153,6 +159,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/reports/reports.component')
             .then(m => m.ReportsComponent),
+      },
+      {
+        path: 'ratings',
+        loadComponent: () =>
+          import('./features/admin/pages/ratings-list/ratings-list.component')
+            .then(m => m.RatingsListComponent),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

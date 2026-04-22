@@ -36,15 +36,34 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
 
   carouselSlides = signal<CarouselSlide[]>([]);
 
+  // Flag que indica que llegó un cambio de estado mientras había una carga
+  // en progreso. El loop interno de la carga lo detecta y relanza loadPage
+  // con los valores más recientes (loadPage lee el estado directamente).
+  private pendingLoad = false;
+
   constructor() {
     effect(async () => {
-      const _search   = this.state.search();
-      const _category = this.state.category();
-      if (!untracked(() => this.loading())) {
-        this.loading.set(true);
-        await this.loadPage(true);
-        this.loading.set(false);
+      // Suscribirse a cambios (reactivo)
+      this.state.search();
+      this.state.category();
+
+      if (untracked(() => this.loading())) {
+        // Hay una carga en curso → marcar como pendiente y salir.
+        // El loop de la carga activa lo recogerá al terminar.
+        this.pendingLoad = true;
+        return;
       }
+
+      // Iniciar carga y repetir mientras lleguen cambios durante la espera
+      this.pendingLoad = false;
+      this.loading.set(true);
+
+      do {
+        this.pendingLoad = false;
+        await this.loadPage(true); // loadPage lee state.search/category en tiempo real
+      } while (this.pendingLoad);
+
+      this.loading.set(false);
     });
   }
 

@@ -15,51 +15,14 @@
 // ============================================================
 
 
-// ── 2. Design tokens ──────────────────────────────────────────────────────────
+// ── 1. Design tokens ──────────────────────────────────────────────────────────
 
-// Breakpoints — definidos en el partial, disponibles globalmente
+// Tokens globales (colores, tipografía, espaciado, sombras, movimiento)
+@use 'styles/tokens';
+
+// Breakpoints — mixin respond-to disponible globalmente
 @use 'styles/breakpoints' as *;
 @forward 'styles/breakpoints';
-
-:root {
-  // Paleta de marca
-  --color-brand-primary:  #5e49d6;
-  --color-brand-light:    #7662ec;
-  --color-brand-dark:     #3d2bbf;
-  --color-brand-border:   #c4b8f5;
-  --color-brand-surface:  #ede9ff;
-  --color-brand-accent:   #e25232;
-  --color-page-bg:        #f7f4ef;
-  --color-text-dark:      #2c241d;
-
-  // Fondos semánticos
-  --color-background-primary:   #ffffff;
-  --color-background-secondary: #f7f4ef;
-  --color-background-tertiary:  #f0eee9;
-  --color-background-warning:   #fef9c3;
-
-  // Textos semánticos
-  --color-text-primary:   #2c241d;
-  --color-text-secondary: #6b5e54;
-  --color-text-tertiary:  #9e9089;
-  --color-text-info:      #2563eb;
-  --color-text-warning:   #92400e;
-
-  // Semánticos — éxito
-  --color-background-success: #dcfce7;
-  --color-text-success:       #166534;
-
-  // Semánticos — peligro / error
-  --color-background-danger:  #fee2e2;
-  --color-text-danger:        #991b1b;
-
-  // Semánticos — info
-  --color-background-info:    #dbeafe;
-
-  // Bordes semánticos
-  --color-border-tertiary: #e4ddd8;
-  --color-border-warning:  #fde68a;
-}
 
 
 // ── 3. Reset base ─────────────────────────────────────────────────────────────

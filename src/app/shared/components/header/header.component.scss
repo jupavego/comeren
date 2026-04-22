@@ -1,47 +1,55 @@
+// ── Contenedor raíz (posicionamiento flotante) ────────────────────────────────
+// Sin filter aquí: un filter en el padre bloquea backdrop-filter en los hijos.
 .topbar {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 3px;
+  left: 3px;
+  right: 3px;
   z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-  width: 100%;
-  max-width: 100%;
-  transform: translateY(0);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &--hidden {
-    transform: translateY(-100%);
+    transform: translateY(-110%);
   }
 }
 
-// Contiene el desborde horizontal sin bloquear el menú móvil (position:absolute)
-.topbar__contenedor,
-.topbar__nav {
-  overflow-x: clip;
+// ── Píldora de cristal ────────────────────────────────────────────────────────
+// Agrupa franja superior + subbarra. El menú móvil queda FUERA para no ser
+// recortado por overflow:hidden.
+// La sombra va aquí (box-shadow) para no interferir con backdrop-filter.
+.topbar__glass {
+  border-radius: 20px;
+  background: linear-gradient(90deg,
+    #5c42df                0%,
+    rgba(92, 66, 223, .80) 25%,
+    rgba(92, 66, 223, .45) 62%,
+    rgba(249, 115, 22, .53) 100%
+  );
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, .20);
+  box-shadow:
+    0 10px 30px rgba(0,   0,   0,   .40),
+    0  2px  8px rgba(30, 10, 100,   .22);
 }
 
 // ── Franja superior ───────────────────────────────────────────────────────────
 .topbar__contenedor {
-  background: linear-gradient(135deg, #5e49d6 0%, #674fe6 45%, #7662ec 100%);
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, .15);
 }
 
 .topbar__inner {
   width: 100%;
-  padding: 0.45rem clamp(1rem, 2vw, 2rem);
+  padding: 0.5rem clamp(1rem, 2vw, 1.5rem);
   display: grid;
-  grid-template-columns:
-    minmax(2rem, 1fr)
-    max-content
-    minmax(0, 650px)
-    minmax(1rem, 1fr)
-    max-content;
+  grid-template-columns: max-content 1fr max-content;
   align-items: center;
   column-gap: clamp(0.75rem, 1.4vw, 1.25rem);
 }
 
 // ── Logo ──────────────────────────────────────────────────────────────────────
 .logo {
-  grid-column: 2;
+  grid-column: 1;
   display: flex;
   align-items: center;
 
@@ -57,74 +65,109 @@
 }
 
 // ── Buscador ──────────────────────────────────────────────────────────────────
-.busqueda-header { grid-column: 3; width: 100%; min-width: 0; }
+.busqueda-header {
+  grid-column: 2;
+  justify-self: center;
+  width: 75%;
+  max-width: 490px;
+  min-width: 0;
+}
 
 .busqueda-box {
   display: flex;
   align-items: center;
   width: 100%;
-  background: #f4f6f5;
-  border: 1px solid rgba(16,34,47,0.08);
-  border-radius: 10px;
-  overflow: hidden;
+  background: rgba(255, 255, 255, .98);
+  border: 1px solid rgba(0, 0, 0, .05);
+  border-radius: 14px;
+  padding: 2px 2px 2px 0;
+  box-shadow:
+    inset 0 4px 8px  rgba(0, 0, 0, .12),
+    inset 0 -2px 4px rgba(255, 255, 255, 1);
+  transition: box-shadow 0.2s;
+
+  &:focus-within {
+    box-shadow:
+      inset 0 6px 12px rgba(0, 0, 0, .15),
+      inset 0 -3px 6px rgba(255, 255, 255, 1);
+  }
 
   input {
     flex: 1;
     min-width: 0;
-    padding: 0.5rem 1rem;
+    padding: 0.55rem 1rem;
     border: none;
     outline: none;
     background: transparent;
-    font-size: clamp(0.75rem, 1.1vw, 1rem);
-    color: #34495a;
+    font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+    color: #333;
+    font-weight: 600;
     font-family: 'Manrope', sans-serif;
-    &::placeholder { color: #66757f; }
+    &::placeholder { color: #888; font-weight: 400; }
   }
 }
 
 .btn-buscar {
   width: 44px;
   min-width: 44px;
-  height: 34px;
+  height: 38px;
   border: none;
-  border-left: 1px solid rgba(16,34,47,0.08);
+  border-left: 1px solid rgba(0, 0, 0, .05);
   background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: background 0.2s;
-  &:hover { background: rgba(255,255,255,0.28); }
+  border-radius: 0 12px 12px 0;
+  margin-right: 2px;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s;
+
+  &:hover  { background: rgba(92, 66, 223, .06); }
+  &:active { transform: scale(0.92); background: rgba(0, 0, 0, .05); }
 }
 
 .icono-buscar {
   width: 19px;
   height: 19px;
-  stroke: #5c6872;
-  stroke-width: 2;
+  stroke: #5c42df;
+  stroke-width: 2.5;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: 0.8;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, .8));
 }
 
 // ── Acciones desktop ──────────────────────────────────────────────────────────
 .acciones-header {
-  grid-column: 5;
+  grid-column: 3;
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.75rem;
   white-space: nowrap;
   font-family: 'Manrope', sans-serif;
 
   a {
     text-decoration: none;
-    color: #ffffff;
-    font-weight: 500;
-    font-size: 0.98rem;
+    color: rgba(255, 255, 255, .9);
+    font-weight: 700;
+    font-size: 0.82rem;
+    transition: color 0.2s;
+    &:hover { color: #fff; }
   }
-  .separador { color: rgba(255,255,255,0.5); }
+
+  // Separador vertical (reemplaza el "|" visualmente)
+  .separador {
+    display: inline-block;
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, .30);
+    color: transparent;
+    font-size: 0;
+    flex-shrink: 0;
+  }
 }
 
 // ── Botón hamburguesa ─────────────────────────────────────────────────────────
@@ -134,17 +177,16 @@
   justify-content: center;
   width: 42px;
   height: 38px;
-  border: 1.5px solid rgba(255,255,255,0.35);
+  border: 1.5px solid rgba(255, 255, 255, .35);
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
-  grid-column: 3;  // en móvil la grid cambia
+  grid-column: 3;
   justify-self: end;
   transition: border-color 0.2s;
 
-  &:hover { border-color: rgba(255,255,255,0.7); }
+  &:hover { border-color: rgba(255, 255, 255, .70); }
 
-  // Contenedor de las 3 líneas
   .hamburguesa-icon {
     position: relative;
     width: 18px;
@@ -166,7 +208,6 @@
     }
   }
 
-  // X cuando abierto
   &--abierto .hamburguesa-icon {
     span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
     span:nth-child(2) { opacity: 0; transform: scaleX(0); }
@@ -174,14 +215,11 @@
   }
 }
 
-// ── Subbarra (desktop) ────────────────────────────────────────────────────────
-.subbarra {
-  background: linear-gradient(135deg, #cfc3f3 0%, #d9ccf8 45%, #e3dafb 100%);
-}
-
+// ── Subbarra de categorías ────────────────────────────────────────────────────
+// Fondo y radio los gestiona .topbar__glass; aquí sólo espaciado y layout.
 .subbarra__inner {
   width: 100%;
-  padding: 0.54rem clamp(0.75rem, 2vw, 2rem);
+  padding: 0.42rem clamp(0.75rem, 2vw, 1.5rem) 0.5rem;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -193,39 +231,64 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0rem, 0.4vw, 0.2rem);
-  flex-wrap: nowrap;           // nunca hace wrap — el font-size se encoge antes
+  gap: 0;
+  flex-wrap: nowrap;
   overflow: hidden;
   font-family: 'Manrope', sans-serif;
 
-  button {
+  // Botones de categoría y enlace de contacto comparten estilo
+  button,
+  .link-subbarra {
     border: none;
     background: transparent;
-    // font-size fluido: 0.72rem en pantallas angostas → 0.95rem en anchas
-    font-size: clamp(0.72rem, 1.1vw, 0.95rem);
-    padding: clamp(0.35rem, 0.6vw, 0.55rem) clamp(0.4rem, 0.7vw, 0.8rem);
-    border-radius: 999px;
+    font-size: clamp(0.64rem, 0.88vw, 0.73rem);
+    padding: 7px clamp(0.45rem, 0.83vw, 0.91rem);
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 500;
-    color: #10222f;
+    font-weight: 700;
+    color: rgba(255, 255, 255, .88);
     white-space: nowrap;
     font-family: inherit;
-    transition: background 0.2s;
-    &:hover  { background: rgba(160,137,243,0.5); }
-    &.activa { background: #ffffff; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  }
-
-  .link-subbarra {
-    display: inline-block;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
     text-decoration: none;
-    color: #10222f;
-    font-weight: 500;
-    white-space: nowrap;
-    font-size: clamp(0.72rem, 1.1vw, 0.95rem);
-    padding: clamp(0.35rem, 0.6vw, 0.55rem) clamp(0.4rem, 0.7vw, 0.8rem);
-    border-radius: 999px;
-    transition: background 0.2s;
-    &:hover { background: rgba(160,137,243,0.5); }
+    display: inline-block;
+    position: relative;
+    transition: color 0.2s, background 0.2s;
+
+    // Separador sutil entre categorías
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 22%;
+      height: 56%;
+      width: 1px;
+      background: rgba(255, 255, 255, .20);
+    }
+
+    &:first-child::before { display: none; }
+
+    // Subrayado naranja animado
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      width: 0;
+      height: 2.5px;
+      background: #f97316;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    &:hover,
+    &.activa {
+      color: #fff;
+      background: rgba(255, 255, 255, .10);
+      &::after { width: 76%; }
+    }
   }
 }
 
@@ -234,21 +297,39 @@
   justify-self: end;
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
-  color: #e25232;
+  color: #ffffff;
   white-space: nowrap;
-  font-size: clamp(0.75rem, 1.1vw, 1rem);
+  font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+}
+
+// Cuando el menú está abierto: píldora sin esquinas ni borde inferior
+.topbar:has(.menu-movil--abierto) .topbar__glass {
+  border-radius: 20px 20px 0 0;
+  border-bottom-color: transparent;
+  box-shadow:
+    0 0px 0px rgba(0,0,0,0),   // elimina sombra inferior que crea gap visual
+    0 2px 8px rgba(30, 10, 100, .22);
 }
 
 // ── Menú móvil ────────────────────────────────────────────────────────────────
-// Usa opacity + translateX igual que la óptica — animación más suave que max-height
 .menu-movil {
   position: absolute;
   left: 0;
-  top: 100%;
+  top: calc(100% - 3px);
   width: 100%;
-  background: #3d2bbf;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.2);
+  // Mismo patrón que topbar__glass — continuación visual de la píldora
+  background: linear-gradient(90deg,
+    #5c42df                0%,
+    rgba(92, 66, 223, .80) 25%,
+    rgba(92, 66, 223, .45) 62%,
+    rgba(249, 115, 22, .53) 100%
+  );
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, .20);
+  border-top: none;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .30);
+  border-radius: 0 0 20px 20px;
   z-index: 99;
 
   // Estado cerrado
@@ -256,7 +337,7 @@
   pointer-events: none;
   transform: translateX(-8px);
   transition:
-    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.3s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 
   // Estado abierto
@@ -266,7 +347,6 @@
     transform: translateX(0);
   }
 
-  // Scroll interno si el contenido es largo
   &__scroll {
     max-height: 70vh;
     overflow-y: auto;
@@ -280,7 +360,7 @@
   // Cada ítem entra con delay escalonado (controlado desde el TS via style)
   &__item {
     transition:
-      opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity   0.4s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
     .menu-movil--abierto & {
@@ -294,11 +374,11 @@
     flex-wrap: wrap;
     gap: 0.4rem;
     padding: 0.75rem 1.25rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, .10);
 
     button {
       border: none;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, .10);
       color: #ffffff;
       padding: 0.45rem 0.9rem;
       border-radius: 999px;
@@ -306,8 +386,12 @@
       font-size: 0.875rem;
       font-weight: 500;
       font-family: 'Manrope', sans-serif;
+      text-transform: none;
       transition: background 0.2s;
-      &:hover { background: rgba(255,255,255,0.2); }
+
+      // Anula el ::after del desktop
+      &::after { display: none; }
+      &:hover  { background: rgba(255, 255, 255, .20); }
       &.activa { background: #ffffff; color: #3d2bbf; font-weight: 700; }
     }
   }
@@ -318,14 +402,15 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1.25rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, .10);
     font-family: 'Manrope', sans-serif;
 
     a {
       text-decoration: none;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255, 255, 255, .85);
       font-weight: 500;
       font-size: 0.9rem;
+      text-transform: none;
       transition: color 0.2s;
       &:hover { color: #ffffff; }
     }
@@ -344,11 +429,11 @@
 
   &__ubicacion {
     padding: 0.65rem 1.25rem 0.5rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, .10);
     font-family: 'Poppins', sans-serif;
     font-weight: 800;
     font-size: 0.875rem;
-    color: #e25232;
+    color: #ffffff;
   }
 }
 
@@ -369,5 +454,6 @@
     grid-column: 3;
   }
 
+  // Subbarra oculta en móvil → píldora cierra en la franja superior
   .subbarra { display: none; }
 }

@@ -44,7 +44,7 @@
     }
   </div>
 
-  <!-- Resumen + enviar -->
+  <!-- Resumen + datos + enviar -->
   <div class="wa-order__footer">
     @if (hasItems()) {
       <div class="wa-order__summary">
@@ -60,6 +60,58 @@
         </div>
       </div>
     }
+
+    <!-- Datos del cliente -->
+    <div class="wa-order__fields">
+      <div class="wa-order__field">
+        <label class="wa-order__label">Tu nombre</label>
+        <input
+          type="text"
+          class="wa-order__input"
+          placeholder="Nombre y apellidos"
+          [value]="buyerName()"
+          (input)="buyerName.set($any($event.target).value)"
+          maxlength="80"
+        />
+      </div>
+      <div class="wa-order__field">
+        <label class="wa-order__label">Dirección de entrega</label>
+        <input
+          type="text"
+          class="wa-order__input"
+          placeholder="Calle, barrio, referencia..."
+          [value]="address()"
+          (input)="address.set($any($event.target).value)"
+          maxlength="120"
+        />
+      </div>
+      <div class="wa-order__field">
+        <label class="wa-order__label">Forma de pago</label>
+        <div class="wa-order__payment-options">
+          <button
+            type="button"
+            class="wa-order__payment-btn"
+            [class.wa-order__payment-btn--active]="payment() === 'efectivo'"
+            (click)="payment.set('efectivo')"
+          >
+            💵 Efectivo
+          </button>
+          <button
+            type="button"
+            class="wa-order__payment-btn"
+            [class.wa-order__payment-btn--active]="payment() === 'transferencia'"
+            (click)="payment.set('transferencia')"
+          >
+            📲 Transferencia
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMsg()) {
+      <p class="wa-order__error">{{ errorMsg() }}</p>
+    }
+
     <button
       class="wa-order__send-btn"
       [disabled]="!hasItems()"

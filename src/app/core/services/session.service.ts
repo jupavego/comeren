@@ -90,8 +90,35 @@ export class SessionService implements OnDestroy {
       .eq('id', userId)
       .single();
 
+    if (!error) return data as Profile;
+
+    // PGRST116 = no rows — usuario OAuth nuevo sin perfil aún
+    if (error.code === 'PGRST116') {
+      return this.createOAuthProfile(userId);
+    }
+
+    console.error('Error al cargar perfil:', error.message);
+    return null;
+  }
+
+  private async createOAuthProfile(userId: string): Promise<Profile | null> {
+    const { data: userData } = await this.supabase.auth.getUser();
+    const meta = userData.user?.user_metadata ?? {};
+
+    const newProfile = {
+      id:        userId,
+      full_name: (meta['full_name'] ?? meta['name'] ?? userData.user?.email?.split('@')[0] ?? '') as string,
+      role:      'client' as UserRole,
+    };
+
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .insert(newProfile)
+      .select()
+      .single();
+
     if (error) {
-      console.error('Error al cargar perfil:', error.message);
+      console.error('Error al crear perfil OAuth:', error.message);
       return null;
     }
 

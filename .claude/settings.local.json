@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mcp-registry__search_mcp_registry",
+      "Bash(gh api *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm install *)",
+      "Bash(uipro init *)",
+      "Read(//tmp/designer-skills/**)",
+      "Read(//tmp/designer-skills/ui-design/**)",
+      "Bash(mkdir -p \"D:/JP/WEB SERVICES/directorio-girardota v2/.claude/plugins\")",
+      "Bash(cp -r /tmp/designer-skills/ui-design \"D:/JP/WEB SERVICES/directorio-girardota v2/.claude/plugins/\")",
+      "Bash(cp -r /tmp/designer-skills/design-systems \"D:/JP/WEB SERVICES/directorio-girardota v2/.claude/plugins/\")",
+      "Bash(cp -r /tmp/designer-skills/ux-strategy \"D:/JP/WEB SERVICES/directorio-girardota v2/.claude/plugins/\")",
+      "Bash(cp -r /tmp/designer-skills/interaction-design \"D:/JP/WEB SERVICES/directorio-girardota v2/.claude/plugins/\")",
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"local business directory microsite warm modern Colombia\" --design-system -p \"Directorio Girardota\" -f markdown)",
+      "Bash(py --version)",
+      "Bash(py skills/ui-ux-pro-max/scripts/search.py \"local business directory microsite warm modern Colombia\" --design-system -p \"Directorio Girardota\" -f markdown)",
+      "Bash(py \".claude/skills/ui-ux-pro-max/scripts/search.py\" \"local business directory microsite warm modern Colombia\" --design-system -p \"Directorio Girardota\" -f markdown)",
+      "Bash(npx ng *)",
+      "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\" /b)",
+      "Bash(xargs grep *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
+    ]
+  }
+}

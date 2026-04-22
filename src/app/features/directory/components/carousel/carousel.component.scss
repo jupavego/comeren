@@ -7,14 +7,14 @@
 .carousel {
   width: 100%;
   overflow: hidden;
-  min-height: 440px;
+  min-height: 554px;   // 440px visible + 114px detrás del nav flotante
+  margin-top: -114px;  // trepa detrás del navbar
   position: relative;
   display: flex;
   align-items: stretch;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-top: 4px solid var(--color-brand-accent);
 }
 
 .carousel__overlay {
@@ -37,8 +37,9 @@
   width: 100%;
   margin: 0 auto;
   padding: 2.5rem 2rem 4rem;
+  padding-top: calc(114px + 2.5rem);  // empuja el texto debajo del nav
   color: white;
-  min-height: 440px;
+  min-height: 554px;
   display: flex;
   align-items: center;
   opacity: 1;
@@ -219,12 +220,14 @@
 // ── Responsive ────────────────────────────────────────────────────────────────
 @include respond-to($bp-sm) {
   .carousel {
-    min-height: 340px;
+    min-height: 404px;   // 340px visible + 64px detrás del nav móvil
+    margin-top: -64px;
   }
 
   .carousel__content {
-    min-height: 340px;
+    min-height: 404px;
     padding: 2rem 1.25rem 3.5rem;
+    padding-top: calc(64px + 2rem);
   }
 
   .carousel__intro h1 {

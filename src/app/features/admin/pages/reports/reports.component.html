@@ -59,4 +59,53 @@
     </div>
 
   </div>
+
+  <!-- Tabla de valoraciones de productos -->
+  <div class="admin-page__section">
+    <div class="admin-page__section-header">
+      <h2 class="admin-page__section-title">Valoraciones de productos</h2>
+      <span class="admin-page__badge">{{ ratings().length }}</span>
+    </div>
+
+    @if (loadingRatings()) {
+      <div class="admin-page__loading"><span class="spinner spinner--sm"></span></div>
+
+    } @else if (ratings().length === 0) {
+      <p class="admin-page__empty">No hay valoraciones registradas aún.</p>
+
+    } @else {
+      <div class="ratings-table-wrap">
+        <table class="ratings-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Producto</th>
+              <th>Negocio</th>
+              <th>Calificación</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of ratings(); track r.id) {
+              <tr>
+                <td>{{ r.author_name }}</td>
+                <td>{{ r.product_name }}</td>
+                <td>{{ r.business_name }}</td>
+                <td>
+                  <span class="rating-pill"
+                    [class.rating-pill--high]="r.rating >= 8"
+                    [class.rating-pill--mid]="r.rating >= 5 && r.rating < 8"
+                    [class.rating-pill--low]="r.rating < 5">
+                    {{ r.rating }}/10
+                  </span>
+                </td>
+                <td>{{ r.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
 </div>

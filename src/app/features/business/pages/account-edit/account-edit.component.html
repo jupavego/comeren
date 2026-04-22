@@ -147,6 +147,52 @@
             <textarea formControlName="history" class="field-input field-input--textarea" rows="4"
               placeholder="Cuéntanos la historia de tu negocio..."></textarea>
           </div>
+
+          <!-- Horarios de atención -->
+          <div class="field-group">
+            <label class="field-label">Horarios de atención</label>
+            <div class="schedule-week">
+              @for (key of dayKeys; track key) {
+                <div class="schedule-col">
+
+                  <!-- Círculo del día -->
+                  <button
+                    type="button"
+                    class="schedule-day-btn"
+                    [class.schedule-day-btn--active]="businessHours()[key].enabled"
+                    [disabled]="!isEditing('general')"
+                    (click)="toggleDay(key, !businessHours()[key].enabled)"
+                    [title]="dayLabels[key]"
+                  >
+                    {{ dayShortLabels[key] }}
+                  </button>
+
+                  <!-- Inputs de hora (solo si abierto) -->
+                  @if (businessHours()[key].enabled) {
+                    <div class="schedule-times-col">
+                      <input
+                        type="time"
+                        class="schedule-time-input"
+                        [value]="businessHours()[key].open"
+                        [disabled]="!isEditing('general')"
+                        (change)="setTime(key, 'open', $any($event.target).value)"
+                      />
+                      <input
+                        type="time"
+                        class="schedule-time-input"
+                        [value]="businessHours()[key].close"
+                        [disabled]="!isEditing('general')"
+                        (change)="setTime(key, 'close', $any($event.target).value)"
+                      />
+                    </div>
+                  } @else {
+                    <span class="schedule-closed-lbl">Cerrado</span>
+                  }
+
+                </div>
+              }
+            </div>
+          </div>
         </div>
 
         @if (isEditing('general')) {
@@ -210,6 +256,33 @@
               <input formControlName="schedule" type="text" class="field-input"
                 placeholder="8:00 AM - 8:00 PM" />
             </div>
+          </div>
+
+          <!-- Mapa — interactivo al editar, placeholder cuando está bloqueado -->
+          <div class="field-group">
+            <label class="field-label">Ubicación en el mapa</label>
+            @if (isEditing('location')) {
+              <app-map-picker
+                [initialLat]="pendingLat()"
+                [initialLng]="pendingLng()"
+                (locationChange)="onLocationChange($event)"
+              />
+            } @else {
+              <div class="map-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                     stroke-linecap="round" stroke-linejoin="round" class="map-placeholder__icon">
+                  <path d="M12 21s-6-5.2-6-10a6 6 0 0112 0c0 4.8-6 10-6 10z"/>
+                  <circle cx="12" cy="11" r="2.5"/>
+                </svg>
+                @if (pendingLat() && pendingLng()) {
+                  <p class="map-placeholder__text">Ubicación configurada</p>
+                  <p class="map-placeholder__hint">Presiona <strong>Editar</strong> para ajustar el pin en el mapa</p>
+                } @else {
+                  <p class="map-placeholder__text">Sin ubicación configurada</p>
+                  <p class="map-placeholder__hint">Presiona <strong>Editar</strong> para colocar tu negocio en el mapa</p>
+                }
+              </div>
+            }
           </div>
         </div>
 
@@ -280,6 +353,294 @@
             <button type="submit" class="btn-primary" [disabled]="saving()">
               @if (saving()) { <span class="btn-spinner"></span> Guardando... }
               @else { Guardar cambios }
+            </button>
+          </div>
+        }
+      </section>
+
+      <!-- ── Personalización: Hero ──────────────────────────────────────────── -->
+      <section class="edit-section" [class.edit-section--active]="isEditing('hero')">
+        <div class="edit-section__header">
+          <h2 class="edit-section__title">Personalización del hero</h2>
+          <button type="button"
+            class="edit-section__toggle"
+            [class.edit-section__toggle--active]="isEditing('hero')"
+            (click)="toggleSection('hero')"
+            [attr.aria-label]="isEditing('hero') ? 'Cerrar edición' : 'Editar hero'">
+            @if (isEditing('hero')) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.55 0 1-.45 1-1 0-.27-.1-.51-.26-.69-.25-.29-.37-.58-.37-.89 0-.55.45-1 1-1h1.18c1.85 0 3.45-1.3 3.45-3.5C18 8.96 15.52 6 12 6c-1.93 0-3.55.83-4.67 2.2"/>
+                <circle cx="6.5"  cy="11.5" r="1.25"/>
+                <circle cx="9.5"  cy="7.5"  r="1.25"/>
+                <circle cx="14.5" cy="7.5"  r="1.25"/>
+                <circle cx="17.5" cy="11.5" r="1.25"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <!-- Sub-sección: colores del panel info -->
+        <div class="custom-subsection">
+          <h3 class="custom-subsection__title">Panel de información</h3>
+          <p class="custom-subsection__hint">
+            Elige el color de fondo y el color de texto del panel que aparece junto a la foto de portada.
+          </p>
+
+          <div class="color-pair-row">
+            <!-- Fondo del panel -->
+            <div class="color-pair">
+              <span class="color-pair__label">Fondo del panel</span>
+              <label class="brand-colors__picker-wrap">
+                <input
+                  type="color"
+                  class="brand-colors__input"
+                  [value]="heroPanelBg()"
+                  [disabled]="!isEditing('hero')"
+                  (input)="heroPanelBg.set($any($event.target).value)"
+                />
+                <span class="brand-colors__preview" [style.background]="heroPanelBg()"></span>
+              </label>
+              <span class="color-pair__hex">{{ heroPanelBg() }}</span>
+            </div>
+
+            <!-- Color de texto -->
+            <div class="color-pair">
+              <span class="color-pair__label">Color de letra</span>
+              <label class="brand-colors__picker-wrap">
+                <input
+                  type="color"
+                  class="brand-colors__input"
+                  [value]="heroPanelText()"
+                  [disabled]="!isEditing('hero')"
+                  (input)="heroPanelText.set($any($event.target).value)"
+                />
+                <span class="brand-colors__preview" [style.background]="heroPanelText()"></span>
+              </label>
+              <span class="color-pair__hex">{{ heroPanelText() }}</span>
+            </div>
+
+            <!-- Preview en vivo -->
+            <div class="hero-panel-preview"
+                 [style.background]="heroPanelBg()"
+                 [style.color]="heroPanelText()">
+              <span class="hero-panel-preview__name">Nombre del negocio</span>
+              <span class="hero-panel-preview__desc">Descripción breve del negocio aquí</span>
+            </div>
+          </div>
+        </div>
+
+        @if (isEditing('hero')) {
+          <div class="edit-section__actions">
+            @if (heroSuccessMsg()) {
+              <div class="field-alert field-alert--success">{{ heroSuccessMsg() }}</div>
+            }
+            @if (heroErrorMsg()) {
+              <div class="field-alert field-alert--error">{{ heroErrorMsg() }}</div>
+            }
+            <button type="button" class="btn-primary" (click)="saveHeroPersonalization()" [disabled]="savingHero()">
+              @if (savingHero()) { <span class="btn-spinner"></span> Guardando... }
+              @else { Guardar apariencia }
+            </button>
+          </div>
+        }
+
+        <!-- Sub-sección: Álbum de fotos -->
+        <div class="custom-subsection custom-subsection--album">
+          <h3 class="custom-subsection__title">
+            Álbum de fotos
+            <span class="album-counter">{{ albumUrls().length + pendingAlbumFiles().length }}/{{ maxAlbum }}</span>
+          </h3>
+          <p class="custom-subsection__hint">
+            Sube hasta {{ maxAlbum }} fotos del negocio. Aparecerán en la galería de tu micrositio.
+          </p>
+
+          <!-- Fotos guardadas -->
+          @if (albumUrls().length > 0) {
+            <div class="album-grid">
+              @for (url of albumUrls(); track url; let i = $index) {
+                <div class="album-thumb">
+                  <img [src]="url" alt="Foto {{ i + 1 }}" loading="lazy" />
+                  <button
+                    type="button"
+                    class="album-thumb__remove"
+                    (click)="removeAlbumUrl(i)"
+                    title="Eliminar foto"
+                    aria-label="Eliminar foto">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="12" height="12">
+                      <path d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Previews de archivos pendientes -->
+          @if (albumPreviews().length > 0) {
+            <div class="album-grid album-grid--pending">
+              @for (preview of albumPreviews(); track preview; let i = $index) {
+                <div class="album-thumb album-thumb--pending">
+                  <img [src]="preview" alt="Nueva foto" />
+                  <button
+                    type="button"
+                    class="album-thumb__remove"
+                    (click)="removePendingAlbumFile(i)"
+                    title="Quitar"
+                    aria-label="Quitar foto pendiente">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="12" height="12">
+                      <path d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                  </button>
+                  <span class="album-thumb__badge">Por guardar</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Botón de agregar -->
+          @if (totalAlbumCount() < maxAlbum) {
+            <label class="album-add-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+                <path d="M20 4l-4 4"/>
+                <path d="M18 2l-2 6"/>
+              </svg>
+              Agregar fotos
+              <input type="file" accept="image/*" multiple hidden (change)="onAlbumFilesSelected($event)" />
+            </label>
+          }
+
+          <!-- Guardar álbum -->
+          @if (pendingAlbumFiles().length > 0) {
+            <div class="edit-section__actions edit-section__actions--album">
+              @if (albumSuccessMsg()) {
+                <div class="field-alert field-alert--success">{{ albumSuccessMsg() }}</div>
+              }
+              @if (albumErrorMsg()) {
+                <div class="field-alert field-alert--error">{{ albumErrorMsg() }}</div>
+              }
+              <button type="button" class="btn-primary" (click)="saveAlbum()" [disabled]="savingAlbum()">
+                @if (savingAlbum()) { <span class="btn-spinner"></span> Subiendo fotos... }
+                @else { Guardar {{ pendingAlbumFiles().length }} foto{{ pendingAlbumFiles().length > 1 ? 's' : '' }} }
+              </button>
+            </div>
+          }
+
+          @if (albumSuccessMsg() && !pendingAlbumFiles().length) {
+            <div class="field-alert field-alert--success" style="margin-top:.75rem">{{ albumSuccessMsg() }}</div>
+          }
+        </div>
+      </section>
+
+
+      <!-- ── Personalización: Catálogo de productos ──────────────────────── -->
+      <section class="edit-section" [class.edit-section--active]="isEditing('catalog')">
+        <div class="edit-section__header">
+          <h2 class="edit-section__title">Catálogo de productos</h2>
+          <button type="button"
+            class="edit-section__toggle"
+            [class.edit-section__toggle--active]="isEditing('catalog')"
+            (click)="toggleSection('catalog')"
+            [attr.aria-label]="isEditing('catalog') ? 'Cerrar edición' : 'Editar catálogo'">
+            @if (isEditing('catalog')) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <!-- Colores de contenedores (brand_colors) -->
+        <div class="custom-subsection">
+          <h3 class="custom-subsection__title">Colores de contenedores</h3>
+          <p class="custom-subsection__hint">
+            Hasta 4 colores. Cada tarjeta de producto usará uno de forma cíclica.
+          </p>
+          <div class="brand-colors__row">
+            @for (color of brandColors(); track $index) {
+              <div class="brand-colors__swatch">
+                <label class="brand-colors__picker-wrap">
+                  <input
+                    type="color"
+                    class="brand-colors__input"
+                    [value]="color"
+                    [disabled]="!isEditing('catalog')"
+                    (input)="updateBrandColor($index, $event)"
+                  />
+                  <span class="brand-colors__preview" [style.background]="color"></span>
+                </label>
+                @if (isEditing('catalog')) {
+                  <button type="button" class="brand-colors__remove" (click)="removeBrandColor($index)" title="Quitar color">×</button>
+                }
+              </div>
+            }
+            @if (isEditing('catalog') && brandColors().length < 4) {
+              <button type="button" class="brand-colors__add" (click)="addBrandColor()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="18" height="18">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+              </button>
+            }
+            @if (brandColors().length === 0 && !isEditing('catalog')) {
+              <p class="brand-colors__empty">Sin colores configurados</p>
+            }
+          </div>
+        </div>
+
+        <!-- Color de letra -->
+        <div class="custom-subsection" style="margin-top:1.25rem">
+          <h3 class="custom-subsection__title">Color de letra</h3>
+          <p class="custom-subsection__hint">Color del texto en la banda inferior de cada tarjeta de producto.</p>
+          <div class="color-pair-row">
+            <div class="color-pair">
+              <span class="color-pair__label">Color de letra</span>
+              <label class="brand-colors__picker-wrap">
+                <input
+                  type="color"
+                  class="brand-colors__input"
+                  [value]="catalogTextColor()"
+                  [disabled]="!isEditing('catalog')"
+                  (input)="catalogTextColor.set($any($event.target).value)"
+                />
+                <span class="brand-colors__preview" [style.background]="catalogTextColor()"></span>
+              </label>
+              <span class="color-pair__hex">{{ catalogTextColor() }}</span>
+            </div>
+
+            <!-- Preview tarjeta producto -->
+            <div class="catalog-card-preview">
+              <div class="catalog-card-preview__band"
+                   [style.background]="brandColors().length ? brandColors()[0] : '#5e49d6'"
+                   [style.color]="catalogTextColor()">
+                <span class="catalog-card-preview__name">Nombre del producto</span>
+                <span class="catalog-card-preview__desc">Descripción breve aquí</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (isEditing('catalog')) {
+          <div class="edit-section__actions">
+            @if (catalogSuccessMsg()) {
+              <div class="field-alert field-alert--success">{{ catalogSuccessMsg() }}</div>
+            }
+            @if (catalogErrorMsg()) {
+              <div class="field-alert field-alert--error">{{ catalogErrorMsg() }}</div>
+            }
+            <button type="button" class="btn-primary" (click)="saveCatalogPersonalization()" [disabled]="savingCatalog()">
+              @if (savingCatalog()) { <span class="btn-spinner"></span> Guardando... }
+              @else { Guardar colores del catálogo }
             </button>
           </div>
         }

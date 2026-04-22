@@ -1,0 +1,58 @@
+<div class="admin-page">
+  <div class="admin-page__header">
+    <h1 class="admin-page__title">Valoraciones de productos</h1>
+    <a routerLink="/admin/dashboard" class="btn-back">Volver</a>
+  </div>
+
+  <!-- Filtro -->
+  <div class="admin-filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Buscar por usuario, producto o negocio..."
+      [value]="searchText()"
+      (input)="searchText.set($any($event.target).value)"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="admin-loading"><span class="spinner"></span></div>
+  } @else {
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Producto</th>
+            <th>Negocio</th>
+            <th>Calificación</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of filtered(); track r.id) {
+            <tr>
+              <td>{{ r.author_name || '—' }}</td>
+              <td>{{ r.product_name || '—' }}</td>
+              <td>{{ r.business_name || '—' }}</td>
+              <td>
+                <span class="rating-pill"
+                  [class.rating-pill--high]="r.rating >= 8"
+                  [class.rating-pill--mid]="r.rating >= 5 && r.rating < 8"
+                  [class.rating-pill--low]="r.rating < 5">
+                  {{ r.rating }}/10
+                </span>
+              </td>
+              <td>{{ r.created_at | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="admin-table__empty">No se encontraron valoraciones</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="admin-count">{{ filtered().length }} valoración{{ filtered().length !== 1 ? 'es' : '' }}</p>
+  }
+</div>

@@ -22,7 +22,8 @@ export class HeaderComponent {
   menuAbierto = signal(false);
   hidden      = signal(false);
 
-  private lastScrollY = 0;
+  private lastScrollY  = 0;
+  private scrollUpFrom = 0; // punto desde donde empezó a subir
 
   constructor() {
     // Sincroniza el input con el estado global: cuando el directorio
@@ -34,18 +35,21 @@ export class HeaderComponent {
 
   @HostListener('window:scroll')
   onScroll(): void {
-    const currentY = window.scrollY;
-    const threshold = 72; // altura aprox. de la barra superior
+    const currentY  = window.scrollY;
+    const topZone   = 72;   // siempre visible en la zona superior
+    const showDelta = 60;   // cuántos px hacia arriba antes de mostrarse
 
-    if (currentY < threshold) {
-      // Siempre visible en la zona superior de la página
+    if (currentY < topZone) {
+      // En la zona superior — siempre visible
       this.hidden.set(false);
+      this.scrollUpFrom = 0;
     } else if (currentY > this.lastScrollY) {
-      // Bajando → ocultar
+      // Bajando → ocultar y resetear el punto de referencia de subida
       this.hidden.set(true);
       this.menuAbierto.set(false);
-    } else {
-      // Subiendo → mostrar
+      this.scrollUpFrom = currentY;
+    } else if (this.scrollUpFrom - currentY >= showDelta) {
+      // Subió al menos showDelta px de forma intencional → mostrar
       this.hidden.set(false);
     }
 
@@ -68,8 +72,17 @@ export class HeaderComponent {
     }
   }
 
+  irInicio(): void {
+    this.cerrarMenu();
+    this.state.clearFilters();
+  }
+
   onSearch(): void {
-    this.state.setSearch(this.searchText);
+    if (this.searchText.trim() === '') {
+      this.state.clearFilters();
+    } else {
+      this.state.setSearch(this.searchText);
+    }
     this.cerrarMenu();
     // Si no estamos en el directorio, navegar antes de filtrar
     if (!this.isOnDirectory()) {
@@ -78,7 +91,11 @@ export class HeaderComponent {
   }
 
   onSearchInput(): void {
-    this.state.setSearch(this.searchText);
+    if (this.searchText.trim() === '') {
+      this.state.clearFilters();
+    } else {
+      this.state.setSearch(this.searchText);
+    }
   }
 
   selectCategory(category: string): void {

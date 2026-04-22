@@ -1,0 +1,91 @@
+<!-- Backdrop -->
+<div class="pr-backdrop" (click)="close()"></div>
+
+<!-- Popup card -->
+<div class="pr-popup" role="dialog" aria-modal="true">
+
+  <!-- Cerrar -->
+  <button class="pr-popup__close" type="button" (click)="close()" aria-label="Cerrar">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" width="14" height="14">
+      <path d="M2 2l12 12M14 2L2 14"/>
+    </svg>
+  </button>
+
+  @if (loading()) {
+
+    <div class="pr-popup__loading"><span class="spinner spinner--sm"></span></div>
+
+  } @else if (done()) {
+
+    <!-- Confirmación -->
+    <div class="pr-popup__done">
+      <div class="pr-popup__done-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <p class="pr-popup__done-title">¡Gracias!</p>
+      <p class="pr-popup__done-sub">
+        Tu calificación de <strong>{{ selected() }}/10</strong> fue registrada.
+      </p>
+    </div>
+
+  } @else {
+
+    <!-- Encabezado -->
+    <div class="pr-popup__header">
+      <p class="pr-popup__product">{{ itemName() }}</p>
+      @if (avgRating() > 0) {
+        <span class="pr-popup__avg">Promedio actual: <strong>{{ avgRating() }}/10</strong>
+          ({{ reviews().length }} voto{{ reviews().length !== 1 ? 's' : '' }})</span>
+      } @else {
+        <span class="pr-popup__avg">Sin valoraciones aún · sé el primero</span>
+      }
+    </div>
+
+    <!-- Instrucción -->
+    <p class="pr-popup__instruction">Selecciona tu calificación</p>
+
+    <!-- Picker 1–10 -->
+    <div class="pr-popup__picker">
+      @for (n of ratingOptions; track n) {
+        <button
+          type="button"
+          class="pr-popup__num"
+          [class.pr-popup__num--selected]="selected() === n"
+          [class.pr-popup__num--low]="n <= 4"
+          [class.pr-popup__num--mid]="n >= 5 && n <= 7"
+          [class.pr-popup__num--high]="n >= 8"
+          [disabled]="submitting()"
+          (click)="select(n)"
+        >{{ n }}</button>
+      }
+    </div>
+
+    <p class="pr-popup__scale-hint">
+      <span>1 = Malo</span>
+      <span>10 = Excelente</span>
+    </p>
+
+    <!-- Botón guardar -->
+    <button
+      type="button"
+      class="pr-popup__submit"
+      [disabled]="selected() === 0 || submitting()"
+      (click)="submitRating()"
+    >
+      @if (submitting()) {
+        <span class="spinner spinner--sm"></span>
+        Guardando…
+      } @else if (selected() === 0) {
+        Selecciona una calificación
+      } @else {
+        Guardar calificación · {{ selected() }}/10
+      }
+    </button>
+
+  }
+
+</div>
