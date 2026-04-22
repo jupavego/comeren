@@ -102,10 +102,27 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Determina si el texto sobre ese color debe ser blanco o negro.
-   * Usa la fórmula NTSC de luminancia relativa (0.299R + 0.587G + 0.114B).
+   * Devuelve el color de letra para el producto en posición `index`.
+   * Usa el color configurado por el negocio (guardado como JSON en catalog_text_color,
+   * paralelo a brand_colors). Si no hay configuración, calcula blanco/negro por luminancia.
    */
   getTextColor(index: number): string {
+    const account = this.account();
+    const stored  = account?.catalog_text_color;
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed[index % parsed.length];
+        }
+      } catch {
+        // Valor antiguo: hex directo — aplica a todas las tarjetas
+        return stored;
+      }
+    }
+
+    // Fallback automático por luminancia
     const hex = this.getProductColor(index);
     if (!hex) return '#ffffff';
     const rgb = this.hexToRgb(hex);

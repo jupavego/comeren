@@ -112,7 +112,7 @@ export interface Account {
   brand_colors?: string[] | null;
   hero_panel_bg?: string | null;      // Fondo sólido del panel de info del hero
   hero_panel_text?: string | null;    // Color de texto del panel de info del hero
-  catalog_text_color?: string | null; // Color de letra en tarjetas de producto
+  catalog_text_color?: string | null; // JSON array de colores de letra por tarjeta (paralelo a brand_colors)
   album_urls?: string[] | null;       // Álbum del negocio — máx 10 fotos
 
   // Relación opcional — se carga con join cuando se necesita

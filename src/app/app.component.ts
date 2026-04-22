@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, HostBinding, computed, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
@@ -28,4 +28,8 @@ export class AppComponent {
   readonly showChrome = computed(() =>
     !this.currentUrl().startsWith('/auth')
   );
+
+  // Quita el padding-top del host cuando no hay chrome (páginas auth)
+  @HostBinding('class.no-chrome')
+  get isNoChrome(): boolean { return !this.showChrome(); }
 }

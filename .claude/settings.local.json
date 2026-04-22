@@ -20,7 +20,8 @@
       "Bash(npx ng *)",
       "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\" /b)",
       "Bash(xargs grep *)",
-      "mcp__Claude_in_Chrome__tabs_context_mcp"
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "PowerShell(Get-ChildItem \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\" -Name | Where-Object { $_ -match \"app\\\\.\" })"
     ]
   }
 }

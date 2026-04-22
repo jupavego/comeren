@@ -203,24 +203,49 @@ export class AccountEditComponent implements OnInit {
 
   // ── Personalización del CATÁLOGO ──────────────────────────────────────────────
   brandColors       = signal<string[]>([]);
-  catalogTextColor  = signal('#ffffff');
+  brandTextColors   = signal<string[]>([]); // Paralelo a brandColors: color de letra por tarjeta
   savingCatalog     = signal(false);
   catalogSuccessMsg = signal<string | null>(null);
   catalogErrorMsg   = signal<string | null>(null);
 
+  /** Parsea el JSON guardado en catalog_text_color y lo sincroniza con la cantidad de brandColors. */
+  private parseBrandTextColors(stored: string | null | undefined, count: number): string[] {
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const result = [...parsed];
+          while (result.length < count) result.push('#ffffff');
+          return result.slice(0, count);
+        }
+      } catch {
+        // Valor antiguo (hex único) — aplicar a todos
+        return Array(count).fill(stored);
+      }
+    }
+    return Array(count).fill('#ffffff');
+  }
+
   addBrandColor(): void {
     if (this.brandColors().length < 4) {
       this.brandColors.update(c => [...c, '#5e49d6']);
+      this.brandTextColors.update(c => [...c, '#ffffff']); // color de letra por defecto
     }
   }
 
   removeBrandColor(index: number): void {
     this.brandColors.update(c => c.filter((_, i) => i !== index));
+    this.brandTextColors.update(c => c.filter((_, i) => i !== index));
   }
 
   updateBrandColor(index: number, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.brandColors.update(c => c.map((col, i) => i === index ? value : col));
+  }
+
+  updateBrandTextColor(index: number, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.brandTextColors.update(c => c.map((col, i) => i === index ? value : col));
   }
 
   async saveCatalogPersonalization(): Promise<void> {
@@ -230,9 +255,11 @@ export class AccountEditComponent implements OnInit {
     this.savingCatalog.set(true);
     this.catalogErrorMsg.set(null);
 
+    const textColorsJson = JSON.stringify(this.brandTextColors());
+
     const result = await this.accounts.update(id, {
       brand_colors:       this.brandColors(),
-      catalog_text_color: this.catalogTextColor(),
+      catalog_text_color: textColorsJson,
     } as any);
 
     this.savingCatalog.set(false);
@@ -245,7 +272,7 @@ export class AccountEditComponent implements OnInit {
     this.account.update(a => a ? {
       ...a,
       brand_colors:       this.brandColors(),
-      catalog_text_color: this.catalogTextColor(),
+      catalog_text_color: textColorsJson,
     } : a);
     this.toggleSection('catalog');
     this.catalogSuccessMsg.set('Colores del catálogo guardados');
@@ -285,8 +312,9 @@ export class AccountEditComponent implements OnInit {
         this.heroPanelText.set(this.account()?.hero_panel_text ?? '#1a0a00');
       }
       if (section === 'catalog') {
-        this.brandColors.set(this.account()?.brand_colors ?? []);
-        this.catalogTextColor.set(this.account()?.catalog_text_color ?? '#ffffff');
+        const colors = this.account()?.brand_colors ?? [];
+        this.brandColors.set(colors);
+        this.brandTextColors.set(this.parseBrandTextColors(this.account()?.catalog_text_color, colors.length));
       }
     } else {
       current.add(section);
@@ -350,10 +378,11 @@ export class AccountEditComponent implements OnInit {
       this.pendingLat.set(account.latitude ?? null);
       this.pendingLng.set(account.longitude ?? null);
       this.businessHours.set(account.schedule_json ?? { ...DEFAULT_HOURS });
-      this.brandColors.set(account.brand_colors ?? []);
+      const colors = account.brand_colors ?? [];
+      this.brandColors.set(colors);
+      this.brandTextColors.set(this.parseBrandTextColors(account.catalog_text_color, colors.length));
       this.heroPanelBg.set(account.hero_panel_bg ?? '#ffffff');
       this.heroPanelText.set(account.hero_panel_text ?? '#1a0a00');
-      this.catalogTextColor.set(account.catalog_text_color ?? '#ffffff');
       this.albumUrls.set(account.album_urls ?? []);
 
       this.form.patchValue({

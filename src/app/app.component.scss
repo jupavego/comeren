@@ -7,4 +7,9 @@
     // Móvil: sólo franja superior (~55px) + top:3px + borde (2px) = ~60px
     padding-top: 64px;
   }
+
+  // Páginas sin header (auth/*): sin padding, el layout ocupa todo el viewport
+  &.no-chrome {
+    padding-top: 0;
+  }
 }
