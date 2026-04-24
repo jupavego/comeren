@@ -4,5 +4,15 @@
   color: var(--color-text-tertiary);
   font-size: 0.8rem;
   font-weight: 700;
-  width: 48px;
+  width: 40px;
+}
+
+.orders-total {
+  font-weight: 700;
+  color: #059669;
+  white-space: nowrap;
+}
+
+.orders-payment {
+  text-transform: capitalize;
 }

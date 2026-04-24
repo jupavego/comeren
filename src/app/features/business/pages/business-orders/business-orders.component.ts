@@ -26,7 +26,7 @@ export class BusinessOrdersComponent implements OnInit {
     const account = await this.accountsService.getMyAccount();
     if (account) {
       const [orders, stats] = await Promise.all([
-        this.orderService.getOrders(),
+        this.orderService.getOrders(account.id),
         this.orderService.getOrderStats(account.id),
       ]);
       this.orders.set(orders);

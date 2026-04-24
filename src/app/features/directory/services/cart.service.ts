@@ -8,19 +8,36 @@ export interface OrderLine {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private lines = signal<Map<string, OrderLine>>(new Map());
+  private lines          = signal<Map<string, OrderLine>>(new Map());
+  readonly accountId     = signal<string | null>(null);
 
   qty(itemId: string): number {
     return this.lines().get(itemId)?.qty ?? 0;
   }
 
-  add(item: CatalogItem): void {
+  /**
+   * Intenta agregar un ítem al carrito.
+   * Retorna:
+   *  - 'added'    → ítem agregado con normalidad
+   *  - 'conflict' → el carrito ya tiene ítems de otro negocio (no se agrega)
+   */
+  add(item: CatalogItem, forAccountId: string): 'added' | 'conflict' {
+    const current = this.accountId();
+
+    // Conflicto: hay ítems de un negocio distinto
+    if (current !== null && current !== forAccountId && this.hasItems()) {
+      return 'conflict';
+    }
+
+    this.accountId.set(forAccountId);
     this.lines.update(map => {
       const next = new Map(map);
       const line = next.get(item.id);
       next.set(item.id, { item, qty: (line?.qty ?? 0) + 1 });
       return next;
     });
+
+    return 'added';
   }
 
   remove(item: CatalogItem): void {
@@ -32,6 +49,18 @@ export class CartService {
       else next.set(item.id, { ...line, qty: line.qty - 1 });
       return next;
     });
+  }
+
+  /** Vacía el carrito completamente */
+  clear(): void {
+    this.lines.set(new Map());
+    this.accountId.set(null);
+  }
+
+  /** Vacía el carrito y agrega el ítem como inicio de un nuevo pedido */
+  clearAndAdd(item: CatalogItem, forAccountId: string): void {
+    this.clear();
+    this.add(item, forAccountId);
   }
 
   orderLines = computed(() =>

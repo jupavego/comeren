@@ -8,7 +8,7 @@
     <input
       type="text"
       class="filter-input"
-      placeholder="Buscar por negocio..."
+      placeholder="Buscar por negocio o cliente..."
       [value]="searchText()"
       (input)="searchText.set($any($event.target).value)"
     />
@@ -23,6 +23,11 @@
           <tr>
             <th>#</th>
             <th>Negocio</th>
+            <th>Cliente</th>
+            <th>Celular</th>
+            <th>Tipo</th>
+            <th>Total</th>
+            <th>Pago</th>
             <th>Fecha</th>
             <th>Hora</th>
           </tr>
@@ -32,12 +37,31 @@
             <tr>
               <td class="orders-num">{{ filtered().length - i }}</td>
               <td>{{ o.business_name || '—' }}</td>
+              <td>{{ o.buyer_name   || '—' }}</td>
+              <td>{{ o.buyer_phone  || '—' }}</td>
+              <td>
+                @if (o.user_role) {
+                  <span class="badge"
+                    [class.badge--client]="o.user_role === 'client'"
+                    [class.badge--business]="o.user_role === 'business'"
+                    [class.badge--admin]="o.user_role === 'admin'"
+                    [class.badge--neutral]="o.user_role === 'anon'">
+                    {{ o.user_role === 'anon' ? 'Visitante' : o.user_role }}
+                  </span>
+                } @else {
+                  <span>—</span>
+                }
+              </td>
+              <td class="orders-total">
+                {{ o.total != null ? ('$' + o.total.toLocaleString('es-CO')) : '—' }}
+              </td>
+              <td class="orders-payment">{{ o.payment || '—' }}</td>
               <td>{{ o.created_at | date:'dd/MM/yyyy' }}</td>
               <td>{{ o.created_at | date:'hh:mm a' }}</td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="4" class="admin-table__empty">No hay pedidos registrados</td>
+              <td colspan="9" class="admin-table__empty">No hay pedidos registrados</td>
             </tr>
           }
         </tbody>

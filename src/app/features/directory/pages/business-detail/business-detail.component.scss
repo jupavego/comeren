@@ -1178,3 +1178,98 @@
   }
 }
 
+// ════════════════════════════════════════════════════════════════════
+// CART CONFLICT — Diálogo de conflicto de negocio
+// ════════════════════════════════════════════════════════════════════
+
+.cart-conflict__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 10, 40, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 9700;
+  animation: fadeIn 0.18s ease;
+}
+
+.cart-conflict {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9750;
+  width: min(92vw, 380px);
+  background: var(--color-background-primary, #ffffff);
+  border-radius: 20px;
+  padding: 2rem 1.75rem 1.5rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  animation: ccPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__msg {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  &__btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+
+    &:active { transform: scale(0.97); }
+
+    &--confirm {
+      background: var(--color-brand-primary, #4e3bce);
+      color: #ffffff;
+
+      &:hover { opacity: 0.9; }
+    }
+
+    &--cancel {
+      background: var(--color-background-secondary, #f7f4ef);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-tertiary, #e4ddd8);
+
+      &:hover { background: var(--color-border-tertiary, #e4ddd8); }
+    }
+  }
+}
+
+@keyframes ccPop {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.88); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+

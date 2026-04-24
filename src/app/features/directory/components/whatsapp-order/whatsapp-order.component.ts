@@ -41,10 +41,11 @@ export class WhatsappOrderComponent implements OnInit {
   address     = signal('');
   payment     = signal<'efectivo' | 'transferencia'>('efectivo');
   errorMsg    = signal<string | null>(null);
+  sent        = signal(false);
 
   // Delegación al servicio compartido
   qty(itemId: string)      { return this.cartService.qty(itemId); }
-  add(item: CatalogItem)   { this.cartService.add(item); }
+  add(item: CatalogItem)   { this.cartService.add(item, this.accountId()); }
   remove(item: CatalogItem){ this.cartService.remove(item); }
   orderLines = this.cartService.orderLines;
   total      = this.cartService.total;
@@ -85,7 +86,20 @@ export class WhatsappOrderComponent implements OnInit {
       '_blank'
     );
 
-    this.orderService.logOrder(this.accountId());
+    const profile = this.session.profile();
+    this.orderService.logOrder({
+      accountId:   this.accountId(),
+      buyerName:   this.buyerName().trim() || undefined,
+      buyerPhone:  profile?.phone ?? undefined,
+      userRole:    profile?.role  ?? 'anon',
+      total:       this.total(),
+      payment:     this.payment(),
+    });
+
+    // Limpiar carrito y mostrar confirmación
+    this.cartService.clear();
+    this.sent.set(true);
+    setTimeout(() => this.close(), 3000);
   }
 
   close(): void { this.closed.emit(); }

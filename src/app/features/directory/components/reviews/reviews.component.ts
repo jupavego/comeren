@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { SessionService } from '../../../../core/services/session.service';
+import { AuthGateService } from '../../../../core/services/auth-gate.service';
 import { Review } from '../../models/review.model';
 
 @Component({
@@ -22,6 +23,7 @@ import { Review } from '../../models/review.model';
 export class ReviewsComponent implements OnInit {
   private reviewService = inject(ReviewService);
   private session       = inject(SessionService);
+  private authGate      = inject(AuthGateService);
 
   accountId = input.required<string>();
 
@@ -67,6 +69,20 @@ export class ReviewsComponent implements OnInit {
 
   // ── Crear ─────────────────────────────────────────────────────────────────
   setRating(value: number): void { this.rating.set(value); }
+
+  /** Abre el formulario solo si el usuario está registrado; si no, lanza el auth gate */
+  requestReview(): void {
+    if (this.showForm()) {
+      // Cancelar siempre está permitido sin auth
+      this.showForm.set(false);
+      this.errorMsg.set(null);
+      return;
+    }
+    this.authGate.requireAuth(() => {
+      this.showForm.set(true);
+      this.errorMsg.set(null);
+    }, 'review');
+  }
 
   toggleForm(): void {
     this.showForm.update(v => !v);

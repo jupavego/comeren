@@ -23,7 +23,8 @@ export class OrdersListComponent implements OnInit {
     const text = this.searchText().toLowerCase().trim();
     if (!text) return this.orders();
     return this.orders().filter(o =>
-      o.business_name?.toLowerCase().includes(text)
+      o.business_name?.toLowerCase().includes(text) ||
+      o.buyer_name?.toLowerCase().includes(text)
     );
   });
 

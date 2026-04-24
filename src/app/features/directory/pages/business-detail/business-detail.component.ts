@@ -10,11 +10,13 @@ import { WhatsappOrderComponent } from '../../components/whatsapp-order/whatsapp
 import { MapViewComponent } from '../../../../shared/components/map-view/map-view.component';
 import { BusinessStatusBadgeComponent } from '../../../../shared/components/business-status-badge/business-status-badge.component';
 import { ProductReviewsComponent } from '../../components/product-reviews/product-reviews.component';
+import { AuthGateComponent } from '../../../../shared/components/auth-gate/auth-gate.component';
+import { AuthGateService } from '../../../../core/services/auth-gate.service';
 
 @Component({
   selector: 'app-business-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReviewsComponent, WhatsappOrderComponent, MapViewComponent, BusinessStatusBadgeComponent, ProductReviewsComponent],
+  imports: [CommonModule, RouterModule, ReviewsComponent, WhatsappOrderComponent, MapViewComponent, BusinessStatusBadgeComponent, ProductReviewsComponent, AuthGateComponent],
   templateUrl: './business-detail.component.html',
   styleUrl: './business-detail.component.scss',
 })
@@ -23,7 +25,8 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   private directoryService = inject(DirectoryService);
   private reviewService    = inject(ReviewService);
   private zone             = inject(NgZone);
-  cart = inject(CartService);
+  cart     = inject(CartService);
+  authGate = inject(AuthGateService);
 
   private shimmerObserver?: IntersectionObserver;
   private dragMoved = false;
@@ -83,7 +86,7 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
     const up = () => {
       this.zone.run(() => {
-        if (!this.dragMoved) this.showOrder.set(true);
+        if (!this.dragMoved) this.authGate.requireAuth(() => this.showOrder.set(true));
         else sessionStorage.setItem('cart_bubble_pos', JSON.stringify(this.bubblePos()));
         this.dragMoved = false;
       });
@@ -254,6 +257,46 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     }
 
     this.loading.set(false);
+  }
+
+  // ── Auth-gated entry points ──────────────────────────────────────────────────
+
+  /** Botón hero "Realizar pedido" y botón final del catálogo */
+  requestOrder(a: Account): void {
+    this.authGate.requireAuth(() =>
+      a.catalog_items?.length ? this.showOrder.set(true) : this.openWhatsapp(a.whatsapp ?? '')
+    );
+  }
+
+  /** Ítem pendiente cuando hay conflicto de negocio en el carrito */
+  conflictItem = signal<CatalogItem | null>(null);
+
+  /** Botón "Agregar" y stepper + en las tarjetas de producto */
+  requestAdd(item: CatalogItem): void {
+    this.authGate.requireAuth(() => {
+      const accountId = this.account()?.id;
+      if (!accountId) return;
+      const result = this.cart.add(item, accountId);
+      if (result === 'conflict') {
+        this.conflictItem.set(item);
+      }
+    });
+  }
+
+  /** Usuario confirma vaciar carrito y empezar pedido del nuevo negocio */
+  confirmClearCart(): void {
+    const item      = this.conflictItem();
+    const accountId = this.account()?.id;
+    if (!item || !accountId) return;
+    this.cart.clearAndAdd(item, accountId);
+    this.conflictItem.set(null);
+  }
+
+  cancelClearCart(): void { this.conflictItem.set(null); }
+
+  /** Badge de valoración en las tarjetas de producto */
+  requestRatingPopup(item: CatalogItem): void {
+    this.authGate.requireAuth(() => this.ratingPopupItem.set(item), 'rating');
   }
 
   scrollToProducts(): void {

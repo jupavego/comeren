@@ -1,9 +1,28 @@
 <div class="wa-order-backdrop" (click)="close()"></div>
 
-<aside class="wa-order">
+<aside class="wa-order" [class.wa-order--sent]="sent()">
+
+  <!-- ── Estado: pedido enviado ─────────────────────────────────────────────── -->
+  @if (sent()) {
+    <div class="wa-order__sent-screen">
+      <div class="wa-order__sent-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round" width="42" height="42">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 class="wa-order__sent-title">¡Pedido enviado!</h3>
+      <p class="wa-order__sent-sub">
+        Tu mensaje fue enviado a <strong>{{ businessName() }}</strong> por WhatsApp.<br>
+        Espera la confirmación del negocio.
+      </p>
+      <button class="wa-order__sent-close" type="button" (click)="close()">Cerrar</button>
+    </div>
+  }
 
   <!-- Header -->
-  <div class="wa-order__header">
+  <div class="wa-order__header" [class.wa-order__header--hidden]="sent()">
     <div class="wa-order__header-text">
       <span class="wa-order__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
@@ -20,8 +39,8 @@
     </button>
   </div>
 
-  <!-- Catálogo -->
-  <div class="wa-order__catalog">
+  <!-- Catálogo (oculto tras envío) -->
+  <div class="wa-order__catalog" [class.wa-order__catalog--hidden]="sent()">
     @for (item of catalog(); track item.id) {
       <div class="wa-order__row">
         <div class="wa-order__row-info">
@@ -44,8 +63,8 @@
     }
   </div>
 
-  <!-- Resumen + datos + enviar -->
-  <div class="wa-order__footer">
+  <!-- Resumen + datos + enviar (oculto tras envío) -->
+  <div class="wa-order__footer" [class.wa-order__footer--hidden]="sent()">
     @if (hasItems()) {
       <div class="wa-order__summary">
         @for (line of orderLines(); track line.item.id) {

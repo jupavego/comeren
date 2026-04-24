@@ -11,24 +11,46 @@ export interface OrderLog {
   account_id: string;
   created_at: string;
   business_name?: string;
+  buyer_name?: string;
+  buyer_phone?: string;
+  user_role?: string;
+  total?: number;
+  payment?: string;
+}
+
+export interface LogOrderPayload {
+  accountId:   string;
+  buyerName?:  string;
+  buyerPhone?: string;
+  userRole?:   string;
+  total?:      number;
+  payment?:    string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   private supabase = inject(SupabaseService);
 
-  async logOrder(accountId: string): Promise<void> {
+  async logOrder(payload: LogOrderPayload): Promise<void> {
     const { error } = await this.supabase
       .from('order_logs')
-      .insert({ account_id: accountId });
+      .insert({
+        account_id:  payload.accountId,
+        buyer_name:  payload.buyerName  ?? null,
+        buyer_phone: payload.buyerPhone ?? null,
+        user_role:   payload.userRole   ?? null,
+        total:       payload.total      ?? null,
+        payment:     payload.payment    ?? null,
+      });
     if (error) console.error('Error logging order:', error.message);
   }
 
-  /** Pedidos del negocio del usuario actual (RLS filtra automáticamente) */
-  async getOrders(): Promise<OrderLog[]> {
+  /** Pedidos de un negocio concreto (filtrado por account_id) */
+  async getOrders(accountId: string): Promise<OrderLog[]> {
     const { data, error } = await this.supabase
       .from('order_logs')
       .select('*')
+      .eq('account_id', accountId)
       .order('created_at', { ascending: false });
     if (error) { console.error(error.message); return []; }
     return (data ?? []) as OrderLog[];

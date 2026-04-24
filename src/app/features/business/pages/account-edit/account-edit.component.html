@@ -595,11 +595,11 @@
                       <input
                         type="color"
                         class="brand-colors__input"
-                        [value]="brandTextColors()[$index] ?? '#ffffff'"
+                        [value]="brandTextColors()[$index]"
                         [disabled]="!isEditing('catalog')"
                         (input)="updateBrandTextColor($index, $event)"
                       />
-                      <span class="brand-colors__preview" [style.background]="brandTextColors()[$index] ?? '#ffffff'"></span>
+                      <span class="brand-colors__preview" [style.background]="brandTextColors()[$index]"></span>
                     </label>
                   </div>
                 </div>
@@ -631,7 +631,7 @@
               @for (color of brandColors(); track $index) {
                 <div class="catalog-palette-preview__card"
                      [style.background]="color"
-                     [style.color]="brandTextColors()[$index] ?? '#ffffff'">
+                     [style.color]="brandTextColors()[$index]">
                   <div class="catalog-palette-preview__img"></div>
                   <div class="catalog-palette-preview__info">
                     <span class="catalog-palette-preview__name">Producto {{ $index + 1 }}</span>
