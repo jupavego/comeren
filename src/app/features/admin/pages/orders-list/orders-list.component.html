@@ -1,0 +1,50 @@
+<div class="admin-page">
+  <div class="admin-page__header">
+    <h1 class="admin-page__title">Pedidos por WhatsApp</h1>
+    <a routerLink="/admin/dashboard" class="btn-back">Volver</a>
+  </div>
+
+  <div class="admin-filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Buscar por negocio..."
+      [value]="searchText()"
+      (input)="searchText.set($any($event.target).value)"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="admin-loading"><span class="spinner"></span></div>
+  } @else {
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Negocio</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of filtered(); track o.id; let i = $index) {
+            <tr>
+              <td class="orders-num">{{ filtered().length - i }}</td>
+              <td>{{ o.business_name || '—' }}</td>
+              <td>{{ o.created_at | date:'dd/MM/yyyy' }}</td>
+              <td>{{ o.created_at | date:'hh:mm a' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="admin-table__empty">No hay pedidos registrados</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="admin-count">
+      {{ filtered().length }} pedido{{ filtered().length !== 1 ? 's' : '' }}
+    </p>
+  }
+</div>

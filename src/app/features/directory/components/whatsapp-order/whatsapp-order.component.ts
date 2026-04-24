@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  computed,
   inject,
   input,
   output,
@@ -11,11 +10,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CatalogItem } from '../../models/account.model';
 import { SessionService } from '../../../../core/services/session.service';
-
-interface OrderLine {
-  item: CatalogItem;
-  qty: number;
-}
+import { CartService } from '../../services/cart.service';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-whatsapp-order',
@@ -25,7 +21,9 @@ interface OrderLine {
   styleUrl: './whatsapp-order.component.scss',
 })
 export class WhatsappOrderComponent implements OnInit {
-  private session = inject(SessionService);
+  private session      = inject(SessionService);
+  private cartService  = inject(CartService);
+  private orderService = inject(OrderService);
 
   /** Número de WhatsApp del negocio (solo dígitos, sin +57) */
   whatsapp     = input.required<string>();
@@ -33,6 +31,8 @@ export class WhatsappOrderComponent implements OnInit {
   businessName = input.required<string>();
   /** Productos disponibles */
   catalog      = input.required<CatalogItem[]>();
+  /** ID del negocio para registrar el pedido */
+  accountId    = input.required<string>();
   /** Emite cuando el usuario cierra el panel */
   closed       = output<void>();
 
@@ -42,7 +42,13 @@ export class WhatsappOrderComponent implements OnInit {
   payment     = signal<'efectivo' | 'transferencia'>('efectivo');
   errorMsg    = signal<string | null>(null);
 
-  private lines = signal<Map<string, OrderLine>>(new Map());
+  // Delegación al servicio compartido
+  qty(itemId: string)      { return this.cartService.qty(itemId); }
+  add(item: CatalogItem)   { this.cartService.add(item); }
+  remove(item: CatalogItem){ this.cartService.remove(item); }
+  orderLines = this.cartService.orderLines;
+  total      = this.cartService.total;
+  hasItems   = this.cartService.hasItems;
 
   ngOnInit(): void {
     const profile = this.session.profile();
@@ -50,41 +56,6 @@ export class WhatsappOrderComponent implements OnInit {
       this.buyerName.set(profile.full_name);
     }
   }
-
-  /** Cantidad actual de un producto */
-  qty(itemId: string): number {
-    return this.lines().get(itemId)?.qty ?? 0;
-  }
-
-  add(item: CatalogItem): void {
-    this.lines.update(map => {
-      const next = new Map(map);
-      const line = next.get(item.id);
-      next.set(item.id, { item, qty: (line?.qty ?? 0) + 1 });
-      return next;
-    });
-  }
-
-  remove(item: CatalogItem): void {
-    this.lines.update(map => {
-      const next = new Map(map);
-      const line = next.get(item.id);
-      if (!line) return next;
-      if (line.qty <= 1) { next.delete(item.id); }
-      else { next.set(item.id, { ...line, qty: line.qty - 1 }); }
-      return next;
-    });
-  }
-
-  orderLines = computed(() =>
-    [...this.lines().values()].filter(l => l.qty > 0)
-  );
-
-  total = computed(() =>
-    this.orderLines().reduce((sum, l) => sum + l.item.price * l.qty, 0)
-  );
-
-  hasItems = computed(() => this.orderLines().length > 0);
 
   send(): void {
     this.errorMsg.set(null);
@@ -113,6 +84,8 @@ export class WhatsappOrderComponent implements OnInit {
       `https://wa.me/57${phone}?text=${encodeURIComponent(msg)}`,
       '_blank'
     );
+
+    this.orderService.logOrder(this.accountId());
   }
 
   close(): void { this.closed.emit(); }

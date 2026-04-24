@@ -145,6 +145,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+
+  &--orders {
+    flex-direction: row;
+    gap: 0.75rem;
+
+    .metric-card { flex: 1; }
+  }
 }
 
 .dashboard-actions-col {
@@ -232,6 +239,18 @@
     .metric-card__icon { background: rgba(255, 255, 255, 0.5); svg { stroke: var(--color-brand-dark); } }
     .metric-card__value { color: #10222f; font-size: clamp(0.72rem, 1.4vw, 0.95rem); font-weight: 700; }
     .metric-card__label { color: var(--color-brand-dark); }
+  }
+
+  &--whatsapp {
+    background: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+    .metric-card__icon svg { stroke: none; fill: #fff; }
+  }
+
+  &--whatsapp-light {
+    background: linear-gradient(135deg, #dcf8c6 0%, #c5f0a4 100%);
+    .metric-card__icon { background: rgba(255,255,255,0.5); svg { stroke: #128c7e; } }
+    .metric-card__value { color: #0a3d2b; }
+    .metric-card__label { color: #1a5c40; }
   }
 
   // Botón clickeable (Productos activos)

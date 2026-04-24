@@ -1,0 +1,8 @@
+@use '../../admin.styles' as *;
+
+.orders-num {
+  color: var(--color-text-tertiary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 48px;
+}

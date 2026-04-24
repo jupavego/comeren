@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { CartService } from '../../services/cart.service';
 import { Account, CatalogItem } from '../../models/account.model';
 import { DirectoryService } from '../../services/directory.service';
 import { ReviewService } from '../../services/review.service';
@@ -21,11 +22,22 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   private route            = inject(ActivatedRoute);
   private directoryService = inject(DirectoryService);
   private reviewService    = inject(ReviewService);
+  private zone             = inject(NgZone);
+  cart = inject(CartService);
 
   private shimmerObserver?: IntersectionObserver;
+  private dragMoved = false;
+
+  private readonly onScroll = () => {
+    const el = document.querySelector<HTMLElement>('.biz-hero__panel-actions');
+    if (!el) return;
+    const hidden = el.getBoundingClientRect().bottom < 0;
+    if (hidden !== this.heroWaHidden()) {
+      this.zone.run(() => this.heroWaHidden.set(hidden));
+    }
+  };
 
   constructor() {
-    // Cuando la cuenta carga, esperar un frame para que el DOM renderice el botón
     effect(() => {
       const loaded = !!this.account();
       if (!loaded) return;
@@ -53,14 +65,49 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.shimmerObserver.observe(btn);
   }
 
-  ngOnDestroy(): void {
-    this.shimmerObserver?.disconnect();
+  onBubblePointerDown(e: PointerEvent): void {
+    const startX   = e.clientX;
+    const startY   = e.clientY;
+    const startPos = { ...this.bubblePos() };
+    this.dragMoved = false;
+
+    const move = (ev: PointerEvent) => {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) this.dragMoved = true;
+      this.zone.run(() => this.bubblePos.set({
+        x: Math.max(8, Math.min(window.innerWidth  - 68, startPos.x + dx)),
+        y: Math.max(8, Math.min(window.innerHeight - 68, startPos.y + dy)),
+      }));
+    };
+
+    const up = () => {
+      this.zone.run(() => {
+        if (!this.dragMoved) this.showOrder.set(true);
+        else sessionStorage.setItem('cart_bubble_pos', JSON.stringify(this.bubblePos()));
+        this.dragMoved = false;
+      });
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+    };
+
+    this.zone.runOutsideAngular(() => {
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+    });
   }
 
-  account   = signal<Account | null>(null);
-  loading   = signal(true);
-  notFound  = signal(false);
-  showOrder = signal(false);
+  ngOnDestroy(): void {
+    this.shimmerObserver?.disconnect();
+    window.removeEventListener('scroll', this.onScroll);
+  }
+
+  account       = signal<Account | null>(null);
+  loading       = signal(true);
+  notFound      = signal(false);
+  showOrder     = signal(false);
+  heroWaHidden  = signal(false);
+  bubblePos     = signal({ x: 0, y: 0 });
 
   ratingPopupItem   = signal<CatalogItem | null>(null);
   productAvgRatings = signal<Record<string, number>>({});
@@ -178,6 +225,13 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    const saved = sessionStorage.getItem('cart_bubble_pos');
+    this.bubblePos.set(
+      saved ? JSON.parse(saved) : { x: window.innerWidth - 80, y: window.innerHeight - 100 }
+    );
+
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {

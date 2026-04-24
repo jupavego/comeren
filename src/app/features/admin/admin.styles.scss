@@ -96,8 +96,9 @@
     color: var(--color-text-secondary);
   }
 
-  &--warning &__value { color: var(--color-text-warning); }
-  &--success &__value { color: var(--color-text-success); }
+  &--warning  &__value { color: var(--color-text-warning); }
+  &--success  &__value { color: var(--color-text-success); }
+  &--whatsapp &__value { color: #128c7e; }
 }
 
 // ── Hero del panel de admin ───────────────────────────────────────────────────

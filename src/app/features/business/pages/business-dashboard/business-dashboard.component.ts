@@ -6,6 +6,7 @@ import { CatalogService } from '../../services/catalog.service';
 import { Account, CatalogItem } from '../../../directory/models/account.model';
 import { ReviewService } from '../../../directory/services/review.service';
 import { ProductRatingRow } from '../../../directory/models/review.model';
+import { OrderService, OrderStats } from '../../../directory/services/order.service';
 
 @Component({
   selector: 'app-business-dashboard',
@@ -19,10 +20,12 @@ export class BusinessDashboardComponent implements OnInit {
   private accountsService = inject(AccountsService);
   private catalogService  = inject(CatalogService);
   private reviewService   = inject(ReviewService);
+  private orderService    = inject(OrderService);
 
   account      = signal<Account | null>(null);
   catalogItems = signal<CatalogItem[]>([]);
   ratings      = signal<ProductRatingRow[]>([]);
+  orderStats   = signal<OrderStats>({ total: 0, thisMonth: 0 });
   loading      = signal(true);
 
   // Métricas computadas
@@ -39,12 +42,14 @@ export class BusinessDashboardComponent implements OnInit {
     this.account.set(account);
 
     if (account) {
-      const [items, ratings] = await Promise.all([
+      const [items, ratings, orders] = await Promise.all([
         this.catalogService.getByAccount(account.id),
         this.reviewService.getProductRatingsForAccount(account.id),
+        this.orderService.getOrderStats(account.id),
       ]);
       this.catalogItems.set(items);
       this.ratings.set(ratings);
+      this.orderStats.set(orders);
     }
 
     this.loading.set(false);

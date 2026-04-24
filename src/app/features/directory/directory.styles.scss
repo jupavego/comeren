@@ -418,25 +418,6 @@
   }
 }
 
-// Botón "Pedir por WhatsApp" en la sección de productos
-.btn-order-wa {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.5rem 1.1rem;
-  background: #25d366;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s;
-  white-space: nowrap;
-
-  &:hover { opacity: 0.88; }
-}
 
 .detail-map {
   border-radius: 14px;

@@ -1,0 +1,56 @@
+<div class="panel">
+  <div class="panel-header">
+    <h1 class="panel-title">Pedidos por WhatsApp</h1>
+    <a routerLink="/business/dashboard" class="btn-back">Volver</a>
+  </div>
+
+  @if (loading()) {
+    <div class="panel-loading"><span class="spinner"></span></div>
+  } @else {
+
+    <!-- Resumen -->
+    <div class="orders-summary">
+      <div class="orders-summary__card orders-summary__card--total">
+        <span class="orders-summary__value">{{ stats().total }}</span>
+        <span class="orders-summary__label">Pedidos totales</span>
+      </div>
+      <div class="orders-summary__card orders-summary__card--month">
+        <span class="orders-summary__value">{{ stats().thisMonth }}</span>
+        <span class="orders-summary__label">Este mes</span>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of filtered(); track o.id; let i = $index) {
+            <tr>
+              <td class="orders-table__num">{{ stats().total - i }}</td>
+              <td>{{ o.created_at | date:'dd/MM/yyyy' }}</td>
+              <td>{{ o.created_at | date:'hh:mm a' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="orders-table__empty">
+                Aún no hay pedidos registrados
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="orders-count">
+      {{ filtered().length }} pedido{{ filtered().length !== 1 ? 's' : '' }} en total
+    </p>
+
+  }
+</div>
