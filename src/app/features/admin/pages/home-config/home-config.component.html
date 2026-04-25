@@ -1,0 +1,265 @@
+@if (loading()) {
+  <div class="admin-loading"><span class="spinner"></span></div>
+} @else {
+
+  <div class="admin-page">
+
+    <!-- Cabecera -->
+    <div class="admin-page__header">
+      <h1 class="admin-page__title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M9 21V9"/>
+        </svg>
+        Administrar home
+      </h1>
+      <a routerLink="/admin/dashboard" class="hc-back-btn">
+        ← Volver al panel
+      </a>
+    </div>
+
+    <!-- ══ SECCIÓN 1: Slide de bienvenida ══════════════════════════════════════ -->
+    <div class="admin-page__section">
+      <div class="admin-page__section-header">
+        <span class="hc-section-icon hc-section-icon--purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="15" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+        </span>
+        <h2 class="admin-page__section-title">Slide de bienvenida</h2>
+      </div>
+
+      <div class="hc-slide-form">
+
+        <!-- Imagen de fondo -->
+        <div class="hc-field">
+          <label class="hc-label">Imagen de fondo del slide</label>
+
+          @if (slide1ImageUrl()) {
+            <div class="hc-img-preview">
+              <img [src]="slide1ImageUrl()!" alt="Preview slide" />
+              <button type="button" class="hc-img-remove" (click)="removeImage()" title="Quitar imagen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" width="16" height="16">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          }
+
+          <label class="hc-upload-btn" [class.hc-upload-btn--loading]="imageUploading()">
+            @if (imageUploading()) {
+              <span class="spinner spinner--sm"></span> Subiendo…
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" width="16" height="16">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              {{ slide1ImageUrl() ? 'Cambiar imagen' : 'Subir imagen' }}
+            }
+            <input type="file" accept="image/*" class="hc-upload-input"
+                   [disabled]="imageUploading()"
+                   (change)="onImageSelected($event)" />
+          </label>
+          <span class="hc-hint">Recomendado: 1600 × 900 px. JPG o WebP.</span>
+        </div>
+
+        <!-- Título -->
+        <div class="hc-field">
+          <label class="hc-label">Título principal</label>
+          <input type="text" class="hc-input"
+                 [value]="slide1Title()"
+                 (input)="slide1Title.set($any($event.target).value)"
+                 maxlength="80"
+                 placeholder="Sabores que se sienten locales" />
+        </div>
+
+        <!-- Descripción -->
+        <div class="hc-field">
+          <label class="hc-label">Descripción</label>
+          <textarea class="hc-input hc-textarea" rows="3"
+                    [value]="slide1Description()"
+                    (input)="slide1Description.set($any($event.target).value)"
+                    maxlength="200"
+                    placeholder="Texto corto que aparece bajo el título…"></textarea>
+        </div>
+
+        <!-- Botones CTA -->
+        <div class="hc-row-2col">
+          <div class="hc-field">
+            <label class="hc-label">Texto botón principal</label>
+            <input type="text" class="hc-input"
+                   [value]="slide1PrimaryBtn()"
+                   (input)="slide1PrimaryBtn.set($any($event.target).value)"
+                   maxlength="40"
+                   placeholder="Explorar negocios" />
+          </div>
+          <div class="hc-field">
+            <label class="hc-label">Texto botón secundario</label>
+            <input type="text" class="hc-input"
+                   [value]="slide1SecondaryBtn()"
+                   (input)="slide1SecondaryBtn.set($any($event.target).value)"
+                   maxlength="40"
+                   placeholder="Ver destacados" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ SECCIÓN 2: Negocios en el carrusel ══════════════════════════════════ -->
+    <div class="admin-page__section">
+      <div class="admin-page__section-header">
+        <span class="hc-section-icon hc-section-icon--teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </span>
+        <h2 class="admin-page__section-title">Negocios en el carrusel</h2>
+        <span class="panel-badge">{{ featured().length }}</span>
+      </div>
+
+      <p class="hc-carousel-hint">
+        Los negocios aparecen en el carrusel del home en el orden que los veas abajo.
+        Si no hay ninguno configurado, el carrusel mostrará los 4 más recientes automáticamente.
+      </p>
+
+      <!-- Lista de destacados con controles de orden -->
+      @if (featured().length > 0) {
+        <div class="hc-featured-list">
+          @for (item of featured(); track item.account_id; let i = $index) {
+            <div class="hc-featured-row">
+
+              <!-- Orden visual -->
+              <span class="hc-featured-index">{{ i + 1 }}</span>
+
+              <!-- Thumbnail -->
+              <div class="hc-featured-thumb">
+                @if (item.cover_url || item.logo_url) {
+                  <img [src]="item.cover_url ?? item.logo_url!" [alt]="item.name" />
+                } @else {
+                  <span class="hc-featured-thumb__placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                         width="18" height="18">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    </svg>
+                  </span>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="hc-featured-info">
+                <span class="hc-featured-name">{{ item.name }}</span>
+                @if (item.category) {
+                  <span class="hc-featured-cat">{{ item.category }}</span>
+                }
+              </div>
+
+              <!-- Controles -->
+              <div class="hc-featured-controls">
+                <button type="button" class="hc-ctrl-btn" title="Subir"
+                        [disabled]="i === 0" (click)="moveUp(i)">
+                  ▲
+                </button>
+                <button type="button" class="hc-ctrl-btn" title="Bajar"
+                        [disabled]="i === featured().length - 1" (click)="moveDown(i)">
+                  ▼
+                </button>
+                <button type="button" class="hc-ctrl-btn hc-ctrl-btn--remove" title="Quitar"
+                        (click)="remove(i)">
+                  ✕
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="admin-page__empty">No hay negocios configurados. Agrega al menos uno para personalizar el carrusel.</p>
+      }
+
+      <!-- Picker de negocios disponibles -->
+      <div class="hc-add-wrap">
+        <div class="hc-add-header">
+          <label class="hc-label">Negocios disponibles para agregar</label>
+          @if (allAccounts().length > 4) {
+            <input type="text" class="hc-add-search"
+                   placeholder="Filtrar por nombre o categoría…"
+                   [value]="addSearch()"
+                   (input)="addSearch.set($any($event.target).value)" />
+          }
+        </div>
+
+        @if (addResults().length > 0) {
+          <div class="hc-picker-grid">
+            @for (a of addResults(); track a.id) {
+              <button type="button" class="hc-picker-card" (click)="addBusiness(a)">
+                <div class="hc-picker-card__thumb">
+                  @if (a.cover_url || a.logo_url) {
+                    <img [src]="a.cover_url ?? a.logo_url!" [alt]="a.name" />
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                         width="20" height="20">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    </svg>
+                  }
+                </div>
+                <div class="hc-picker-card__info">
+                  <span class="hc-picker-card__name">{{ a.name }}</span>
+                  @if (a.category) {
+                    <span class="hc-picker-card__cat">{{ a.category }}</span>
+                  }
+                </div>
+                <span class="hc-picker-card__add">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                       stroke-linecap="round" width="14" height="14">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Agregar
+                </span>
+              </button>
+            }
+          </div>
+        } @else if (addSearch().length > 0) {
+          <p class="admin-page__empty">No hay negocios que coincidan con "{{ addSearch() }}".</p>
+        } @else {
+          <p class="admin-page__empty">Todos los negocios aprobados ya están en el carrusel.</p>
+        }
+      </div>
+
+    </div>
+
+    <!-- ══ Barra de guardar ════════════════════════════════════════════════════ -->
+    <div class="hc-save-bar">
+      @if (saveMsg()) {
+        <span class="hc-save-msg hc-save-msg--ok">✓ {{ saveMsg() }}</span>
+      }
+      @if (saveError()) {
+        <span class="hc-save-msg hc-save-msg--err">✕ {{ saveError() }}</span>
+      }
+      <button type="button" class="hc-save-btn"
+              [disabled]="saving()"
+              (click)="save()">
+        @if (saving()) {
+          <span class="spinner spinner--sm spinner--white"></span> Guardando…
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" width="16" height="16">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Guardar cambios
+        }
+      </button>
+    </div>
+
+  </div>
+
+}

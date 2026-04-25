@@ -18,14 +18,14 @@
   flex-direction: column;
   overflow: hidden;
   background: #000;
-  margin-top: -114px;  // fondo detrás del navbar flotante
+  margin-top: -106px;  // fondo detrás del navbar flotante
 
   // ── Cover: altura fija, crece con el viewport ─────────────────────
-  // calc(72vh + 114px) → el cover ocupa ~72% del viewport visible
+  // calc(72vh + 106px) → el cover ocupa ~72% del viewport visible
   &__cover {
     position: relative;
     flex-shrink: 0;
-    height: calc(72vh + 114px);
+    height: calc(72vh + 106px);
     overflow: hidden;
     z-index: 1;
     background-color: var(--brown-900);
@@ -49,7 +49,7 @@
   }
 
   // ── Topbar: categoría (izq) + status (der) ────────────────────────
-  // top: 120px → queda 6px por debajo del nav flotante (~114px de alto)
+  // top: 120px → queda 6px por debajo del nav flotante (~106px de alto)
   &__topbar {
     position: absolute;
     top: 120px; left: 0; right: 0;
@@ -68,7 +68,7 @@
   // top = cover_height - 72px → queda en la franja baja del cover, sobre el panel
   &__namebar {
     position: absolute;
-    top: calc(72vh + 114px - 72px);
+    top: calc(72vh + 106px - 72px);
     left: 0; right: 0;
     z-index: 3;
     display: flex;

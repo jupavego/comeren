@@ -178,6 +178,12 @@ export const routes: Routes = [
           import('./features/admin/pages/orders-list/orders-list.component')
             .then(m => m.OrdersListComponent),
       },
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('./features/admin/pages/home-config/home-config.component')
+            .then(m => m.HomeConfigComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

@@ -14,6 +14,7 @@ import { DirectoryStateService } from '../../services/directory-state.service';
 import { CarouselComponent, CarouselSlide } from '../../components/carousel/carousel.component';
 import { DirectoryListComponent } from '../../components/directory-list/directory-list.component';
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
+import { HomeConfigService, HomeConfig, HomeFeatured, DEFAULT_HOME_CONFIG } from '../../../../features/admin/services/home-config.service';
 
 const PAGE_SIZE = 12;
 
@@ -25,8 +26,9 @@ const PAGE_SIZE = 12;
   styleUrl: './directory-home.component.scss',
 })
 export class DirectoryHomeComponent implements OnInit, OnDestroy {
-  private directoryService = inject(DirectoryService);
-  readonly state           = inject(DirectoryStateService);
+  private directoryService  = inject(DirectoryService);
+  private homeConfigService = inject(HomeConfigService);
+  readonly state            = inject(DirectoryStateService);
 
   accounts    = signal<Account[]>([]);
   loading     = signal(true);
@@ -68,12 +70,20 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    const [, featured] = await Promise.all([
+    const [, config, featuredDB] = await Promise.all([
       this.loadPage(true),
-      this.directoryService.getFeatured(4),
+      this.homeConfigService.getConfig(),
+      this.homeConfigService.getFeaturedWithDetails(),
     ]);
 
-    this.carouselSlides.set(this.buildSlides(featured));
+    // Si hay negocios configurados en BD, usarlos; si no, cargar los 4 más recientes
+    if (featuredDB.length > 0) {
+      this.carouselSlides.set(this.buildSlidesFromDB(config, featuredDB));
+    } else {
+      const featured = await this.directoryService.getFeatured(4);
+      this.carouselSlides.set(this.buildSlides(config, featured));
+    }
+
     this.loading.set(false);
   }
 
@@ -85,16 +95,9 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
 
   // ── Construcción de slides ──────────────────────────────────────────────────
 
-  private buildSlides(featured: Account[]): CarouselSlide[] {
-    const intro: CarouselSlide = {
-      type:            'intro',
-      title:           'Sabores que se sienten locales',
-      description:     'Explora negocios de comida en Girardota y encuentra una opción rica, cercana y confiable.',
-      primaryBtn:      'Explorar negocios',
-      secondaryBtn:    'Ver destacados',
-      primaryAction:   () => this.scrollToList(),
-      secondaryAction: () => this.scrollToList(),
-    };
+  /** Slide intro desde config de BD + negocios desde Account[] (fallback). */
+  private buildSlides(config: HomeConfig, featured: Account[]): CarouselSlide[] {
+    const intro = this.buildIntroSlide(config);
 
     const businessSlides: CarouselSlide[] = featured.map(a => ({
       type:       'business' as const,
@@ -105,11 +108,44 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
           : undefined,
       category:   a.category ?? undefined,
       title:      a.name,
-      subtitle:   a.slogan ?? undefined,
+      subtitle:   (a as any).slogan ?? undefined,
       linkUrl:    `/negocio/${a.id}`,
     }));
 
     return [intro, ...businessSlides];
+  }
+
+  /** Slide intro desde config de BD + negocios desde home_featured. */
+  private buildSlidesFromDB(config: HomeConfig, featured: HomeFeatured[]): CarouselSlide[] {
+    const intro = this.buildIntroSlide(config);
+
+    const businessSlides: CarouselSlide[] = featured.map(f => ({
+      type:       'business' as const,
+      background: f.cover_url
+        ? `url('${f.cover_url}')`
+        : f.logo_url
+          ? `url('${f.logo_url}')`
+          : undefined,
+      category:   f.category ?? undefined,
+      title:      f.name,
+      subtitle:   f.slogan ?? undefined,
+      linkUrl:    `/negocio/${f.account_id}`,
+    }));
+
+    return [intro, ...businessSlides];
+  }
+
+  private buildIntroSlide(config: HomeConfig): CarouselSlide {
+    return {
+      type:            'intro',
+      background:      config.slide1_image_url ? `url('${config.slide1_image_url}')` : undefined,
+      title:           config.slide1_title,
+      description:     config.slide1_description,
+      primaryBtn:      config.slide1_primary_btn,
+      secondaryBtn:    config.slide1_secondary_btn,
+      primaryAction:   () => this.scrollToList(),
+      secondaryAction: () => this.scrollToList(),
+    };
   }
 
   private scrollToList(): void {
