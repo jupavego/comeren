@@ -144,13 +144,21 @@
           }
         </div>
 
+        <!-- Verificación anti-bot (solo en producción con Turnstile configurado) -->
+        @if (useTurnstile) {
+          <app-turnstile
+            (resolved)="onTurnstileResolved($event)"
+            (errored)="onTurnstileError()"
+          />
+        }
+
         <!-- Error global -->
         @if (errorMessage()) {
           <div class="auth-alert auth-alert--error">{{ errorMessage() }}</div>
         }
 
         <!-- Submit -->
-        <button type="submit" class="btn-primary" [disabled]="loading()">
+        <button type="submit" class="btn-primary" [disabled]="loading() || (useTurnstile && !turnstileToken())">
           @if (loading()) {
             <span class="btn-spinner"></span> Creando cuenta...
           } @else {
