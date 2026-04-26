@@ -6,37 +6,16 @@
 -- ============================================================
 
 -- ── Crear usuario admin inicial ──────────────────────────────
--- Este bloque crea un usuario admin de prueba directamente en
--- auth.users. En producción, el primer admin debe crearse
--- desde el dashboard de Supabase → Authentication → Users.
+-- El primer usuario administrador debe crearse directamente
+-- desde el Supabase Dashboard:
+--   Dashboard → Authentication → Users → Invite user
 --
--- Credenciales de prueba (cambiar antes de cualquier deploy):
---   email:    admin@comengirardota.com
---   password: Admin1234!
+-- Luego asignar el rol 'admin' manualmente:
+--   Dashboard → Table Editor → profiles → editar el registro
+--   y cambiar role a 'admin'.
 --
--- NOTA: Supabase hashea las contraseñas internamente.
--- Este INSERT usa la función crypt() disponible en pgcrypto.
-
--- (Descomentar solo si se necesita seed de usuario admin)
--- INSERT INTO auth.users (
---   id,
---   email,
---   encrypted_password,
---   email_confirmed_at,
---   raw_user_meta_data,
---   raw_app_meta_data,
---   created_at,
---   updated_at
--- ) VALUES (
---   uuid_generate_v4(),
---   'admin@comengirardota.com',
---   crypt('Admin1234!', gen_salt('bf')),
---   NOW(),
---   '{"role": "admin", "full_name": "Administrador"}'::jsonb,
---   '{"role": "admin"}'::jsonb,
---   NOW(),
---   NOW()
--- ) ON CONFLICT (email) DO NOTHING;
+-- NUNCA incluir credenciales en este archivo.
+-- SEC-003 | 2026-04-26
 
 -- ── Categorías de referencia ─────────────────────────────────
 -- No se almacenan en la base de datos — están hardcodeadas en

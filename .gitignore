@@ -40,3 +40,10 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment files con secrets — nunca versionar
+# Las keys de producción se inyectan via variables de entorno del hosting
+.env
+.env.*
+!.env.example
+src/environments/environment.prod.ts

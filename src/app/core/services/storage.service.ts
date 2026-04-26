@@ -15,6 +15,25 @@ export class StorageService {
   private supabase = inject(SupabaseService);
   private session  = inject(SessionService);
 
+  // SEC-009 | OWASP A05: Security Misconfiguration
+  // Valida extensión, MIME type y tamaño antes de enviar al servidor.
+  private validateImageFile(file: File): string | null {
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+    const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return `Formato no permitido. Usa: ${ALLOWED_EXTENSIONS.join(', ')}`;
+    }
+    if (!file.type.startsWith('image/')) {
+      return 'El archivo no es una imagen válida';
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+      return 'El archivo supera el tamaño máximo de 5 MB';
+    }
+    return null;
+  }
+
   async uploadImage(
     bucket: StorageBucket,
     file: File,
@@ -23,16 +42,19 @@ export class StorageService {
     const userId = this.session.user()?.id;
     if (!userId) return { success: false, error: 'No autenticado' };
 
-    const ext      = file.name.split('.').pop();
+    const validationError = this.validateImageFile(file);
+    if (validationError) return { success: false, error: validationError };
+
+    const ext      = file.name.split('.').pop()?.toLowerCase();
     const name     = fileName ?? `${Date.now()}.${ext}`;
     const path     = `${userId}/${name}`;
-    const mimeType = file.type || 'image/jpeg';
+    const mimeType = file.type;
 
     const { error } = await this.supabase.storage
       .from(bucket)
       .upload(path, file, {
         contentType: mimeType,
-        upsert: true,   // sobreescribe si ya existe
+        upsert: true,
       });
 
     if (error) return { success: false, error: error.message };
