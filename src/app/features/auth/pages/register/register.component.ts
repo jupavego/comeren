@@ -73,7 +73,7 @@ export class RegisterComponent {
     this.loading.set(false);
 
     if (!result.success) {
-      this.errorMessage.set(this.mapError(result.error));
+      this.errorMessage.set(result.error ?? 'Error al registrarse');
       return;
     }
 
@@ -91,10 +91,4 @@ export class RegisterComponent {
     this.showPassword.update(v => !v);
   }
 
-  private mapError(error?: string): string {
-    if (!error) return 'Error al registrarse';
-    if (error.includes('already registered')) return 'Este correo ya está registrado';
-    if (error.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres';
-    return error;
-  }
 }

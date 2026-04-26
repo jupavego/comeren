@@ -44,7 +44,7 @@ export class LoginComponent {
     );
 
     if (!result.success) {
-      this.errorMessage.set(this.mapError(result.error));
+      this.errorMessage.set(result.error ?? 'Error al iniciar sesión');
       this.loading.set(false);
       return;
     }
@@ -74,11 +74,4 @@ export class LoginComponent {
     this.showPassword.update(v => !v);
   }
 
-  private mapError(error?: string): string {
-    if (!error) return 'Error al iniciar sesión';
-    if (error.includes('Invalid login credentials')) return 'Correo o contraseña incorrectos';
-    if (error.includes('Email not confirmed'))       return 'Debes confirmar tu correo antes de ingresar';
-    if (error.includes('Too many requests'))         return 'Demasiados intentos. Espera unos minutos';
-    return error;
-  }
 }
