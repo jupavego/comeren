@@ -11,12 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-// ── Tipos de slide públicos ───────────────────────────────────────────────────
-// El padre arma los slides; el carrusel solo los anima y navega.
-
 export interface CarouselSlideIntro {
   type: 'intro';
-  background?: string;        // CSS: url(...) o gradient
+  background?: string;
   title: string;
   description?: string;
   primaryBtn?: string;
@@ -27,18 +24,18 @@ export interface CarouselSlideIntro {
 
 export interface CarouselSlideBusiness {
   type: 'business';
-  background?: string;        // CSS: url(...) o gradient
+  background?: string;
   category?: string;
-  title: string;              // nombre del negocio
-  subtitle?: string;          // slogan
-  linkUrl?: string;           // routerLink destino
+  title: string;
+  subtitle?: string;
+  linkUrl?: string;
   linkLabel?: string;
 }
 
 export interface CarouselSlideHero {
   type: 'hero';
   background?: string;
-  eyebrow?: string;           // texto pequeño encima del título (ej: categoría)
+  eyebrow?: string;
   title: string;
   description?: string;
 }
@@ -47,8 +44,6 @@ export type CarouselSlide =
   | CarouselSlideIntro
   | CarouselSlideBusiness
   | CarouselSlideHero;
-
-// ── Componente ────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-carousel',
@@ -59,57 +54,73 @@ export type CarouselSlide =
 })
 export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
 
-  /** Slides ya construidos por el padre */
   @Input() slides: CarouselSlide[] = [];
-
-  /** Intervalo del autoplay en ms. 0 = desactivado */
   @Input() autoplayMs = 9000;
-
-  /** Altura mínima del carrusel */
   @Input() minHeight = '440px';
 
   // ── Estado interno ──────────────────────────────────────────────────────────
-  currentIndex = signal(0);
-  // currentSlide se deriva — una sola fuente de verdad
-  currentSlide = computed(() => this.slides[this.currentIndex()] ?? null);
-  animating    = signal(false);
+  // displayedIndex: qué slide se muestra en pantalla (cambia en mitad de transición)
+  // currentIndex:  qué dot está activo (sigue a displayedIndex)
+  displayedIndex = signal(0);
+  currentIndex   = signal(0);
 
+  // Fase de la transición — controla las clases CSS que disparan los @keyframes
+  phase = signal<'idle' | 'exit' | 'enter'>('idle');
+
+  // El slide que se renderiza deriva de displayedIndex
+  currentSlide = computed(() => this.slides[this.displayedIndex()] ?? null);
+
+  private inTransition = false;
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  ngOnInit(): void {
-    this.startAutoplay();
-  }
+  ngOnInit(): void { this.startAutoplay(); }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['slides'] && !changes['slides'].firstChange) {
+      this.displayedIndex.set(0);
       this.currentIndex.set(0);
+      this.phase.set('idle');
+      this.inTransition = false;
       this.stopAutoplay();
       this.startAutoplay();
     }
   }
 
-  ngOnDestroy(): void {
-    this.stopAutoplay();
-  }
+  ngOnDestroy(): void { this.stopAutoplay(); }
 
   // ── Navegación ──────────────────────────────────────────────────────────────
 
   goToSlide(index: number): void {
-    if (!this.slides.length || index === this.currentIndex()) return;
-    this.currentIndex.set(index);
-    this.animating.set(true);
-    setTimeout(() => this.animating.set(false), 500);
+    if (this.inTransition || !this.slides.length || index === this.displayedIndex()) return;
+    this.inTransition = true;
+
+    // Fase 1 — salida: el contenido actual se desvanece (220 ms)
+    this.phase.set('exit');
+
+    setTimeout(() => {
+      // Fase 2 — swap: mientras el contenido está invisible se cambia el slide
+      // El fondo también cambia aquí, cubierto por la opacidad cero del contenido
+      this.displayedIndex.set(index);
+      this.currentIndex.set(index);
+      this.phase.set('enter');
+
+      // Fase 3 — entrada: el nuevo contenido aparece (320 ms)
+      setTimeout(() => {
+        this.phase.set('idle');
+        this.inTransition = false;
+      }, 340);
+    }, 230);
   }
 
   prev(): void {
     const len = this.slides.length;
     if (!len) return;
-    this.goToSlide((this.currentIndex() - 1 + len) % len);
+    this.goToSlide((this.displayedIndex() - 1 + len) % len);
   }
 
   next(): void {
     if (!this.slides.length) return;
-    this.goToSlide((this.currentIndex() + 1) % this.slides.length);
+    this.goToSlide((this.displayedIndex() + 1) % this.slides.length);
   }
 
   // ── Autoplay ─────────────────────────────────────────────────────────────────

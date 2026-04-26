@@ -41,6 +41,8 @@
     object-fit: cover;
     object-position: center;
     display: block;
+    // Reveal de entrada: zoom-out sutil desde 1.06 → 1.0
+    animation: hero-img-reveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   // Gradiente oscurecedor sobre la foto
@@ -85,6 +87,8 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0 40px;
+    // Nombre e info entran con delay para que la imagen ya esté visible
+    animation: hero-text-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
   }
 
   &__namebar-info {
@@ -257,6 +261,8 @@
   &__panel {
     position: relative;
     z-index: 2;
+    // Panel de info entra después del namebar
+    animation: hero-text-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.62s both;
     margin-top: -28px;   // sube 28px sobre el cover para integración visual
     background: var(--biz-panel-bg, #ffffff);
     color: var(--biz-panel-text, #1a0a00);
@@ -1230,6 +1236,18 @@
     border-color: rgba(255, 255, 255, 0.55);
     transform: scale(1.12);
   }
+}
+
+// ── Animaciones de entrada del hero del micrositio ───────────────────────────
+// Una sola vez al cargar la página — no repiten
+@keyframes hero-img-reveal {
+  from { opacity: 0; transform: scale(1.06); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes hero-text-reveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 @keyframes lbFade { from { opacity: 0; } to { opacity: 1; } }

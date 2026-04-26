@@ -9,7 +9,9 @@
   >
     <div class="carousel__overlay"></div>
 
-    <div class="carousel__content" [class.carousel__content--animating]="animating()">
+    <div class="carousel__content"
+         [class.carousel__content--exit]="phase() === 'exit'"
+         [class.carousel__content--enter]="phase() === 'enter'">
 
       @switch (slide.type) {
 
