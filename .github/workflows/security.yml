@@ -2,7 +2,7 @@
 # Security CI Pipeline — Comer en / Directorio Girardota
 # ============================================================
 # Ejecuta tres jobs de seguridad en paralelo en cada push a
-# main o a cualquier rama security/** y en cada PR hacia main.
+# main o a la rama security, y en cada PR hacia main.
 #
 # Jobs:
 #   1. dependency-audit  — npm audit (vulnerabilidades en deps)
@@ -16,7 +16,7 @@ on:
   push:
     branches:
       - main
-      - 'security/**'
+      - security
   pull_request:
     branches:
       - main
