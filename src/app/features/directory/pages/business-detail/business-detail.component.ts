@@ -220,9 +220,12 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     const saved = sessionStorage.getItem('cart_bubble_pos');
-    this.bubblePos.set(
-      saved ? JSON.parse(saved) : { x: window.innerWidth - 80, y: window.innerHeight - 100 }
-    );
+    const defaultPos = { x: window.innerWidth - 80, y: window.innerHeight - 100 };
+    try {
+      this.bubblePos.set(saved ? JSON.parse(saved) : defaultPos);
+    } catch {
+      this.bubblePos.set(defaultPos);
+    }
 
     const id = this.route.snapshot.paramMap.get('id');
 

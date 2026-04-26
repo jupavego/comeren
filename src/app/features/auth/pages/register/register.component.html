@@ -108,7 +108,7 @@
               formControlName="password"
               class="field-input field-input--icon"
               [class.field-input--error]="password.invalid && password.touched"
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Mínimo 8 caracteres"
               autocomplete="new-password"
             />
             <button type="button" class="field-icon-btn" (click)="togglePassword()" tabindex="-1">
@@ -122,7 +122,7 @@
           @if (password.invalid && password.touched) {
             <span class="field-error">
               @if (password.errors?.['required'])  { La contraseña es obligatoria }
-              @if (password.errors?.['minlength']) { Mínimo 6 caracteres }
+              @if (password.errors?.['minlength']) { Mínimo 8 caracteres }
             </span>
           }
         </div>
