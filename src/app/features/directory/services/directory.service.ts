@@ -6,6 +6,12 @@ import { Account, CatalogItem } from '../models/account.model';
 export class DirectoryService {
   private supabase = inject(SupabaseService);
 
+  // SEC-008 | OWASP A03: Injection
+  // Previene que caracteres especiales de PostgREST alteren el filtro .or().
+  private sanitizeQuery(query: string): string {
+    return query.trim().slice(0, 100).replace(/[(),']/g, '');
+  }
+
   // Obtiene todos los negocios aprobados y activos para el directorio público
   // Carga paginada — devuelve una página de negocios y si hay más.
   // page: número de página (0-based), pageSize: cuántos por página.
@@ -42,6 +48,7 @@ export class DirectoryService {
     page: number,
     pageSize = 12
   ): Promise<{ data: Account[]; hasMore: boolean }> {
+    const safe = this.sanitizeQuery(query);
     const from = page * pageSize;
     const to   = from + pageSize;
 
@@ -51,11 +58,11 @@ export class DirectoryService {
       .eq('active', true)
       .eq('status', 'approved')
       .or(
-        `name.ilike.%${query}%,` +
-        `description.ilike.%${query}%,` +
-        `zone.ilike.%${query}%,` +
-        `category.ilike.%${query}%,` +
-        `slogan.ilike.%${query}%`
+        `name.ilike.%${safe}%,` +
+        `description.ilike.%${safe}%,` +
+        `zone.ilike.%${safe}%,` +
+        `category.ilike.%${safe}%,` +
+        `slogan.ilike.%${safe}%`
       )
       .order('name', { ascending: true })
       .range(from, to);
@@ -131,17 +138,18 @@ export class DirectoryService {
 
   // Búsqueda por texto — filtra por nombre, zona, categoría, descripción
   async search(query: string): Promise<Account[]> {
+    const safe = this.sanitizeQuery(query);
     const { data, error } = await this.supabase
       .from('accounts')
       .select('*')
       .eq('active', true)
       .eq('status', 'approved')
       .or(
-        `name.ilike.%${query}%,` +
-        `description.ilike.%${query}%,` +
-        `zone.ilike.%${query}%,` +
-        `category.ilike.%${query}%,` +
-        `slogan.ilike.%${query}%`
+        `name.ilike.%${safe}%,` +
+        `description.ilike.%${safe}%,` +
+        `zone.ilike.%${safe}%,` +
+        `category.ilike.%${safe}%,` +
+        `slogan.ilike.%${safe}%`
       )
       .order('name', { ascending: true });
 
