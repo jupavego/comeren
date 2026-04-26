@@ -1,4 +1,4 @@
-@use 'styles/breakpoints' as *;
+﻿@use 'styles/breakpoints' as *;
 
 // ── Backdrop ──────────────────────────────────────────────────────────────────
 .wa-order-backdrop {
@@ -6,7 +6,7 @@
   inset: 0;
   background: rgba(30, 20, 60, 0.45);
   backdrop-filter: blur(3px);
-  z-index: 400;
+  z-index: var(--z-drawer);
   animation: fadeIn 0.2s ease;
 }
 
@@ -21,7 +21,7 @@
   background: var(--color-background-primary, #ffffff);
   border-left: 1px solid var(--color-border-tertiary, #e4ddd8);
   box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
-  z-index: 401;
+  z-index: calc(var(--z-drawer) + 1);
   display: flex;
   flex-direction: column;
   animation: slideInRight 0.25s ease;
@@ -33,7 +33,7 @@
     justify-content: space-between;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--color-border-tertiary, #e4ddd8);
-    background: #25d366;
+    background: var(--color-whatsapp);
     color: #ffffff;
   }
 
@@ -60,7 +60,7 @@
     padding: 0.25rem;
     display: flex;
     border-radius: 6px;
-    transition: background 0.15s;
+    transition: background var(--duration-fast);
 
     &:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; }
 
@@ -99,7 +99,7 @@
   &__row-img {
     width: 48px;
     height: 48px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
     flex-shrink: 0;
   }
@@ -131,7 +131,7 @@
   &__counter-btn {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1.5px solid var(--color-border-tertiary, #e4ddd8);
     background: var(--color-background-primary, #ffffff);
     color: var(--color-text-primary);
@@ -144,8 +144,8 @@
     transition: background 0.12s, border-color 0.12s;
 
     &:hover:not(:disabled) {
-      background: #25d366;
-      border-color: #25d366;
+      background: var(--color-whatsapp);
+      border-color: var(--color-whatsapp);
       color: #ffffff;
     }
 
@@ -217,18 +217,18 @@
   &__input {
     padding: 0.55rem 0.75rem;
     border: 1px solid var(--color-border-tertiary);
-    border-radius: 8px;
-    font-family: 'Manrope', sans-serif;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
     font-size: 0.9rem;
     color: var(--color-text-primary);
     background: var(--color-background-primary);
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.15s;
+    transition: border-color var(--duration-fast);
 
     &:focus {
       outline: none;
-      border-color: #25d366;
+      border-color: var(--color-whatsapp);
     }
   }
 
@@ -241,18 +241,18 @@
     flex: 1;
     padding: 0.5rem;
     border: 1.5px solid var(--color-border-tertiary);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--color-background-secondary);
     color: var(--color-text-secondary);
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    transition: border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
 
     &--active {
-      border-color: #25d366;
-      background: #dcfce7;
+      border-color: var(--color-whatsapp);
+      background: var(--color-background-success);
       color: #166534;
     }
   }
@@ -270,15 +270,15 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.875rem;
-    background: #25d366;
+    background: var(--color-whatsapp);
     color: #ffffff;
     border: none;
-    border-radius: 12px;
-    font-family: 'Poppins', sans-serif;
+    border-radius: var(--radius-md);
+    font-family: var(--font-heading);
     font-size: 0.9375rem;
     font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity var(--duration-fast);
 
     &:hover:not(:disabled) { opacity: 0.9; }
     &:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -328,7 +328,7 @@
   }
 
   &__sent-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.4rem;
     font-weight: 800;
     color: #1a2e1a;
@@ -346,14 +346,14 @@
     margin-top: 0.5rem;
     padding: 0.65rem 2rem;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: linear-gradient(135deg, #059669 0%, #34d399 100%);
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.9375rem;
     font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity var(--duration-fast);
 
     &:hover { opacity: 0.9; }
   }

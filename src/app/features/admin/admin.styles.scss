@@ -1,9 +1,10 @@
-// admin.styles.scss
+﻿// admin.styles.scss
 // Estilos exclusivos del feature admin.
 // Los componentes globales (btn-*, field-*, modal-*, spinner) vienen de styles.scss.
 // Cada componente importa con: @use '../../admin.styles' as *;
 
 @use 'styles/breakpoints' as *;
+@use 'styles/shared-cards' as *;
 
 .admin-page {
   max-width: 1100px;
@@ -49,7 +50,7 @@
   padding: 2px 10px;
   background: var(--color-background-warning);
   color: var(--color-text-warning);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -69,45 +70,15 @@
 }
 
 // ── Stats grid ────────────────────────────────────────────────────────────────
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
-}
-
-.stat-card {
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-
-  &__value {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    line-height: 1;
-  }
-
-  &__label {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-  }
-
-  &--warning  &__value { color: var(--color-text-warning); }
-  &--success  &__value { color: var(--color-text-success); }
-  &--whatsapp &__value { color: #128c7e; }
-}
+.stats-grid { @include stats-grid(180px); }
 
 // ── Hero del panel de admin ───────────────────────────────────────────────────
 .admin-hero {
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--color-background-primary);
   border: 1px solid var(--color-border-tertiary);
-  box-shadow: 0 4px 24px rgba(94, 73, 214, 0.08);
+  box-shadow: 0 4px 24px rgba(var(--color-brand-primary-rgb), 0.08);
 
   &__cover {
     height: 120px;
@@ -121,7 +92,7 @@
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-    background: linear-gradient(135deg, #3d2bbf 0%, var(--color-brand-primary) 50%, var(--color-brand-light) 100%);
+    background: linear-gradient(135deg, var(--color-brand-dark) 0%, var(--color-brand-primary) 50%, var(--color-brand-light) 100%);
   }
 
   &__identity {
@@ -146,7 +117,7 @@
   }
 
   &__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.3rem;
     font-weight: 800;
     color: #ffffff;
@@ -166,7 +137,7 @@
     padding: 0.35rem 1rem;
     background: rgba(255, 255, 255, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     font-size: 0.8rem;
     font-weight: 700;
     color: #ffffff;
@@ -183,68 +154,24 @@
 }
 
 .admin-action-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem;
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: 16px;
-  background: var(--color-background-primary);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  @include action-card-base;
 
-  &:hover {
-    border-color: var(--color-brand-light);
-    box-shadow: 0 8px 24px rgba(94, 73, 214, 0.1);
-    transform: translateY(-2px);
+  &:hover &__arrow { transform: translateX(3px); }
 
-    .admin-action-card__arrow { transform: translateX(3px); }
-  }
-
-  &__icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    svg { width: 20px; height: 20px; }
-
-    &--purple { background: rgba(94, 73, 214, 0.1);  svg { stroke: var(--color-brand-primary); } }
-    &--orange  { background: rgba(226, 82, 50, 0.1);  svg { stroke: var(--color-brand-accent); } }
-    &--teal    { background: rgba(20, 184, 166, 0.1); svg { stroke: #0d9488; } }
-    &--green   { background: rgba(5, 150, 105, 0.1);  svg { stroke: #059669; } }
-  }
-
-  &__content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
+  &__icon { @include action-card-icon; }
 
   &__label {
     display: block;
     font-size: 0.9375rem;
     font-weight: 700;
     color: var(--color-text-primary);
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
   }
 
   &__desc {
     display: block;
     font-size: 0.8125rem;
     color: var(--color-text-secondary);
-  }
-
-  &__arrow {
-    font-size: 1rem;
-    color: var(--color-text-tertiary);
-    transition: transform 0.2s;
-    flex-shrink: 0;
   }
 }
 
@@ -260,23 +187,23 @@
   min-width: 220px;
   padding: 0.5rem 0.875rem;
   font-size: 0.9375rem;
-  border: 1px solid var(--color-border-secondary);
-  border-radius: 8px;
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--radius-sm);
   background: var(--color-background-primary);
   color: var(--color-text-primary);
 
   &:focus {
     outline: none;
     border-color: var(--color-border-info);
-    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
+    box-shadow: var(--shadow-focus-info);
   }
 }
 
 .filter-select {
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
-  border: 1px solid var(--color-border-secondary);
-  border-radius: 8px;
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--radius-sm);
   background: var(--color-background-primary);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -288,7 +215,7 @@
 .admin-table-wrapper {
   overflow-x: auto; // scroll horizontal en móvil
   border: 1px solid var(--color-border-tertiary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .admin-table {
@@ -351,7 +278,7 @@
   &__img {
     width: 44px;
     height: 44px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
     border: 1px solid var(--color-border-tertiary);
     flex-shrink: 0;
@@ -360,7 +287,7 @@
   &__no-img {
     width: 44px;
     height: 44px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--color-background-secondary);
     border: 1px solid var(--color-border-tertiary);
     display: flex;
@@ -405,7 +332,7 @@
 .role-select {
   padding: 0.3rem 0.5rem;
   font-size: 0.8125rem;
-  border: 1px solid var(--color-border-secondary);
+  border: 1px solid var(--color-border-tertiary);
   border-radius: 6px;
   background: var(--color-background-primary);
   color: var(--color-text-primary);
@@ -444,7 +371,7 @@
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--duration-fast);
 
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -485,7 +412,7 @@
   &__icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: var(--color-background-secondary);
     display: flex;
     align-items: center;
@@ -515,7 +442,7 @@
 // ── Sección interna de página ────────────────────────────────────────────────
 .admin-page__section {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   display: flex;
@@ -533,7 +460,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   color: var(--color-text-primary);
 }
 
@@ -557,18 +484,18 @@
   min-width: 24px;
   height: 24px;
   padding: 0 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--color-brand-primary);
   color: white;
   font-size: 0.72rem;
   font-weight: 700;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
 }
 
 // ── Tabla de valoraciones (compartida: admin + business dashboard) ────────────
 .ratings-table-wrap {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1.5px solid #ede9f8;
 }
 
@@ -605,15 +532,15 @@
 .rating-pill {
   display: inline-flex;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 0.72rem;
   font-weight: 800;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   color: white;
 
-  &--high { background: #16a34a; }
+  &--high { background: var(--green-600); }
   &--mid  { background: #d97706; }
-  &--low  { background: #dc2626; }
+  &--low  { background: var(--red-600); }
 }
 
 // Botón de exportar (exclusivo de admin)
@@ -625,11 +552,11 @@
   background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-light) 100%);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--duration-fast);
 
   &:hover { opacity: 0.9; }
 }

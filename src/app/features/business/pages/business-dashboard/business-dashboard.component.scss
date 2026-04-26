@@ -1,4 +1,4 @@
-@use '../../business.styles' as *;
+﻿@use '../../business.styles' as *;
 @use 'styles/breakpoints' as *;
 
 // ── Contenedor principal ──────────────────────────────────────────────────────
@@ -15,11 +15,11 @@
 
 // ── Hero — banner de identidad del negocio ────────────────────────────────────
 .dashboard-hero {
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--color-background-primary);
   border: 1px solid var(--color-border-tertiary);
-  box-shadow: 0 4px 24px rgba(94, 73, 214, 0.08);
+  box-shadow: 0 4px 24px rgba(var(--color-brand-primary-rgb), 0.08);
 
   &__cover {
     height: 160px;
@@ -57,7 +57,7 @@
     border-radius: 14px;
     object-fit: cover;
     border: 3px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 10px rgba(94, 73, 214, 0.2);
+    box-shadow: 0 2px 10px rgba(var(--color-brand-primary-rgb), 0.2);
     flex-shrink: 0;
   }
 
@@ -68,18 +68,18 @@
     border: 3px solid rgba(255, 255, 255, 0.8);
     background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-light));
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 800;
     font-size: 1.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 10px rgba(94, 73, 214, 0.2);
+    box-shadow: 0 2px 10px rgba(var(--color-brand-primary-rgb), 0.2);
     flex-shrink: 0;
   }
 
   &__name {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.4rem;
     font-weight: 800;
     color: #ffffff;
@@ -102,7 +102,7 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 0.9rem;
   line-height: 1.6;
 
@@ -114,14 +114,14 @@
   }
 
   &--warning {
-    background: #fffbeb;
+    background: var(--color-background-warning);
     color: #92400e;
     border: 1px solid #fcd34d;
   }
 
   &--error {
-    background: #fef2f2;
-    color: #991b1b;
+    background: var(--red-50);
+    color: var(--red-800);
     border: 1px solid #fca5a5;
   }
 }
@@ -167,7 +167,7 @@
 
 // ── Tarjeta métrica ───────────────────────────────────────────────────────────
 .metric-card {
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.1rem 1.25rem;
   display: flex;
   flex-direction: row;
@@ -183,7 +183,7 @@
   &__icon {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
@@ -202,7 +202,7 @@
   }
 
   &__value {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: clamp(0.85rem, 1.8vw, 1.5rem);
     font-weight: 800;
     color: #ffffff;
@@ -221,7 +221,7 @@
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.7);
     flex-shrink: 0;
-    transition: transform 0.2s;
+    transition: transform var(--duration-normal);
   }
 
   // Variantes de color
@@ -242,13 +242,13 @@
   }
 
   &--whatsapp {
-    background: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+    background: linear-gradient(135deg, var(--color-whatsapp-dark) 0%, var(--color-whatsapp) 100%);
     .metric-card__icon svg { stroke: none; fill: #fff; }
   }
 
   &--whatsapp-light {
     background: linear-gradient(135deg, #dcf8c6 0%, #c5f0a4 100%);
-    .metric-card__icon { background: rgba(255,255,255,0.5); svg { stroke: #128c7e; } }
+    .metric-card__icon { background: rgba(255,255,255,0.5); svg { stroke: var(--color-whatsapp-dark); } }
     .metric-card__value { color: #0a3d2b; }
     .metric-card__label { color: #1a5c40; }
   }
@@ -256,7 +256,7 @@
   // Botón clickeable (Productos activos)
   &--btn {
     cursor: pointer;
-    transition: filter 0.2s, transform 0.15s;
+    transition: filter var(--duration-normal), transform var(--duration-fast);
 
     &:hover { filter: brightness(1.08); transform: translateY(-1px); }
     &:active { transform: translateY(0); }
@@ -271,7 +271,7 @@
 .ratings-section {
   background: var(--color-background-primary);
   border: 1px solid var(--color-border-tertiary);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -287,7 +287,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     color: var(--color-text-primary);
     flex: 1;
   }
@@ -301,7 +301,7 @@
 
 .ratings-table-wrap {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1.5px solid #ede9f8;
 }
 
@@ -338,15 +338,15 @@
 .rating-pill {
   display: inline-flex;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 0.72rem;
   font-weight: 800;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   color: white;
 
-  &--high { background: #16a34a; }
+  &--high { background: var(--green-600); }
   &--mid  { background: #d97706; }
-  &--low  { background: #dc2626; }
+  &--low  { background: var(--red-600); }
 }
 
 .panel-badge {
@@ -356,12 +356,12 @@
   min-width: 24px;
   height: 24px;
   padding: 0 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--color-brand-primary);
   color: white;
   font-size: 0.72rem;
   font-weight: 700;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────

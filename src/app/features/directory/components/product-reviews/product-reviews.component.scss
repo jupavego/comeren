@@ -1,11 +1,11 @@
-// ── Backdrop ──────────────────────────────────────────────────────────────────
+﻿// ── Backdrop ──────────────────────────────────────────────────────────────────
 .pr-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(10, 8, 24, 0.52);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  z-index: 200;
+  z-index: var(--z-dropdown);
   animation: prFadeIn 0.18s ease;
 }
 
@@ -15,10 +15,10 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 201;
+  z-index: calc(var(--z-dropdown) + 1);
   width: min(92vw, 380px);
   background: white;
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   padding: 2rem 1.75rem 1.75rem;
   box-shadow:
     0 32px 80px rgba(8, 6, 24, 0.28),
@@ -39,7 +39,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all var(--duration-fast);
 
     &:hover {
       background: #f0edf8;
@@ -63,7 +63,7 @@
     margin: 0 0 0.25rem;
     font-size: 1rem;
     font-weight: 800;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     color: var(--color-text-primary);
     letter-spacing: -0.02em;
   }
@@ -104,7 +104,7 @@
     background: #fafafa;
     font-size: 0.95rem;
     font-weight: 800;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     cursor: pointer;
     transition: all 0.14s;
     color: var(--color-text-primary);
@@ -116,8 +116,8 @@
     }
 
     // Colores semánticos al hover según valor
-    &--low:hover:not(:disabled)  { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
-    &--mid:hover:not(:disabled)  { border-color: #d97706; color: #d97706; background: #fffbeb; }
+    &--low:hover:not(:disabled)  { border-color: var(--red-600); color: var(--red-600); background: var(--red-50); }
+    &--mid:hover:not(:disabled)  { border-color: #d97706; color: #d97706; background: var(--color-background-warning); }
     &--high:hover:not(:disabled) {
       border-color: var(--color-brand-primary);
       color: var(--color-brand-primary);
@@ -132,7 +132,7 @@
       color: white;
     }
 
-    &--selected#{&}--low  { background: #dc2626; }
+    &--selected#{&}--low  { background: var(--red-600); }
     &--selected#{&}--mid  { background: #d97706; }
     &--selected#{&}--high { background: var(--color-brand-primary); }
 
@@ -144,15 +144,15 @@
     width: 100%;
     margin-top: 0.75rem;
     padding: 0.75rem 1rem;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     border: none;
     background: var(--color-brand-primary);
     color: white;
     font-size: 0.875rem;
     font-weight: 700;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     cursor: pointer;
-    transition: opacity 0.15s, background 0.2s;
+    transition: opacity var(--duration-fast), background var(--duration-normal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,7 +191,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-light, #7662ec));
+    background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-light));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -204,7 +204,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 800;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     color: var(--color-text-primary);
   }
 

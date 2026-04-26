@@ -1,9 +1,11 @@
+﻿@use 'styles/breakpoints' as *;
+
 :host { display: block; }
 
 .footer {
   background: linear-gradient(135deg, #1e1570 0%, #2a2096 50%, #3126a8 100%);
   color: rgba(255,255,255,0.8);
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   border-top: 3px solid #e25232;
 }
 
@@ -29,7 +31,7 @@
 }
 
 .footer__logo {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   font-weight: 800;
   font-size: 1.25rem;
   color: #ffffff;
@@ -49,7 +51,7 @@
 .footer__col-title {
   font-size: 0.95rem;
   font-weight: 800;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #ff7043;
@@ -69,7 +71,7 @@
   a {
     text-decoration: none;
     color: inherit;
-    transition: color 0.2s;
+    transition: color var(--duration-normal);
     &:hover { color: #ffffff; }
   }
 }
@@ -100,7 +102,7 @@
   a {
     color: rgba(255,255,255,0.5);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color var(--duration-normal);
     &:hover { color: #ffffff; }
   }
 }
@@ -113,7 +115,7 @@
   a {
     text-decoration: none;
     color: inherit;
-    transition: color 0.2s;
+    transition: color var(--duration-normal);
     &:hover { color: #ffffff; }
   }
 }
@@ -131,14 +133,14 @@
     justify-content: center;
     gap: 0.45rem;
     padding: 0.55rem 0.95rem;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: #ffffff;
     color: #2f2396; // o el color exacto del fondo principal del footer
     font-size: 0.82rem;
     font-weight: 700;
     line-height: 1;
     text-decoration: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform var(--duration-normal) ease, opacity var(--duration-normal) ease;
 
     &:hover {
       opacity: 0.8;
@@ -186,7 +188,7 @@
 
 
 // ── Responsive ────────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
+@include respond-to($bp-sm) {
   .footer__inner {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
@@ -198,7 +200,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@include respond-to($bp-xs) {
   .footer__inner {
     grid-template-columns: 1fr;
     gap: 1.75rem;

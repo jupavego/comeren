@@ -104,6 +104,7 @@
   --color-brand-primary:     var(--violet-600);
   --color-brand-primary-rgb: 94, 73, 214;
   --color-brand-light:       var(--violet-500);
+  --color-brand-light-rgb:   118, 98, 236;
   --color-brand-dark:        var(--violet-700);
   --color-brand-border:      var(--violet-200);
   --color-brand-surface:     var(--violet-50);
@@ -125,6 +126,7 @@
   // WhatsApp CTA
   --color-whatsapp:       var(--green-whatsapp-light);
   --color-whatsapp-dark:  var(--green-whatsapp-dark);
+  --color-whatsapp-rgb:   37, 211, 102;
 
   // ================================================================
   // ALIAS SEMÁNTICOS — FONDOS
@@ -143,7 +145,6 @@
   // ALIAS SEMÁNTICOS — TEXTO
   // ================================================================
 
-  --color-text-dark:      var(--brown-900);
   --color-text-primary:   var(--brown-900);
   --color-text-secondary: var(--neutral-700);
   --color-text-tertiary:  var(--neutral-500);
@@ -158,10 +159,11 @@
   // ================================================================
 
   --color-border-primary:  var(--neutral-300);
-  --color-border-secondary: var(--neutral-200);
   --color-border-tertiary: var(--neutral-200);
   --color-border-warning:  var(--amber-200);
-  --color-border-focus:    var(--orange-400);
+  --color-border-info:     var(--blue-500);
+  --color-border-success:  var(--green-500);
+  --color-border-danger:   var(--red-500);
 
   // ================================================================
   // TIPOGRAFÍA
@@ -232,10 +234,6 @@
   --radius-3xl:  28px;
   --radius-full: 9999px;
 
-  --border-width-sm: 1px;
-  --border-width-md: 2px;
-  --border-width-lg: 3px;
-
   // ================================================================
   // ELEVACIÓN (sombras)
   // ================================================================
@@ -251,14 +249,20 @@
   --shadow-cta-orange: 0 8px 24px rgba(249, 115, 22, .38);
   --shadow-cta-wa:     0 8px 24px rgba(37, 211, 102, .38);
 
+  // Sombras de brand — botones y estados de foco
+  --shadow-brand-sm:  0 2px 8px rgba(var(--color-brand-primary-rgb), 0.25);
+  --shadow-brand-md:  0 4px 12px rgba(var(--color-brand-primary-rgb), 0.35);
+  --shadow-focus:     0 0 0 3px rgba(var(--color-brand-primary-rgb), 0.1);
+  --shadow-focus-info: 0 0 0 3px rgba(24, 95, 165, 0.1);
+
   // ================================================================
   // MOVIMIENTO / ANIMACIÓN
   // ================================================================
 
   --duration-instant: 80ms;
   --duration-fast:    150ms;
-  --duration-normal:  250ms;
-  --duration-slow:    400ms;
+  --duration-normal:  200ms;
+  --duration-slow:    300ms;
   --duration-slower:  600ms;
 
   --ease-default:  cubic-bezier(0.4, 0, 0.2, 1);
@@ -268,26 +272,19 @@
   --ease-spring:   cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   // ================================================================
-  // Z-INDEX
+  // Z-INDEX — capas globales de apilamiento
+  // Valores internos a componentes (1-10) se dejan como números crudos.
   // ================================================================
 
-  --z-base:    0;
-  --z-raised:  10;
-  --z-overlay: 20;
-  --z-modal:   30;
-  --z-toast:   40;
-  --z-tooltip: 50;
+  --z-navbar:    100;   // topbar fijo
+  --z-dropdown:  200;   // dropdowns, popups flotantes
+  --z-gallery:   300;   // galería de fotos a pantalla completa
+  --z-drawer:    400;   // panel lateral (wa-order)
+  --z-modal:    1000;   // modal overlay global
+  --z-bubble:   9000;   // botón flotante WhatsApp arrastrable
+  --z-conflict: 9700;   // diálogo de conflicto de carrito
+  --z-gate:     9800;   // auth-gate (máxima prioridad)
 
-  // ================================================================
-  // LAYOUT
-  // ================================================================
-
-  --max-width-xs:  480px;
-  --max-width-sm:  640px;
-  --max-width-md:  768px;
-  --max-width-lg:  1024px;
-  --max-width-xl:  1280px;
-  --max-width-2xl: 1440px;
 }
 
 // ── Media query reducción de movimiento ──────────────────────

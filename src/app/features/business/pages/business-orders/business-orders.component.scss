@@ -1,4 +1,4 @@
-@use '../../business.styles' as *;
+﻿@use '../../business.styles' as *;
 
 .orders-summary {
   display: flex;
@@ -14,7 +14,7 @@
     gap: 0.2rem;
 
     &--total {
-      background: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+      background: linear-gradient(135deg, var(--color-whatsapp-dark) 0%, var(--color-whatsapp) 100%);
     }
     &--month {
       background: linear-gradient(135deg, #dcf8c6 0%, #c5f0a4 100%);
@@ -22,7 +22,7 @@
   }
 
   &__value {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 2rem;
     font-weight: 800;
     line-height: 1;
@@ -42,7 +42,7 @@
 
 .orders-table-wrap {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1.5px solid #ede9f8;
 }
 

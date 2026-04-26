@@ -1,5 +1,7 @@
-// auth-layout.component.scss
+﻿// auth-layout.component.scss
 // Layout de dos columnas: sidebar de marca + área de formulario
+
+@use 'styles/breakpoints' as *;
 
 .auth-layout {
   min-height: 100vh;
@@ -16,8 +18,8 @@
   // Mismo gradiente que el header pill, pero en columna
   background: linear-gradient(160deg,
     #5c42df                0%,
-    rgba(92, 66, 223, .92) 40%,
-    rgba(92, 66, 223, .75) 70%,
+    rgba(var(--color-brand-primary-rgb), .92) 40%,
+    rgba(var(--color-brand-primary-rgb), .75) 70%,
     rgba(249, 115, 22, .65) 100%
   );
   display: flex;
@@ -78,7 +80,7 @@
   }
 
   &__name {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 800;
     font-size: 1.35rem;
     color: #ffffff;
@@ -87,7 +89,7 @@
   }
 
   &__tagline {
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-weight: 500;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, .72);
@@ -121,7 +123,7 @@
     }
 
     strong {
-      font-family: 'Poppins', sans-serif;
+      font-family: var(--font-heading);
       font-size: 0.85rem;
       font-weight: 700;
       color: #ffffff;
@@ -129,7 +131,7 @@
     }
 
     span {
-      font-family: 'Manrope', sans-serif;
+      font-family: var(--font-body);
       font-size: 0.75rem;
       color: rgba(255, 255, 255, .65);
       line-height: 1.4;
@@ -162,12 +164,12 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.8125rem;
     font-weight: 600;
     color: rgba(255, 255, 255, .60);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color var(--duration-normal);
 
     svg { flex-shrink: 0; }
 
@@ -188,16 +190,16 @@
   // Fondo con textura suave: color crema claro + patrón de puntos sutil
   background-color: #f2f0f9;
   background-image:
-    radial-gradient(circle, rgba(92, 66, 223, .07) 1px, transparent 1px);
+    radial-gradient(circle, rgba(var(--color-brand-primary-rgb), .07) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
-@media (max-width: 900px) {
+@include respond-to($bp-nav) {
   .auth-sidebar { width: 320px; padding: 2rem 1.75rem; }
 }
 
-@media (max-width: 700px) {
+@include respond-to($bp-sidebar) {
   .auth-layout { flex-direction: column; }
 
   .auth-sidebar {

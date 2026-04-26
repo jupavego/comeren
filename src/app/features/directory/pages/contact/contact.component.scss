@@ -1,7 +1,7 @@
-.contact-page {
+﻿.contact-page {
   min-height: 80vh;
   padding: 3rem 1rem;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   background: #f7f4ef;
 }
 
@@ -17,7 +17,7 @@
   text-align: center;
 
   &__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
     color: #2c241d;
@@ -40,7 +40,7 @@
 
 .contact-card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.75rem 1.5rem;
   text-align: center;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
@@ -52,7 +52,7 @@
   &__icon  { font-size: 2rem; line-height: 1; }
 
   &__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1rem;
     font-weight: 700;
     color: #2c241d;
@@ -67,7 +67,7 @@
 
   &__link {
     font-size: 0.9375rem;
-    color: #5e49d6;
+    color: var(--color-brand-primary);
     text-decoration: none;
     font-weight: 600;
 
@@ -76,8 +76,8 @@
 }
 
 .contact-cta {
-  background: linear-gradient(135deg, #5e49d6 0%, #7662ec 100%);
-  border-radius: 20px;
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-light) 100%);
+  border-radius: var(--radius-xl);
   padding: 2.5rem 2rem;
   text-align: center;
   color: #ffffff;
@@ -87,7 +87,7 @@
   gap: 1rem;
 
   &__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0;
@@ -105,13 +105,13 @@
     display: inline-flex;
     padding: 0.8rem 1.75rem;
     background: #ffffff;
-    color: #5e49d6;
+    color: var(--color-brand-primary);
     text-decoration: none;
     border-radius: 10px;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     font-size: 0.9375rem;
-    transition: opacity 0.15s;
+    transition: opacity var(--duration-fast);
 
     &:hover { opacity: 0.9; }
   }

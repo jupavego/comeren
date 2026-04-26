@@ -1,4 +1,4 @@
-@use '../../business.styles' as *;
+﻿@use '../../business.styles' as *;
 
 .ratings-filter {
   margin-bottom: 1.5rem;
@@ -11,7 +11,7 @@
 
 .ratings-table-wrap {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1.5px solid #ede9f8;
 }
 
@@ -54,15 +54,15 @@
 .rating-pill {
   display: inline-flex;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 0.72rem;
   font-weight: 800;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   color: white;
 
-  &--high { background: #16a34a; }
+  &--high { background: var(--green-600); }
   &--mid  { background: #d97706; }
-  &--low  { background: #dc2626; }
+  &--low  { background: var(--red-600); }
 }
 
 .ratings-count {

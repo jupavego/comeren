@@ -1,3 +1,5 @@
+﻿@use 'styles/breakpoints' as *;
+
 // ── Contenedor raíz (posicionamiento flotante) ────────────────────────────────
 // Sin filter aquí: un filter en el padre bloquea backdrop-filter en los hijos.
 .topbar {
@@ -5,8 +7,8 @@
   top: 3px;
   left: 3px;
   right: 3px;
-  z-index: 100;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-navbar);
+  transition: transform var(--duration-slow) var(--ease-default);
 
   &--hidden {
     transform: translateY(-110%);
@@ -18,11 +20,11 @@
 // recortado por overflow:hidden.
 // La sombra va aquí (box-shadow) para no interferir con backdrop-filter.
 .topbar__glass {
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: linear-gradient(90deg,
     #5c42df                0%,
-    rgba(92, 66, 223, .80) 25%,
-    rgba(92, 66, 223, .45) 62%,
+    rgba(var(--color-brand-primary-rgb), .80) 25%,
+    rgba(var(--color-brand-primary-rgb), .45) 62%,
     rgba(249, 115, 22, .53) 100%
   );
   backdrop-filter: blur(22px);
@@ -60,7 +62,7 @@
     color: #ffffff;
     letter-spacing: 0.2px;
     white-space: nowrap;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
   }
 }
 
@@ -84,7 +86,7 @@
   box-shadow:
     inset 0 4px 8px  rgba(0, 0, 0, .12),
     inset 0 -2px 4px rgba(255, 255, 255, 1);
-  transition: box-shadow 0.2s;
+  transition: box-shadow var(--duration-normal);
 
   &:focus-within {
     box-shadow:
@@ -102,7 +104,7 @@
     font-size: clamp(0.75rem, 1.1vw, 0.9rem);
     color: #333;
     font-weight: 600;
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     &::placeholder { color: #888; font-weight: 400; }
   }
 }
@@ -121,9 +123,9 @@
   padding: 0;
   border-radius: 0 12px 12px 0;
   margin-right: 2px;
-  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s;
+  transition: background var(--duration-normal) var(--ease-default), transform var(--duration-fast);
 
-  &:hover  { background: rgba(92, 66, 223, .06); }
+  &:hover  { background: rgba(var(--color-brand-primary-rgb), .06); }
   &:active { transform: scale(0.92); background: rgba(0, 0, 0, .05); }
 }
 
@@ -147,14 +149,14 @@
   align-items: center;
   gap: 0.75rem;
   white-space: nowrap;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
 
   a {
     text-decoration: none;
     color: rgba(255, 255, 255, .9);
     font-weight: 700;
     font-size: 0.82rem;
-    transition: color 0.2s;
+    transition: color var(--duration-normal);
     &:hover { color: #fff; }
   }
 
@@ -183,7 +185,7 @@
   cursor: pointer;
   grid-column: 3;
   justify-self: end;
-  transition: border-color 0.2s;
+  transition: border-color var(--duration-normal);
 
   &:hover { border-color: rgba(255, 255, 255, .70); }
 
@@ -234,7 +236,7 @@
   gap: 0;
   flex-wrap: nowrap;
   overflow: hidden;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
 
   // Botones de categoría y enlace de contacto comparten estilo
   button,
@@ -243,7 +245,7 @@
     background: transparent;
     font-size: clamp(0.64rem, 0.88vw, 0.73rem);
     padding: 7px clamp(0.45rem, 0.83vw, 0.91rem);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-weight: 700;
     color: rgba(255, 255, 255, .88);
@@ -254,7 +256,7 @@
     text-decoration: none;
     display: inline-block;
     position: relative;
-    transition: color 0.2s, background 0.2s;
+    transition: color var(--duration-normal), background var(--duration-normal);
 
     // Separador sutil entre categorías
     &::before {
@@ -277,9 +279,9 @@
       left: 50%;
       width: 0;
       height: 2.5px;
-      background: #f97316;
+      background: var(--color-warm-primary);
       border-radius: 2px;
-      transition: width 0.3s ease;
+      transition: width var(--duration-slow) ease;
       transform: translateX(-50%);
     }
 
@@ -295,7 +297,7 @@
 .ubicacion-subbarra {
   grid-column: 3;
   justify-self: end;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
   font-weight: 800;
   color: #ffffff;
   white-space: nowrap;
@@ -320,8 +322,8 @@
   // Mismo patrón que topbar__glass — continuación visual de la píldora
   background: linear-gradient(90deg,
     #5c42df                0%,
-    rgba(92, 66, 223, .80) 25%,
-    rgba(92, 66, 223, .45) 62%,
+    rgba(var(--color-brand-primary-rgb), .80) 25%,
+    rgba(var(--color-brand-primary-rgb), .45) 62%,
     rgba(249, 115, 22, .53) 100%
   );
   backdrop-filter: blur(22px);
@@ -330,15 +332,15 @@
   border-top: none;
   box-shadow: 0 18px 50px rgba(0, 0, 0, .30);
   border-radius: 0 0 20px 20px;
-  z-index: 99;
+  z-index: calc(var(--z-navbar) - 1);
 
   // Estado cerrado
   opacity: 0;
   pointer-events: none;
   transform: translateX(-8px);
   transition:
-    opacity   0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity   var(--duration-slow) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--duration-slow) cubic-bezier(0.22, 1, 0.36, 1);
 
   // Estado abierto
   &--abierto {
@@ -381,18 +383,18 @@
       background: rgba(255, 255, 255, .10);
       color: #ffffff;
       padding: 0.45rem 0.9rem;
-      border-radius: 999px;
+      border-radius: var(--radius-full);
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
-      font-family: 'Manrope', sans-serif;
+      font-family: var(--font-body);
       text-transform: none;
-      transition: background 0.2s;
+      transition: background var(--duration-normal);
 
       // Anula el ::after del desktop
       &::after { display: none; }
       &:hover  { background: rgba(255, 255, 255, .20); }
-      &.activa { background: #ffffff; color: #3d2bbf; font-weight: 700; }
+      &.activa { background: #ffffff; color: var(--color-brand-dark); font-weight: 700; }
     }
   }
 
@@ -403,7 +405,7 @@
     gap: 0.75rem;
     padding: 0.75rem 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, .10);
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
 
     a {
       text-decoration: none;
@@ -411,7 +413,7 @@
       font-weight: 500;
       font-size: 0.9rem;
       text-transform: none;
-      transition: color 0.2s;
+      transition: color var(--duration-normal);
       &:hover { color: #ffffff; }
     }
 
@@ -422,7 +424,7 @@
       background: #f0b23d;
       color: #ffffff;
       padding: 0.5rem 1.25rem;
-      border-radius: 999px;
+      border-radius: var(--radius-full);
       font-weight: 700;
     }
   }
@@ -430,7 +432,7 @@
   &__ubicacion {
     padding: 0.65rem 1.25rem 0.5rem;
     border-top: 1px solid rgba(255, 255, 255, .10);
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 800;
     font-size: 0.875rem;
     color: #ffffff;
@@ -438,7 +440,7 @@
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
-@media (max-width: 900px) {
+@include respond-to($bp-nav) {
   .topbar__inner {
     grid-template-columns: max-content 1fr max-content;
     column-gap: 0.75rem;

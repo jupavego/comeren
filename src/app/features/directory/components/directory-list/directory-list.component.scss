@@ -1,4 +1,4 @@
-@use '../../directory.styles' as *;
+﻿@use '../../directory.styles' as *;
 @use 'styles/breakpoints' as *;
 
 :host {
@@ -46,11 +46,11 @@
 .btn-load-more {
   background: white;
   border: 1.5px solid #d4cfc8;
-  color: var(--color-text-dark);
+  color: var(--color-text-primary);
   padding: 0.8rem 2rem;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-weight: 700;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
 
   &:hover:not(:disabled) {
     border-color: #9e9890;

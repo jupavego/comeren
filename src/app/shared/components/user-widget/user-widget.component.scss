@@ -1,4 +1,4 @@
-// user-widget.component.scss
+﻿// user-widget.component.scss
 // Estilos propios del widget — sin herencia del header gracias
 // al encapsulamiento de Angular (ViewEncapsulation.Emulated por defecto)
 @use 'styles/breakpoints' as *;
@@ -16,9 +16,9 @@
   cursor: pointer;
   padding: 0.3rem 0.5rem;
   border-radius: 10px;
-  transition: background 0.15s;
+  transition: background var(--duration-fast);
   user-select: none;
-  z-index: 200;
+  z-index: var(--z-dropdown);
 
 
 
@@ -54,7 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     font-size: 0.9rem;
     color: #ffffff;
@@ -70,7 +70,7 @@
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #22c55e;
+    background: var(--green-500);
     border: none;
     outline: none;
     box-shadow: none;
@@ -86,7 +86,7 @@
   }
 
   &__name {
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 700;
     color: #ffffff;
@@ -98,7 +98,7 @@
   }
 
   &__role {
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.7rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.65);
@@ -109,7 +109,7 @@
   // ── Chevron ──────────────────────────────────────────────────────────────
   &__chevron {
     color: rgba(255, 255, 255, 0.65);
-    transition: transform 0.2s;
+    transition: transform var(--duration-normal);
     flex-shrink: 0;
   }
 
@@ -129,7 +129,7 @@
     border-radius: 14px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
     padding: 0.4rem;
-    z-index: 201;
+    z-index: calc(var(--z-dropdown) + 1);
     animation: dropdownIn 0.15s ease;
   }
 
@@ -138,8 +138,8 @@
     align-items: center;
     gap: 0.7rem;
     padding: 0.65rem 0.875rem;
-    border-radius: 8px;
-    font-family: 'Manrope', sans-serif;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 600;
     color: #2c241d;
@@ -154,7 +154,7 @@
 
     svg {
       flex-shrink: 0;
-      color: #5e49d6;
+      color: var(--color-brand-primary);
     }
 
     &:hover {

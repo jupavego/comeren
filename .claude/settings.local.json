@@ -22,7 +22,15 @@
       "Bash(xargs grep *)",
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "PowerShell(Get-ChildItem \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\" -Name | Where-Object { $_ -match \"app\\\\.\" })",
-      "Bash(git -C \"D:/JP/WEB SERVICES/directorio-girardota v2\" worktree list)"
+      "Bash(git -C \"D:/JP/WEB SERVICES/directorio-girardota v2\" worktree list)",
+      "Bash(grep -h \"^//\" \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\styles.scss\" \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\styles\\\\_tokens.scss\")",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(grep -rn \"\\\\.scss$\" -l .)",
+      "Bash(grep \"#[0-9a-fA-F]\\\\{3,6\\\\}\")",
+      "Bash(grep -oP \"#[0-9a-fA-F]{3,6}\")",
+      "Bash(grep -rEoh \":\\\\s*#[0-9a-fA-F]{3,6}\" src/app src/styles --include=\"*.scss\")",
+      "Bash(grep -oE \"#[0-9a-fA-F]{3,6}\")"
     ]
   }
 }

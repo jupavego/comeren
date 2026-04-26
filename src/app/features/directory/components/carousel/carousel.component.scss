@@ -1,4 +1,4 @@
-@use '../../directory.styles' as *;
+﻿@use '../../directory.styles' as *;
 @use 'styles/breakpoints' as *;
 
 :host { display: block; }
@@ -61,7 +61,7 @@
     margin: 0.6rem 0;
     max-width: 620px;
     line-height: 1.05;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 800;
     letter-spacing: -0.02em;
   }
@@ -71,7 +71,7 @@
     line-height: 1.6;
     margin: 0 0 1.4rem;
     max-width: 720px;
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-weight: 500;
   }
 }
@@ -92,7 +92,7 @@
   h2 {
     font-size: clamp(2.1rem, 4.8vw, 3.8rem);
     margin: 0.6rem 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 800;
   }
 
@@ -100,7 +100,7 @@
     font-size: 1.05rem;
     line-height: 1.6;
     margin: 0 0 1.4rem;
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     font-weight: 500;
   }
 }
@@ -111,7 +111,7 @@
   background: #FF5630;
   color: white;
   padding: 0.45rem 0.8rem;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 0.85rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
@@ -127,10 +127,10 @@
   padding: 0.95rem 1.35rem;
   border-radius: 18px;
   font-weight: 800;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   border: none;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--duration-fast);
 
   &:hover { opacity: 0.9; }
 }
@@ -143,10 +143,10 @@
   padding: 0.95rem 1.35rem;
   border-radius: 18px;
   font-weight: 700;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   border: 1px solid rgba(255, 255, 255, 0.28);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--duration-fast);
 
   &:hover { background: rgba(255, 255, 255, 0.25); }
 }
@@ -167,7 +167,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s, transform 0.2s;
+  transition: color var(--duration-normal), transform var(--duration-normal);
   // Sombra para legibilidad sobre cualquier fondo de imagen
   filter: drop-shadow(0 1px 4px rgba(0,0,0,0.5));
 
@@ -207,7 +207,7 @@
   background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s, transform 0.2s;
+  transition: background var(--duration-normal), transform var(--duration-normal);
 
   &--active {
     background: #ffffff;

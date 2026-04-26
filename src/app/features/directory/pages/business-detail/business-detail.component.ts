@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { Account, CatalogItem } from '../../models/account.model';
@@ -16,6 +16,7 @@ import { AuthGateService } from '../../../../core/services/auth-gate.service';
 @Component({
   selector: 'app-business-detail',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, ReviewsComponent, WhatsappOrderComponent, MapViewComponent, BusinessStatusBadgeComponent, ProductReviewsComponent, AuthGateComponent],
   templateUrl: './business-detail.component.html',
   styleUrl: './business-detail.component.scss',
@@ -29,22 +30,17 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   authGate = inject(AuthGateService);
 
   private shimmerObserver?: IntersectionObserver;
+  private actionsObserver?: IntersectionObserver;
   private dragMoved = false;
-
-  private readonly onScroll = () => {
-    const el = document.querySelector<HTMLElement>('.biz-hero__panel-actions');
-    if (!el) return;
-    const hidden = el.getBoundingClientRect().bottom < 0;
-    if (hidden !== this.heroWaHidden()) {
-      this.zone.run(() => this.heroWaHidden.set(hidden));
-    }
-  };
 
   constructor() {
     effect(() => {
       const loaded = !!this.account();
       if (!loaded) return;
-      setTimeout(() => this.setupShimmerObserver(), 0);
+      setTimeout(() => {
+        this.setupShimmerObserver();
+        this.setupActionsObserver();
+      }, 0);
     });
   }
 
@@ -66,6 +62,18 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     );
 
     this.shimmerObserver.observe(btn);
+  }
+
+  // Reemplaza el onScroll listener: cero querySelector por evento de scroll.
+  private setupActionsObserver(): void {
+    this.actionsObserver?.disconnect();
+    const el = document.querySelector<HTMLElement>('.biz-hero__panel-actions');
+    if (!el) return;
+    this.actionsObserver = new IntersectionObserver(
+      ([entry]) => this.zone.run(() => this.heroWaHidden.set(!entry.isIntersecting)),
+      { threshold: 0 }
+    );
+    this.actionsObserver.observe(el);
   }
 
   onBubblePointerDown(e: PointerEvent): void {
@@ -102,7 +110,7 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.shimmerObserver?.disconnect();
-    window.removeEventListener('scroll', this.onScroll);
+    this.actionsObserver?.disconnect();
   }
 
   account       = signal<Account | null>(null);
@@ -121,10 +129,9 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   // ── Hero: colores del panel de info ──────────────────────────────────────────
 
-  readonly heroPanelBg  = computed(() => this.account()?.hero_panel_bg  ?? '#ffffff');
+  readonly heroPanelBg   = computed(() => this.account()?.hero_panel_bg  ?? '#ffffff');
   readonly heroPanelText = computed(() => this.account()?.hero_panel_text ?? '#1a0a00');
 
-  /** RGB del color de fondo del panel para los efectos de sombra sutil */
   readonly heroPanelRgb = computed(() => {
     const rgb = this.hexToRgb(this.account()?.hero_panel_bg ?? '#ffffff');
     return rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '255,255,255';
@@ -132,18 +139,66 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   readonly albumPhotos = computed(() => this.account()?.album_urls ?? []);
 
-  openRatingPopup(item: CatalogItem): void  { this.ratingPopupItem.set(item); }
+  // ── Estilos de producto precalculados — se computan UNA sola vez al cargar account ──
+  readonly productStyles = computed(() => {
+    const account = this.account();
+    if (!account) return [];
 
-  // ── Colores corporativos en product cards ─────────────────────────────────────
+    const items  = account.catalog_items ?? [];
+    const colors = account.brand_colors  ?? [];
 
-  /** Devuelve el hex del color que le corresponde al producto según índice (cíclico). */
-  getProductColor(index: number): string | null {
-    const colors = this.account()?.brand_colors;
-    if (!colors?.length) return null;
-    return colors[index % colors.length];
-  }
+    // Parsear colores de texto una sola vez
+    let textColorArray: string[] | null = null;
+    let textColorFixed: string | null   = null;
+    const stored = account.catalog_text_color;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) textColorArray = parsed;
+      } catch {
+        textColorFixed = stored; // hex directo (formato antiguo)
+      }
+    }
 
-  /** Convierte un hex a componentes RGB. */
+    return items.map((_, i) => {
+      const hex = colors.length ? colors[i % colors.length] : null;
+      const rgb = hex ? this.hexToRgb(hex) : null;
+
+      let textColor: string;
+      if (textColorArray) {
+        textColor = textColorArray[i % textColorArray.length];
+      } else if (textColorFixed) {
+        textColor = textColorFixed;
+      } else if (rgb) {
+        const luma = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+        textColor = luma > 0.5 ? '#000000' : '#ffffff';
+      } else {
+        textColor = '#ffffff';
+      }
+
+      const mantleStyle = rgb ? {
+        background:
+          `linear-gradient(90deg,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},1.00)  0%,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},0.92) 16%,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},0.70) 38%,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},0.32) 64%,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},0.14) 84%,` +
+          `rgba(${rgb.r},${rgb.g},${rgb.b},0.00) 100%)`,
+      } : null;
+
+      const descBandStyle = rgb ? {
+        background:
+          `radial-gradient(circle at 10% 20%,rgba(255,255,255,.16) 0%,transparent 26%),` +
+          `radial-gradient(circle at 80% 15%,rgba(255,255,255,.07) 0%,transparent 22%),` +
+          `linear-gradient(90deg,rgba(255,255,255,.05) 0%,transparent 60%),` +
+          `rgb(${rgb.r},${rgb.g},${rgb.b})`,
+      } : null;
+
+      return { textColor, mantleStyle, descBandStyle };
+    });
+  });
+
   private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return m
@@ -151,76 +206,12 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
       : null;
   }
 
-  /**
-   * Devuelve el color de letra para el producto en posición `index`.
-   * Usa el color configurado por el negocio (guardado como JSON en catalog_text_color,
-   * paralelo a brand_colors). Si no hay configuración, calcula blanco/negro por luminancia.
-   */
-  getTextColor(index: number): string {
-    const account = this.account();
-    const stored  = account?.catalog_text_color;
-
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed[index % parsed.length];
-        }
-      } catch {
-        // Valor antiguo: hex directo — aplica a todas las tarjetas
-        return stored;
-      }
-    }
-
-    // Fallback automático por luminancia
-    const hex = this.getProductColor(index);
-    if (!hex) return '#ffffff';
-    const rgb = this.hexToRgb(hex);
-    if (!rgb) return '#ffffff';
-    const luma = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    return luma > 0.5 ? '#000000' : '#ffffff';
-  }
-
-  /** Estilo del manto (gradiente de izq. a transparente) con el color corporativo. */
-  getNameMantleStyle(index: number): Record<string, string> | null {
-    const hex = this.getProductColor(index);
-    if (!hex) return null;
-    const rgb = this.hexToRgb(hex);
-    if (!rgb) return null;
-    const { r, g, b } = rgb;
-    return {
-      background: `linear-gradient(90deg,` +
-        `rgba(${r},${g},${b},1.00)  0%,` +
-        `rgba(${r},${g},${b},0.92) 16%,` +
-        `rgba(${r},${g},${b},0.70) 38%,` +
-        `rgba(${r},${g},${b},0.32) 64%,` +
-        `rgba(${r},${g},${b},0.14) 84%,` +
-        `rgba(${r},${g},${b},0.00) 100%)`,
-    };
-  }
-
-  /** Estilo de la banda de descripción (fondo sólido con reflejos) con el color corporativo. */
-  getDescBandStyle(index: number): Record<string, string> | null {
-    const hex = this.getProductColor(index);
-    if (!hex) return null;
-    const rgb = this.hexToRgb(hex);
-    if (!rgb) return null;
-    const { r, g, b } = rgb;
-    return {
-      background:
-        `radial-gradient(circle at 10% 20%,rgba(255,255,255,.16) 0%,transparent 26%),` +
-        `radial-gradient(circle at 80% 15%,rgba(255,255,255,.07) 0%,transparent 22%),` +
-        `linear-gradient(90deg,rgba(255,255,255,.05) 0%,transparent 60%),` +
-        `rgb(${r},${g},${b})`,
-    };
-  }
+  openRatingPopup(item: CatalogItem): void  { this.ratingPopupItem.set(item); }
 
   closeRatingPopup(): void {
-    // Guardar referencia del id antes de limpiar el popup
     const id = this.ratingPopupItem()?.id;
     this.ratingPopupItem.set(null);
-    // El promedio ya fue guardado vía onProductAvgLoaded al emitir avgUpdated
-    void id; // referencia usada solo para legibilidad
+    void id;
   }
 
   onProductAvgLoaded(itemId: string, avg: number): void {
@@ -232,8 +223,6 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.bubblePos.set(
       saved ? JSON.parse(saved) : { x: window.innerWidth - 80, y: window.innerHeight - 100 }
     );
-
-    window.addEventListener('scroll', this.onScroll, { passive: true });
 
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -247,31 +236,32 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
     if (!data) {
       this.notFound.set(true);
-    } else {
-      this.account.set(data);
-      const itemIds = (data.catalog_items ?? []).map(i => i.id);
-      if (itemIds.length) {
-        const avgs = await this.reviewService.getAveragesForItems(itemIds);
-        this.productAvgRatings.set(avgs);
-      }
+      this.loading.set(false);
+      return;
     }
 
+    // Mostrar contenido de inmediato — no esperar las valoraciones
+    this.account.set(data);
     this.loading.set(false);
+
+    // Valoraciones en segundo plano — no bloquean el render ni el scroll
+    const itemIds = (data.catalog_items ?? []).map(i => i.id);
+    if (itemIds.length) {
+      const avgs = await this.reviewService.getAveragesForItems(itemIds);
+      this.productAvgRatings.set(avgs);
+    }
   }
 
   // ── Auth-gated entry points ──────────────────────────────────────────────────
 
-  /** Botón hero "Realizar pedido" y botón final del catálogo */
   requestOrder(a: Account): void {
     this.authGate.requireAuth(() =>
       a.catalog_items?.length ? this.showOrder.set(true) : this.openWhatsapp(a.whatsapp ?? '')
     );
   }
 
-  /** Ítem pendiente cuando hay conflicto de negocio en el carrito */
   conflictItem = signal<CatalogItem | null>(null);
 
-  /** Botón "Agregar" y stepper + en las tarjetas de producto */
   requestAdd(item: CatalogItem): void {
     this.authGate.requireAuth(() => {
       const accountId = this.account()?.id;
@@ -283,7 +273,6 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Usuario confirma vaciar carrito y empezar pedido del nuevo negocio */
   confirmClearCart(): void {
     const item      = this.conflictItem();
     const accountId = this.account()?.id;
@@ -294,33 +283,13 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   cancelClearCart(): void { this.conflictItem.set(null); }
 
-  /** Badge de valoración en las tarjetas de producto */
   requestRatingPopup(item: CatalogItem): void {
     this.authGate.requireAuth(() => this.ratingPopupItem.set(item), 'rating');
   }
 
+  // Delega al browser: off-main-thread, respeta scroll-margin-top del CSS
   scrollToProducts(): void {
-    const el = document.getElementById('productos');
-    if (!el) return;
-
-    const startY    = window.scrollY;
-    const targetY   = el.getBoundingClientRect().top + window.scrollY - 16;
-    const distance  = targetY - startY;
-    const duration  = 1400;
-    const startTime = performance.now();
-
-    // easeInOutCubic — arranque y frenado suaves
-    const ease = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    const step = (now: number) => {
-      const elapsed  = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      window.scrollTo(0, startY + distance * ease(progress));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
+    document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   openWhatsapp(phone: string): void {

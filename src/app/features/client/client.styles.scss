@@ -1,4 +1,4 @@
-// client.styles.scss
+﻿// client.styles.scss
 // Estilos exclusivos del feature client (perfil de usuario).
 // Los componentes globales (btn-*, field-*, spinner) vienen de styles.scss.
 // Cada componente importa con: @use '../../client.styles' as *;
@@ -129,11 +129,11 @@
   background: transparent;
   color: var(--color-text-danger);
   border: 1px solid var(--color-border-danger);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 0.9375rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--duration-fast);
 
   &:hover { background: var(--color-background-danger); }
 }
