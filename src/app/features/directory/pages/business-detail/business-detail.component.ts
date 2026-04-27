@@ -7,6 +7,7 @@ import { DirectoryService } from '../../services/directory.service';
 import { ReviewService } from '../../services/review.service';
 import { ReviewsComponent } from '../../components/reviews/reviews.component';
 import { WhatsappOrderComponent } from '../../components/whatsapp-order/whatsapp-order.component';
+import { ProductCardComponent, ProductStyle } from '../../components/product-card/product-card.component';
 import { MapViewComponent } from '../../../../shared/components/map-view/map-view.component';
 import { BusinessStatusBadgeComponent } from '../../../../shared/components/business-status-badge/business-status-badge.component';
 import { ProductReviewsComponent } from '../../components/product-reviews/product-reviews.component';
@@ -17,7 +18,7 @@ import { AuthGateService } from '../../../../core/services/auth-gate.service';
   selector: 'app-business-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ReviewsComponent, WhatsappOrderComponent, MapViewComponent, BusinessStatusBadgeComponent, ProductReviewsComponent, AuthGateComponent],
+  imports: [CommonModule, RouterModule, ReviewsComponent, WhatsappOrderComponent, MapViewComponent, BusinessStatusBadgeComponent, ProductReviewsComponent, AuthGateComponent, ProductCardComponent],
   templateUrl: './business-detail.component.html',
   styleUrl: './business-detail.component.scss',
 })
@@ -140,7 +141,7 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   readonly albumPhotos = computed(() => this.account()?.album_urls ?? []);
 
   // ── Estilos de producto precalculados — se computan UNA sola vez al cargar account ──
-  readonly productStyles = computed(() => {
+  readonly productStyles = computed<ProductStyle[]>(() => {
     const account = this.account();
     if (!account) return [];
 

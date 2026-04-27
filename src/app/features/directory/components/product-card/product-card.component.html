@@ -1,0 +1,82 @@
+<div class="product-card" [class.product-card--no-image]="!item().image_url">
+
+  <!-- Zona de imagen -->
+  <div class="product-card__media"
+       [class.product-card__media--clickable]="!!item().image_url"
+       (click)="openLightbox()">
+    @if (item().image_url) {
+      <img [src]="item().image_url" [alt]="item().name" loading="lazy" />
+      <span class="product-card__zoom-hint" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" width="16" height="16">
+          <circle cx="8.5" cy="8.5" r="5"/>
+          <path d="M12.5 12.5L17 17"/>
+          <path d="M6.5 8.5h4M8.5 6.5v4"/>
+        </svg>
+      </span>
+    }
+  </div>
+
+  <!-- Badge valoración — esquina superior izquierda -->
+  <div class="product-card__rating-corner">
+    <button
+      type="button"
+      class="product-card__rating"
+      [class.product-card__rating--none]="!avgRating()"
+      (click)="requestRating()"
+    >
+      <span class="product-card__rating-dot"></span>
+      <span class="product-card__rating-label">Valoración</span>
+      <span class="product-card__rating-value">
+        {{ avgRating() ? (avgRating() + '/10') : '— / 10' }}
+      </span>
+    </button>
+    <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
+  </div>
+
+  <!-- Precio — esquina superior derecha -->
+  <div class="product-card__price-corner">
+    <div class="product-card__price-box">
+      <span class="product-card__price-label">Precio</span>
+      <span class="product-card__price-value">
+        {{ item().price | currency:'COP':'symbol-narrow':'1.0-0' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Manto del nombre — gradiente sobre imagen -->
+  <div class="product-card__name-veil">
+    <div class="product-card__name-mantle" [ngStyle]="style().mantleStyle">
+      <h3 class="product-card__name" [style.color]="style().textColor">{{ item().name }}</h3>
+    </div>
+  </div>
+
+  <!-- Banda inferior — descripción + agregar -->
+  <div class="product-card__desc-band" [ngStyle]="style().descBandStyle">
+    <div class="product-card__desc-content">
+      @if (item().description) {
+        <p class="product-card__desc-text" [style.color]="style().textColor">
+          {{ item().description }}
+        </p>
+      }
+    </div>
+    <div class="product-card__add-row">
+      @if (qty() === 0) {
+        <button class="product-card__add-btn" type="button" (click)="requestAdd()">
+          Agregar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.8" stroke-linecap="round" width="13" height="13">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </button>
+      } @else {
+        <div class="product-card__stepper">
+          <button type="button" (click)="remove()">−</button>
+          <span>{{ qty() }}</span>
+          <button type="button" (click)="requestAdd()">+</button>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>
