@@ -26,23 +26,32 @@
   }
 }
 
-// ── Botón outline ─────────────────────────────────────────────────────────────
-.btn-outline {
+// ── Botón "Nueva sección" — acento brand sin competir con el CTA principal ────
+.btn-section {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--color-border);
-  background: transparent;
-  color: var(--color-text-primary);
+  padding: 0.575rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-brand-primary);
+  background: rgba(var(--color-brand-primary-rgb), 0.06);
+  color: var(--color-brand-primary);
   font-family: var(--font-heading);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: border-color var(--duration-fast), background var(--duration-fast);
+  transition:
+    background var(--duration-fast),
+    box-shadow var(--duration-fast),
+    transform 0.12s;
 
-  &:hover { border-color: var(--color-brand-primary); background: var(--color-background-secondary); }
+  &:hover {
+    background: rgba(var(--color-brand-primary-rgb), 0.12);
+    box-shadow: 0 2px 8px rgba(var(--color-brand-primary-rgb), 0.18);
+  }
+
+  &:active { transform: translateY(1px); }
 }
 
 // ── Lista de secciones (contenedor DnD de secciones) ─────────────────────────

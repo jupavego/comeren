@@ -5,7 +5,7 @@
     <h1 class="panel-title">Mis productos</h1>
     <div class="panel-header__actions">
       <a routerLink="/business/dashboard" class="btn-back">Volver</a>
-      <button class="btn-outline" (click)="openCreateSection()">+ Sección</button>
+      <button class="btn-section" (click)="openCreateSection()">+ Sección</button>
       <button class="btn-primary" (click)="openCreate()">+ Producto</button>
     </div>
   </div>
@@ -26,7 +26,7 @@
       <div class="catalog-empty">
         <p>Aún no tienes productos ni secciones.</p>
         <div class="catalog-empty__actions">
-          <button class="btn-outline" (click)="openCreateSection()">Crear sección</button>
+          <button class="btn-section" (click)="openCreateSection()">Crear sección</button>
           <button class="btn-primary"  (click)="openCreate()">Agregar producto</button>
         </div>
       </div>
