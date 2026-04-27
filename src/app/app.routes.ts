@@ -188,6 +188,14 @@ export const routes: Routes = [
     ],
   },
 
+  // ── Legal ────────────────────────────────────────────────────────────────
+  {
+    path: 'privacidad',
+    loadComponent: () =>
+      import('./shared/pages/privacy/privacy.component')
+        .then(m => m.PrivacyComponent),
+  },
+
   // ── 404 ──────────────────────────────────────────────────────────────────
   {
     path: '**',
