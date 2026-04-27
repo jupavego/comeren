@@ -8,24 +8,30 @@ import {
 } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TurnstileService } from '../../../../core/services/turnstile.service';
+import { TurnstileComponent } from '../../../../shared/components/turnstile/turnstile.component';
 import { UserRole } from '../../../../core/models/profile.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, TurnstileComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class RegisterComponent {
-  private fb   = inject(FormBuilder);
-  private auth = inject(AuthService);
+  private fb         = inject(FormBuilder);
+  private auth       = inject(AuthService);
+  private turnstile  = inject(TurnstileService);
 
-  loading      = signal(false);
-  errorMessage = signal<string | null>(null);
-  success      = signal(false);
-  showPassword = signal(false);
+  loading           = signal(false);
+  errorMessage      = signal<string | null>(null);
+  success           = signal(false);
+  showPassword      = signal(false);
+  turnstileToken    = signal<string | null>(null);
+  readonly useTurnstile = environment.production && !!environment.turnstileSiteKey;
 
   form = this.fb.group(
     {
@@ -54,14 +60,43 @@ export class RegisterComponent {
     this.role.setValue(role);
   }
 
+  onTurnstileResolved(token: string): void {
+    this.turnstileToken.set(token);
+  }
+
+  onTurnstileError(): void {
+    this.turnstileToken.set(null);
+    this.errorMessage.set('Error en la verificación de seguridad. Recarga la página.');
+  }
+
   async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.loading.set(true);
-    this.errorMessage.set(null);
+    // En producción exigir token de Turnstile antes de llamar a Supabase
+    if (this.useTurnstile) {
+      const token = this.turnstileToken();
+      if (!token) {
+        this.errorMessage.set('Completa la verificación de seguridad para continuar.');
+        return;
+      }
+
+      this.loading.set(true);
+      this.errorMessage.set(null);
+
+      const check = await this.turnstile.verify(token);
+      if (!check.success) {
+        this.errorMessage.set(check.error ?? 'Verificación fallida. Intenta de nuevo.');
+        this.loading.set(false);
+        this.turnstileToken.set(null);
+        return;
+      }
+    } else {
+      this.loading.set(true);
+      this.errorMessage.set(null);
+    }
 
     const result = await this.auth.register({
       email:    this.email.value!,
@@ -73,7 +108,8 @@ export class RegisterComponent {
     this.loading.set(false);
 
     if (!result.success) {
-      this.errorMessage.set(this.mapError(result.error));
+      this.errorMessage.set(result.error ?? 'Error al registrarse');
+      this.turnstileToken.set(null);
       return;
     }
 
@@ -84,17 +120,9 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
     await this.auth.loginWithGoogle();
-    // El navegador redirige a Google — no se necesita manejo posterior
   }
 
   togglePassword(): void {
     this.showPassword.update(v => !v);
-  }
-
-  private mapError(error?: string): string {
-    if (!error) return 'Error al registrarse';
-    if (error.includes('already registered')) return 'Este correo ya está registrado';
-    if (error.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres';
-    return error;
   }
 }

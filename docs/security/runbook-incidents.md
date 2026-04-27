@@ -1,6 +1,38 @@
 # Runbook de Respuesta a Incidentes de Seguridad
 
-> **Versión:** 1.0 | **Última actualización:** 2026-04-26
+> **Versión:** 1.1 | **Última actualización:** 2026-04-26
+
+---
+
+## ⚡ Tarjeta de referencia rápida — leer primero si hay un incidente activo
+
+```
+1. CALMA — no borres logs ni evidencia todavía
+
+2. CONTÉN antes de remediar:
+   - Cuenta comprometida  → Supabase Dashboard → Authentication → Users → Ban user
+   - API key expuesta     → Supabase Dashboard → Settings → API → Regenerate anon key
+   - Secret expuesto      → Terminal:
+       "C:\Users\ASUS VivoBook\supabase-cli\supabase.exe" secrets set NOMBRE=NUEVO_VALOR --project-ref lckybvgsyitzuoyebnon
+   - Turnstile comprometido → Cloudflare Dashboard → Turnstile → Rotate secret key
+
+3. DOCUMENTA mientras actúas:
+   - Fecha y hora exacta de detección
+   - Qué viste / qué alertó
+   - Qué acciones tomaste y cuándo
+
+4. NOTIFICA si hay datos personales afectados (Ley 1581):
+   - Usuarios afectados: aviso por correo
+   - SIC si es breach significativo: www.sic.gov.co
+
+5. RESTAURA desde backup si hay corrupción de datos:
+   - Supabase Dashboard → Database → Backups
+   - O desde último dump manual guardado localmente
+
+6. POST-MORTEM dentro de 5 días hábiles (template al final de este doc)
+```
+
+---
 >
 > Este documento define el proceso estándar para detectar, contener, remediar y documentar incidentes de seguridad en la plataforma "Comer en".
 
