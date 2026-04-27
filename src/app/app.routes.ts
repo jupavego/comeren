@@ -7,6 +7,7 @@ export const routes: Routes = [
   // ── Directorio público ───────────────────────────────────────────────────
   {
     path: '',
+    pathMatch: 'full',
     loadComponent: () =>
       import('./features/directory/pages/directory-home/directory-home.component')
         .then(m => m.DirectoryHomeComponent),
