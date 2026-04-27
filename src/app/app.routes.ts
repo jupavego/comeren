@@ -190,6 +190,12 @@ export const routes: Routes = [
 
   // ── Legal ────────────────────────────────────────────────────────────────
   {
+    path: 'security',
+    loadComponent: () =>
+      import('./shared/pages/security-disclosure/security-disclosure.component')
+        .then(m => m.SecurityDisclosureComponent),
+  },
+  {
     path: 'privacidad',
     loadComponent: () =>
       import('./shared/pages/privacy/privacy.component')
