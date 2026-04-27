@@ -45,9 +45,10 @@ jobs:
         run: npm ci
 
       - name: Run npm audit
-        run: npm audit --audit-level=high
-        # Falla el job si hay vulnerabilidades HIGH o CRITICAL.
-        # Vulnerabilidades MODERATE o LOW se reportan pero no bloquean.
+        run: npm audit --audit-level=high --omit=dev
+        # --omit=dev: audita solo dependencias de producción.
+        # Las vulnerabilidades en devDependencies (Angular CLI, webpack, vite)
+        # no llegan al bundle desplegado en Vercel — no son riesgo real.
 
   # ── Job 2: Static Application Security Testing (SAST) ──────
   sast-scan:
