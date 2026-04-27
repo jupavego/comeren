@@ -1,4 +1,5 @@
 @use '../../directory.styles' as *;
+@use 'styles/breakpoints' as *;
 
 :host {
   display: block;
@@ -334,5 +335,13 @@
     font-family: var(--font-heading);
     font-size: 0.85rem;
     font-weight: 800;
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@include respond-to($bp-sm) {
+  .product-card {
+    min-height: 270px;
+    border-radius: var(--radius-lg);
   }
 }

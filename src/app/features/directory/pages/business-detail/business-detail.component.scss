@@ -896,13 +896,6 @@
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-// Móvil
-@include respond-to($bp-sm) {
-  .product-card {
-    min-height: 270px;
-    border-radius: var(--radius-lg);
-  }
-}
 
 // ════════════════════════════════════════════════════════════════════
 // CART CONFLICT — Diálogo de conflicto de negocio

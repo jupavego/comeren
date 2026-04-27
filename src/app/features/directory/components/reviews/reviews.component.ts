@@ -8,7 +8,6 @@ import {
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { SessionService } from '../../../../core/services/session.service';
 import { AuthGateService } from '../../../../core/services/auth-gate.service';
@@ -17,7 +16,7 @@ import { Review } from '../../models/review.model';
 @Component({
   selector: 'app-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './reviews.component.html',
   styleUrl: './reviews.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

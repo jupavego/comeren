@@ -262,17 +262,6 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   conflictItem = signal<CatalogItem | null>(null);
 
-  requestAdd(item: CatalogItem): void {
-    this.authGate.requireAuth(() => {
-      const accountId = this.account()?.id;
-      if (!accountId) return;
-      const result = this.cart.add(item, accountId);
-      if (result === 'conflict') {
-        this.conflictItem.set(item);
-      }
-    });
-  }
-
   confirmClearCart(): void {
     const item      = this.conflictItem();
     const accountId = this.account()?.id;
