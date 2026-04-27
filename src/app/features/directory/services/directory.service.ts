@@ -24,7 +24,7 @@ export class DirectoryService {
 
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, logo_url, category, schedule_json, slogan, description, address, zone, schedule, active, status')
       .eq('active', true)
       .eq('status', 'approved')
       .order('name', { ascending: true })
@@ -54,7 +54,7 @@ export class DirectoryService {
 
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, logo_url, category, schedule_json, slogan, description, address, zone, schedule, active, status')
       .eq('active', true)
       .eq('status', 'approved')
       .or(
@@ -88,7 +88,7 @@ export class DirectoryService {
 
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, logo_url, category, schedule_json, slogan, description, address, zone, schedule, active, status')
       .eq('active', true)
       .eq('status', 'approved')
       .eq('category', category)
@@ -141,7 +141,7 @@ export class DirectoryService {
     const safe = this.sanitizeQuery(query);
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, logo_url, category, schedule_json, slogan, description, address, zone, schedule, active, status')
       .eq('active', true)
       .eq('status', 'approved')
       .or(
@@ -165,7 +165,7 @@ export class DirectoryService {
   async getByCategory(category: string): Promise<Account[]> {
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, logo_url, category, schedule_json, slogan, description, address, zone, schedule, active, status')
       .eq('active', true)
       .eq('status', 'approved')
       .eq('category', category)
@@ -183,7 +183,7 @@ export class DirectoryService {
   async getFeatured(limit = 4): Promise<Account[]> {
     const { data, error } = await this.supabase
       .from('accounts')
-      .select('*')
+      .select('id, name, cover_url, logo_url, category, slogan')
       .eq('active', true)
       .eq('status', 'approved')
       .order('created_at', { ascending: false })

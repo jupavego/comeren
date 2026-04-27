@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Input,
   OnChanges,
@@ -51,6 +52,7 @@ export type CarouselSlide =
   imports: [CommonModule, RouterModule],
   templateUrl: './carousel.component.html',
   styleUrl: './carousel.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -71,7 +73,9 @@ export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
   currentSlide = computed(() => this.slides[this.displayedIndex()] ?? null);
 
   private inTransition = false;
-  private intervalId: ReturnType<typeof setInterval> | null = null;
+  private intervalId:  ReturnType<typeof setInterval> | null = null;
+  private exitTimeout: ReturnType<typeof setTimeout> | null = null;
+  private enterTimeout: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void { this.startAutoplay(); }
 
@@ -86,7 +90,11 @@ export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void { this.stopAutoplay(); }
+  ngOnDestroy(): void {
+    this.stopAutoplay();
+    if (this.exitTimeout)  clearTimeout(this.exitTimeout);
+    if (this.enterTimeout) clearTimeout(this.enterTimeout);
+  }
 
   // ── Navegación ──────────────────────────────────────────────────────────────
 
@@ -97,7 +105,7 @@ export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
     // Fase 1 — salida: el contenido actual se desvanece (220 ms)
     this.phase.set('exit');
 
-    setTimeout(() => {
+    this.exitTimeout = setTimeout(() => {
       // Fase 2 — swap: mientras el contenido está invisible se cambia el slide
       // El fondo también cambia aquí, cubierto por la opacidad cero del contenido
       this.displayedIndex.set(index);
@@ -105,7 +113,7 @@ export class CarouselComponent implements OnInit, OnChanges, OnDestroy {
       this.phase.set('enter');
 
       // Fase 3 — entrada: el nuevo contenido aparece (320 ms)
-      setTimeout(() => {
+      this.enterTimeout = setTimeout(() => {
         this.phase.set('idle');
         this.inTransition = false;
       }, 340);

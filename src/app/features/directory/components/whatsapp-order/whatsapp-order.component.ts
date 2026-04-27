@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   inject,
@@ -19,6 +20,7 @@ import { OrderService } from '../../services/order.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './whatsapp-order.component.html',
   styleUrl: './whatsapp-order.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WhatsappOrderComponent implements OnInit {
   private session      = inject(SessionService);

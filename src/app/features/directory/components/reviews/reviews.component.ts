@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   inject,
@@ -19,6 +20,7 @@ import { Review } from '../../models/review.model';
   imports: [CommonModule, FormsModule],
   templateUrl: './reviews.component.html',
   styleUrl: './reviews.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewsComponent implements OnInit {
   private reviewService = inject(ReviewService);
