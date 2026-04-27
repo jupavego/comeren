@@ -176,6 +176,8 @@
 
           <div class="products-grid">
             @for (item of a.catalog_items; track item.id) {
+              @let style = productStyles()[$index];
+              @let avgRating = productAvgRatings()[item.id];
               <div class="product-entry">
 
                 <!-- ── Card premium ── -->
@@ -203,13 +205,13 @@
                     <button
                       type="button"
                       class="product-card__rating"
-                      [class.product-card__rating--none]="!productAvgRatings()[item.id]"
+                      [class.product-card__rating--none]="!avgRating"
                       (click)="requestRatingPopup(item)"
                     >
                       <span class="product-card__rating-dot"></span>
                       <span class="product-card__rating-label">Valoración</span>
                       <span class="product-card__rating-value">
-                        {{ productAvgRatings()[item.id] ? (productAvgRatings()[item.id] + '/10') : '— / 10' }}
+                        {{ avgRating ? (avgRating + '/10') : '— / 10' }}
                       </span>
                     </button>
                     <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
@@ -227,20 +229,16 @@
 
                   <!-- Manto del nombre — gradiente sobre imagen -->
                   <div class="product-card__name-veil">
-                    <div class="product-card__name-mantle"
-                         [ngStyle]="productStyles()[$index].mantleStyle">
-                      <h3 class="product-card__name"
-                          [style.color]="productStyles()[$index].textColor">{{ item.name }}</h3>
+                    <div class="product-card__name-mantle" [ngStyle]="style.mantleStyle">
+                      <h3 class="product-card__name" [style.color]="style.textColor">{{ item.name }}</h3>
                     </div>
                   </div>
 
                   <!-- Banda inferior — descripción + agregar -->
-                  <div class="product-card__desc-band"
-                       [ngStyle]="productStyles()[$index].descBandStyle">
+                  <div class="product-card__desc-band" [ngStyle]="style.descBandStyle">
                     <div class="product-card__desc-content">
                       @if (item.description) {
-                        <p class="product-card__desc-text"
-                           [style.color]="productStyles()[$index].textColor">{{ item.description }}</p>
+                        <p class="product-card__desc-text" [style.color]="style.textColor">{{ item.description }}</p>
                       }
                     </div>
                     <div class="product-card__add-row">

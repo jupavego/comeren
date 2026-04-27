@@ -206,12 +206,8 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
       : null;
   }
 
-  openRatingPopup(item: CatalogItem): void  { this.ratingPopupItem.set(item); }
-
   closeRatingPopup(): void {
-    const id = this.ratingPopupItem()?.id;
     this.ratingPopupItem.set(null);
-    void id;
   }
 
   onProductAvgLoaded(itemId: string, avg: number): void {
