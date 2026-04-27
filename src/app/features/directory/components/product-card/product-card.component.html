@@ -17,23 +17,6 @@
     }
   </div>
 
-  <!-- Badge valoración — esquina inferior izquierda de la imagen -->
-  <div class="product-card__rating-corner">
-    <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
-    <button
-      type="button"
-      class="product-card__rating"
-      [class.product-card__rating--none]="!avgRating()"
-      (click)="requestRating()"
-      aria-label="Valoración del producto"
-    >
-      <svg viewBox="0 0 16 16" fill="currentColor" width="11" height="11" aria-hidden="true">
-        <path d="M8 1l1.76 3.57 3.94.57-2.85 2.78.67 3.92L8 9.77l-3.52 1.85.67-3.92L2.3 4.84l3.94-.57z"/>
-      </svg>
-      <span class="product-card__rating-value">{{ avgRating() ?? '—' }}</span>
-    </button>
-  </div>
-
   <!-- Precio — esquina superior derecha -->
   <div class="product-card__price-corner">
     <div class="product-card__price-box">
@@ -61,6 +44,25 @@
       }
     </div>
     <div class="product-card__add-row">
+
+      <!-- Valoración — izquierda de la fila -->
+      <div class="product-card__rating-corner">
+        <button
+          type="button"
+          class="product-card__rating"
+          [class.product-card__rating--none]="!avgRating()"
+          (click)="requestRating()"
+          aria-label="Valoración del producto"
+        >
+          <svg viewBox="0 0 16 16" fill="currentColor" width="11" height="11" aria-hidden="true">
+            <path d="M8 1l1.76 3.57 3.94.57-2.85 2.78.67 3.92L8 9.77l-3.52 1.85.67-3.92L2.3 4.84l3.94-.57z"/>
+          </svg>
+          <span class="product-card__rating-value">{{ avgRating() ?? '—' }}</span>
+        </button>
+        <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
+      </div>
+
+      <!-- Agregar / stepper — derecha de la fila -->
       @if (qty() === 0) {
         <button class="product-card__add-btn" type="button" (click)="requestAdd()">
           Agregar
@@ -76,6 +78,7 @@
           <button type="button" (click)="requestAdd()">+</button>
         </div>
       }
+
     </div>
   </div>
 
