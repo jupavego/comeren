@@ -17,21 +17,21 @@
     }
   </div>
 
-  <!-- Badge valoración — esquina superior izquierda -->
+  <!-- Badge valoración — esquina inferior izquierda de la imagen -->
   <div class="product-card__rating-corner">
+    <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
     <button
       type="button"
       class="product-card__rating"
       [class.product-card__rating--none]="!avgRating()"
       (click)="requestRating()"
+      aria-label="Valoración del producto"
     >
-      <span class="product-card__rating-dot"></span>
-      <span class="product-card__rating-label">Valoración</span>
-      <span class="product-card__rating-value">
-        {{ avgRating() ? (avgRating() + '/10') : '— / 10' }}
-      </span>
+      <svg viewBox="0 0 16 16" fill="currentColor" width="11" height="11" aria-hidden="true">
+        <path d="M8 1l1.76 3.57 3.94.57-2.85 2.78.67 3.92L8 9.77l-3.52 1.85.67-3.92L2.3 4.84l3.94-.57z"/>
+      </svg>
+      <span class="product-card__rating-value">{{ avgRating() ?? '—' }}</span>
     </button>
-    <span class="product-card__rating-tooltip">¡Toca para calificar!</span>
   </div>
 
   <!-- Precio — esquina superior derecha -->
