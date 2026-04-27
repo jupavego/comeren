@@ -719,7 +719,7 @@
   overflow: hidden;
   background: #141220;
   isolation: isolate;
-  contain: layout style;
+  contain: layout style paint;
   // box-shadow en lugar de filter:drop-shadow en el padre — sin composición off-screen
   box-shadow:
     0 16px 32px rgba(30, 15, 80, 0.24),
@@ -803,11 +803,9 @@
   gap: 7px;
   padding: 7px 12px;
   border-radius: var(--radius-full);
-  background: rgba(12, 14, 22, 0.22);
+  background: rgba(8, 8, 18, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   transition: background 0.18s, transform var(--duration-fast);
 
@@ -859,11 +857,9 @@
 .product-card__price-box {
   padding: 9px 13px;
   border-radius: 18px;
-  background: rgba(252, 250, 246, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(16px) saturate(130%);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+  background: rgba(248, 246, 240, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
   white-space: nowrap;
 }
 
@@ -956,7 +952,7 @@
 
 .product-card__add-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   margin-top: 6px;
 }
