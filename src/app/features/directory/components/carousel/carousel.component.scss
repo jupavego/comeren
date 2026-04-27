@@ -253,7 +253,6 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  overflow: hidden;
   background: rgba(255, 255, 255, 0.30);
   transition: width var(--duration-slow) var(--ease-default),
               background var(--duration-slow) var(--ease-default);
@@ -261,24 +260,8 @@
 
   &--active {
     width: 28px;
-    background: rgba(255, 255, 255, 0.25);
-
-    // Barra de progreso que rellena el pill durante el autoplay
-    &::after {
-      content: '';
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: #ffffff;
-      border-radius: inherit;
-      animation: dot-progress 9s linear forwards;
-    }
+    background: #ffffff;
   }
-}
-
-@keyframes dot-progress {
-  from { width: 0%; }
-  to   { width: 100%; }
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
