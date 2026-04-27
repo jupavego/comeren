@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../../../core/services/supabase.service';
-import { Account, CatalogItem, CatalogSection } from '../models/account.model';
+import { Account, CatalogSection } from '../models/account.model';
 
 @Injectable({ providedIn: 'root' })
 export class DirectoryService {
@@ -144,17 +144,14 @@ export class DirectoryService {
 
     const account = data as Account;
 
-    // Poblar items dentro de cada sección para facilitar el render
+    // Agrupar items por sección en memoria. El orden ya viene correcto del DB
+    // gracias a los .order() de la query — no necesitamos re-ordenar en JS.
     if (account.catalog_sections && account.catalog_items) {
       const allItems = account.catalog_items;
-      account.catalog_sections = (account.catalog_sections as CatalogSection[])
-        .sort((a, b) => a.position - b.position)
-        .map(s => ({
-          ...s,
-          items: allItems
-            .filter(i => i.section_id === s.id)
-            .sort((a, b) => a.position - b.position),
-        }));
+      account.catalog_sections = (account.catalog_sections as CatalogSection[]).map(s => ({
+        ...s,
+        items: allItems.filter(i => i.section_id === s.id),
+      }));
     }
 
     return account;

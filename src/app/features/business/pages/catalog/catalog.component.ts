@@ -6,7 +6,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { CatalogService } from '../../services/catalog.service';
+import { CatalogService, ReorderItemPayload } from '../../services/catalog.service';
 import { AccountsService } from '../../services/accounts.service';
 import { StorageService } from '../../../../core/services/storage.service';
 import { CatalogItem, CatalogSection } from '../../../directory/models/account.model';
@@ -27,8 +27,8 @@ export class CatalogComponent implements OnInit {
   private storage  = inject(StorageService);
 
   accountId  = signal<string | null>(null);
-  sections   = signal<CatalogSection[]>([]);   // secciones con sus items poblados
-  freeItems  = signal<CatalogItem[]>([]);       // productos sin sección
+  sections   = signal<CatalogSection[]>([]);
+  freeItems  = signal<CatalogItem[]>([]);
   loading    = signal(true);
   saving     = signal(false);
   uploading  = signal(false);
@@ -36,20 +36,19 @@ export class CatalogComponent implements OnInit {
   successMsg = signal<string | null>(null);
 
   // ── Estado del formulario de producto ─────────────────────────────────────────
-  showForm       = signal(false);
-  editingItem    = signal<CatalogItem | null>(null);
-  imagePreview   = signal<string | null>(null);
-  imageFile      = signal<File | null>(null);
-  formSectionId  = signal<string | null>(null);  // sección preseleccionada al abrir modal
+  showForm     = signal(false);
+  editingItem  = signal<CatalogItem | null>(null);
+  imagePreview = signal<string | null>(null);
+  imageFile    = signal<File | null>(null);
 
   // ── Estado del formulario de sección ──────────────────────────────────────────
-  showSectionForm   = signal(false);
-  editingSection    = signal<CatalogSection | null>(null);
-  sectionNameInput  = signal('');
-  sectionSaving     = signal(false);
-  sectionError      = signal<string | null>(null);
+  showSectionForm  = signal(false);
+  editingSection   = signal<CatalogSection | null>(null);
+  sectionNameInput = signal('');
+  sectionSaving    = signal(false);
+  sectionError     = signal<string | null>(null);
 
-  // ── IDs de drop lists (para conectarlos entre sí) ────────────────────────────
+  // IDs de todos los drop-lists conectados entre sí (secciones + área libre)
   readonly sectionDropListIds = computed(() =>
     ['free-items', ...this.sections().map(s => `section-${s.id}`)]
   );
@@ -65,6 +64,9 @@ export class CatalogComponent implements OnInit {
   get name()  { return this.form.controls.name; }
   get price() { return this.form.controls.price; }
 
+  // Debounce para agrupar drops rápidos en una sola llamada RPC
+  private reorderDebounce?: ReturnType<typeof setTimeout>;
+
   // ── Ciclo de vida ─────────────────────────────────────────────────────────────
 
   async ngOnInit(): Promise<void> {
@@ -76,14 +78,12 @@ export class CatalogComponent implements OnInit {
     this.loading.set(false);
   }
 
-  /** Carga secciones e items y los cruza en memoria */
   private async loadData(accountId: string): Promise<void> {
     const [rawSections, allItems] = await Promise.all([
       this.catalog.getSections(accountId),
       this.catalog.getByAccount(accountId),
     ]);
 
-    // Poblar items dentro de cada sección
     const sectionsWithItems: CatalogSection[] = rawSections.map(s => ({
       ...s,
       items: allItems
@@ -91,7 +91,6 @@ export class CatalogComponent implements OnInit {
         .sort((a, b) => a.position - b.position),
     }));
 
-    // Items sin sección
     const free = allItems
       .filter(i => i.section_id === null)
       .sort((a, b) => a.position - b.position);
@@ -107,12 +106,8 @@ export class CatalogComponent implements OnInit {
 
     const secs = [...this.sections()];
     moveItemInArray(secs, event.previousIndex, event.currentIndex);
-
-    // Actualizar posiciones localmente
-    secs.forEach((s, i) => (s.position = i));
     this.sections.set(secs);
 
-    // Persistir en background
     const accountId = this.accountId();
     if (accountId) {
       this.catalog.reorderSections(accountId, secs.map((s, i) => ({ id: s.id, position: i })));
@@ -125,44 +120,48 @@ export class CatalogComponent implements OnInit {
     const accountId = this.accountId();
     if (!accountId) return;
 
+    // No-op: misma posición en el mismo contenedor
+    if (event.previousContainer === event.container &&
+        event.previousIndex     === event.currentIndex) return;
+
     if (event.previousContainer === event.container) {
-      // Reorden dentro del mismo contenedor
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      // Movimiento entre contenedores
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex,
       );
-      // Actualizar section_id del item movido
+      // Actualizar section_id del item en la estructura local (sin mutar el original)
       event.container.data[event.currentIndex] = {
         ...event.container.data[event.currentIndex],
         section_id: targetSectionId,
       };
     }
 
-    // Recalcular posiciones y persistir
-    this.persistItemOrder(accountId);
+    this.schedulePersistItemOrder(accountId);
   }
 
-  /** Recalcula posiciones de todos los items y llama a la RPC */
-  private persistItemOrder(accountId: string): void {
-    const payload: { id: string; section_id: string | null; position: number }[] = [];
+  /**
+   * Debounce de 300ms para agrupar drops rápidos consecutivos.
+   * Evita disparar N RPCs cuando el usuario arrastra varios items seguidos.
+   */
+  private schedulePersistItemOrder(accountId: string): void {
+    clearTimeout(this.reorderDebounce);
+    this.reorderDebounce = setTimeout(() => this.persistItemOrder(accountId), 300);
+  }
 
-    // Items libres
+  /** Construye el payload desde el estado actual y llama a la RPC de reorder. */
+  private persistItemOrder(accountId: string): void {
+    const payload: ReorderItemPayload[] = [];
+
     this.freeItems().forEach((item, i) => {
-      item.position  = i;
-      item.section_id = null;
       payload.push({ id: item.id, section_id: null, position: i });
     });
 
-    // Items en secciones
     this.sections().forEach(sec => {
       (sec.items ?? []).forEach((item, i) => {
-        item.position   = i;
-        item.section_id = sec.id;
         payload.push({ id: item.id, section_id: sec.id, position: i });
       });
     });
@@ -176,7 +175,6 @@ export class CatalogComponent implements OnInit {
     this.editingItem.set(null);
     this.imagePreview.set(null);
     this.imageFile.set(null);
-    this.formSectionId.set(sectionId);
     this.form.reset({ name: '', description: '', price: 0, active: true, section_id: sectionId });
     this.showForm.set(true);
     this.errorMsg.set(null);
@@ -186,7 +184,6 @@ export class CatalogComponent implements OnInit {
     this.editingItem.set(item);
     this.imagePreview.set(item.image_url);
     this.imageFile.set(null);
-    this.formSectionId.set(item.section_id);
     this.form.patchValue({
       name:        item.name,
       description: item.description ?? '',
@@ -222,7 +219,6 @@ export class CatalogComponent implements OnInit {
     this.saving.set(true);
     this.errorMsg.set(null);
 
-    // Subir imagen si hay nueva
     let imageUrl = this.editingItem()?.image_url ?? undefined;
     const file = this.imageFile();
     if (file) {
@@ -255,12 +251,9 @@ export class CatalogComponent implements OnInit {
       const result = await this.catalog.update(editing.id, formData);
       this.saving.set(false);
       if (!result.success) { this.errorMsg.set(result.error ?? 'Error al guardar'); return; }
-
-      // Actualizar en listas locales
       if (result.data) this.replaceItemInLists(result.data);
 
     } else {
-      // Determinar posición: al final de la lista destino
       const targetList = sectionId
         ? (this.sections().find(s => s.id === sectionId)?.items ?? [])
         : this.freeItems();
@@ -269,8 +262,6 @@ export class CatalogComponent implements OnInit {
       const result = await this.catalog.create(accountId, { ...formData, position });
       this.saving.set(false);
       if (!result.success) { this.errorMsg.set(result.error ?? 'Error al crear'); return; }
-
-      // Insertar en la lista correspondiente
       if (result.data) this.insertItemInList(result.data);
     }
 
@@ -398,7 +389,6 @@ export class CatalogComponent implements OnInit {
 
     const result = await this.catalog.deleteSection(section.id);
     if (result.success) {
-      // Mover los productos de la sección al área libre
       const orphans = (section.items ?? []).map(i => ({ ...i, section_id: null }));
       this.freeItems.update(items => [...items, ...orphans]);
       this.sections.update(secs => secs.filter(s => s.id !== section.id));

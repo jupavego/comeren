@@ -331,11 +331,11 @@
   }
 }
 
-// ── Botones de icono pequeños ─────────────────────────────────────────────────
-.btn-icon--sm {
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 7px !important;
+// ── Botones de icono pequeños — mayor especificidad que el .btn-icon de styles.scss
+.btn-icon.btn-icon--sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
 }
 
 // ── Modal pequeño para sección ────────────────────────────────────────────────
