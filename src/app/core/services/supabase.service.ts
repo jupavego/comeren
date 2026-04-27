@@ -34,4 +34,8 @@ export class SupabaseService {
   get storage() {
     return this.client.storage;
   }
+
+  rpc(fn: string, params?: Record<string, unknown>) {
+    return this.client.rpc(fn, params);
+  }
 }

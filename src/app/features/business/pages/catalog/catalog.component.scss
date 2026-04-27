@@ -1,24 +1,267 @@
-﻿@use '../../business.styles' as *;
+@use '../../business.styles' as *;
 @use 'styles/breakpoints' as *;
 
-.catalog-list {
+// ── Hint de drag ──────────────────────────────────────────────────────────────
+.catalog-hint {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1.25rem;
+  font-size: 0.78rem;
+  color: var(--color-text-tertiary);
+  svg { opacity: 0.6; flex-shrink: 0; }
 }
 
+// ── Estado vacío ──────────────────────────────────────────────────────────────
+.catalog-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary);
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1.25rem;
+  }
+}
+
+// ── Botón outline ─────────────────────────────────────────────────────────────
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+
+  &:hover { border-color: var(--color-brand-primary); background: var(--color-background-secondary); }
+}
+
+// ── Lista de secciones (contenedor DnD de secciones) ─────────────────────────
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  // CDK placeholder de sección mientras se arrastra
+  &.cdk-drop-list-dragging .section-block:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0,0,0.2,1);
+  }
+}
+
+// ── Bloque de sección ─────────────────────────────────────────────────────────
+.section-block {
+  background: var(--color-background-secondary);
+  border: 1.5px solid var(--color-border-tertiary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--duration-fast);
+
+  &:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  &.cdk-drag-animating { transition: transform 250ms cubic-bezier(0,0,0.2,1); }
+
+  // Placeholder visual mientras se arrastra la sección
+  &__drag-placeholder {
+    height: 60px;
+    border-radius: var(--radius-lg);
+    background: rgba(var(--color-brand-primary-rgb, 99,91,255), 0.06);
+    border: 2px dashed rgba(var(--color-brand-primary-rgb, 99,91,255), 0.25);
+  }
+
+  // Cabecera de sección
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border-tertiary);
+  }
+
+  &__grip {
+    display: flex;
+    align-items: center;
+    cursor: grab;
+    color: var(--color-text-tertiary);
+    padding: 4px;
+    border-radius: 6px;
+    transition: color var(--duration-fast), background var(--duration-fast);
+
+    &:hover { color: var(--color-text-primary); background: var(--color-background-secondary); }
+    &:active { cursor: grabbing; }
+  }
+
+  &__name {
+    flex: 1;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    background: var(--color-background-secondary);
+    border: 1px solid var(--color-border-tertiary);
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  // Zona de items dentro de la sección
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem;
+    min-height: 60px;
+    transition: background var(--duration-fast);
+
+    &--empty { background: rgba(var(--color-brand-primary-rgb, 99,91,255), 0.02); }
+
+    // CDK: animación al reordenar dentro de la sección
+    &.cdk-drop-list-dragging .product-row:not(.cdk-drag-placeholder) {
+      transition: transform 200ms cubic-bezier(0,0,0.2,1);
+    }
+
+    // Highlight al arrastrar DESDE otro contenedor hacia este
+    &.cdk-drop-list-receiving {
+      background: rgba(var(--color-brand-primary-rgb, 99,91,255), 0.05);
+      outline: 2px dashed rgba(var(--color-brand-primary-rgb, 99,91,255), 0.3);
+      outline-offset: -4px;
+      border-radius: var(--radius-md);
+    }
+  }
+}
+
+// ── Área de productos sin sección ─────────────────────────────────────────────
+.free-items-section {
+  margin-top: 1.5rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.25rem;
+  }
+
+  &__label {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .section-block__items {
+    border: 1.5px dashed var(--color-border-tertiary);
+    border-radius: var(--radius-lg);
+  }
+}
+
+// ── Hint dentro de sección vacía ──────────────────────────────────────────────
+.section-empty-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-brand-primary);
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover { opacity: 0.75; }
+}
+
+// ── Fila de producto ──────────────────────────────────────────────────────────
 .product-row {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  transition: opacity var(--duration-normal);
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast), opacity var(--duration-normal);
+  background: var(--color-background);
+  border: 1px solid transparent;
 
-  &--inactive { opacity: 0.5; }
+  &--inactive { opacity: 0.48; }
+
+  &:hover {
+    background: var(--color-background-secondary);
+    border-color: var(--color-border-tertiary);
+  }
+
+  // Placeholder CDK dentro del drop-list
+  &.cdk-drag-placeholder {
+    background: rgba(var(--color-brand-primary-rgb, 99,91,255), 0.06);
+    border: 2px dashed rgba(var(--color-brand-primary-rgb, 99,91,255), 0.25);
+    opacity: 1;
+    > * { opacity: 0; }
+  }
+
+  &.cdk-drag-animating {
+    transition: transform 200ms cubic-bezier(0,0,0.2,1);
+  }
+
+  // Estilo mientras está siendo arrastrado
+  &.cdk-drag-preview {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    border: 1.5px solid var(--color-border);
+    opacity: 0.98;
+  }
+
+  &__grip {
+    display: flex;
+    align-items: center;
+    cursor: grab;
+    color: var(--color-text-tertiary);
+    padding: 4px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: color var(--duration-fast), background var(--duration-fast);
+
+    &:hover { color: var(--color-text-primary); background: var(--color-background-secondary); }
+    &:active { cursor: grabbing; }
+  }
 
   &__image {
-    flex: 0 0 113px;
-    width: 113px;
-    height: 113px;
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--color-background-secondary);
@@ -32,8 +275,9 @@
   }
 
   &__no-image {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: var(--color-text-tertiary);
+    text-align: center;
   }
 
   &__body {
@@ -41,12 +285,12 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
 
   &__name {
     font-family: var(--font-heading);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-text-primary);
     margin: 0;
@@ -55,69 +299,65 @@
     text-overflow: ellipsis;
   }
 
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    align-items: center;
+  }
+
   &__desc {
-    font-size: 0.8125rem;
+    font-size: 0.775rem;
     color: var(--color-text-secondary);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 24ch;
   }
 
   &__price {
     font-family: var(--font-heading);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: #059669;
   }
 
-  // Columna derecha: meta + botones apilados
   &__actions {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-    min-width: 160px;
-  }
-
-  &__meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.2rem;
-    width: 100%;
-  }
-
-  &__btns {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-
-    .btn-icon {
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-
-      svg { width: 18px; height: 18px; }
-    }
+    gap: 2px;
+    flex-shrink: 0;
   }
+}
 
-  // Responsive: apila verticalmente en tablet
-  @include respond-to($bp-sm) {
-    flex-wrap: wrap;
+// ── Botones de icono pequeños ─────────────────────────────────────────────────
+.btn-icon--sm {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 7px !important;
+}
 
+// ── Modal pequeño para sección ────────────────────────────────────────────────
+.modal--sm {
+  max-width: 420px !important;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@include respond-to($bp-sm) {
+  .product-row {
     &__image {
-      flex: 0 0 100%;
-      width: 100%;
-      height: 200px;
-      border-radius: 10px;
+      flex: 0 0 52px;
+      width: 52px;
+      height: 52px;
     }
 
-    &__body    { flex: 1; min-width: 0; }
-    &__actions { min-width: unset; align-items: flex-start; }
+    &__actions {
+      gap: 1px;
+      .btn-icon { width: 32px; height: 32px; }
+    }
   }
+
+  .section-block__header { padding: 0.5rem 0.75rem; }
+  .catalog-hint { display: none; }
 }

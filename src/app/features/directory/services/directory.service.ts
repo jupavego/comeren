@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../../../core/services/supabase.service';
-import { Account, CatalogItem } from '../models/account.model';
+import { Account, CatalogItem, CatalogSection } from '../models/account.model';
 
 @Injectable({ providedIn: 'root' })
 export class DirectoryService {
@@ -105,12 +105,17 @@ export class DirectoryService {
     return { data: items.slice(0, pageSize), hasMore };
   }
 
-  // Obtiene un negocio por ID incluyendo sus productos activos
+  // Obtiene un negocio por ID incluyendo sus secciones y productos activos
   async getById(id: string): Promise<Account | null> {
     const { data, error } = await this.supabase
       .from('accounts')
       .select(`
         *,
+        catalog_sections (
+          id,
+          name,
+          position
+        ),
         catalog_items (
           id,
           name,
@@ -118,7 +123,9 @@ export class DirectoryService {
           price,
           image_url,
           active,
-          approval_status
+          approval_status,
+          section_id,
+          position
         )
       `)
       .eq('id', id)
@@ -126,6 +133,8 @@ export class DirectoryService {
       .eq('status', 'approved')
       .eq('catalog_items.active', true)
       .eq('catalog_items.approval_status', 'approved')
+      .order('position', { referencedTable: 'catalog_sections', ascending: true })
+      .order('position', { referencedTable: 'catalog_items',    ascending: true })
       .single();
 
     if (error) {
@@ -133,7 +142,22 @@ export class DirectoryService {
       return null;
     }
 
-    return data as Account;
+    const account = data as Account;
+
+    // Poblar items dentro de cada sección para facilitar el render
+    if (account.catalog_sections && account.catalog_items) {
+      const allItems = account.catalog_items;
+      account.catalog_sections = (account.catalog_sections as CatalogSection[])
+        .sort((a, b) => a.position - b.position)
+        .map(s => ({
+          ...s,
+          items: allItems
+            .filter(i => i.section_id === s.id)
+            .sort((a, b) => a.position - b.position),
+        }));
+    }
+
+    return account;
   }
 
   // Búsqueda por texto — filtra por nombre, zona, categoría, descripción

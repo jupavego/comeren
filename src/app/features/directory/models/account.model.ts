@@ -82,6 +82,19 @@ export interface CatalogItem {
   active: boolean;
   approval_status: CatalogApprovalStatus;
   created_at: string;
+  // Secciones y ordenamiento
+  section_id: string | null;
+  position: number;
+}
+
+export interface CatalogSection {
+  id: string;
+  account_id: string;
+  name: string;
+  position: number;
+  created_at: string;
+  // Relación local — se puebla en el cliente, no viene de la DB
+  items?: CatalogItem[];
 }
 
 export interface Account {
@@ -115,8 +128,9 @@ export interface Account {
   catalog_text_color?: string | null; // JSON array de colores de letra por tarjeta (paralelo a brand_colors)
   album_urls?: string[] | null;       // Álbum del negocio — máx 10 fotos
 
-  // Relación opcional — se carga con join cuando se necesita
-  catalog_items?: CatalogItem[];
+  // Relaciones opcionales — se cargan con join cuando se necesitan
+  catalog_items?:    CatalogItem[];
+  catalog_sections?: CatalogSection[];
 }
 
 // DTO para crear o editar un negocio

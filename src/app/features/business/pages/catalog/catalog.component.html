@@ -1,97 +1,216 @@
 <div class="panel">
+
+  <!-- Cabecera del panel -->
   <div class="panel-header">
     <h1 class="panel-title">Mis productos</h1>
     <div class="panel-header__actions">
       <a routerLink="/business/dashboard" class="btn-back">Volver</a>
-      <button class="btn-primary" (click)="openCreate()">+ Agregar producto</button>
+      <button class="btn-outline" (click)="openCreateSection()">+ Sección</button>
+      <button class="btn-primary" (click)="openCreate()">+ Producto</button>
     </div>
   </div>
 
   @if (successMsg()) {
     <div class="field-alert field-alert--success">{{ successMsg() }}</div>
   }
+  @if (errorMsg()) {
+    <div class="field-alert field-alert--error">{{ errorMsg() }}</div>
+  }
 
   @if (loading()) {
     <div class="panel-loading"><span class="spinner"></span></div>
   } @else {
 
-    @if (items().length === 0) {
+    @if (sections().length === 0 && freeItems().length === 0) {
+      <!-- Estado vacío -->
       <div class="catalog-empty">
-        <p>Aún no tienes productos registrados.</p>
-        <button class="btn-primary" (click)="openCreate()">Agregar primer producto</button>
+        <p>Aún no tienes productos ni secciones.</p>
+        <div class="catalog-empty__actions">
+          <button class="btn-outline" (click)="openCreateSection()">Crear sección</button>
+          <button class="btn-primary"  (click)="openCreate()">Agregar producto</button>
+        </div>
       </div>
     } @else {
-      <div class="catalog-list">
-        @for (item of items(); track item.id) {
-          <div class="edit-section product-row" [class.product-row--inactive]="!item.active">
 
-              <!-- Imagen -->
-              <div class="product-row__image">
-                @if (item.image_url) {
-                  <img [src]="item.image_url" [alt]="item.name" loading="lazy" />
-                } @else {
-                  <div class="product-row__no-image">Sin imagen</div>
-                }
+      <div class="catalog-hint">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zM7 14a2 2 0 100 4 2 2 0 000-4zM13 2a2 2 0 100 4 2 2 0 000-4zM13 8a2 2 0 100 4 2 2 0 000-4zM13 14a2 2 0 100 4 2 2 0 000-4z"/></svg>
+        Arrastra secciones o productos para reordenarlos
+      </div>
+
+      <!-- ── Lista de secciones (DnD de secciones) ─────────────────────────── -->
+      <div
+        cdkDropList
+        cdkDropListLockAxis="y"
+        [cdkDropListData]="sections()"
+        (cdkDropListDropped)="dropSection($event)"
+        class="sections-list"
+      >
+        @for (section of sections(); track section.id) {
+          <div
+            cdkDrag
+            [cdkDragData]="section"
+            class="section-block"
+          >
+            <!-- Cabecera de sección -->
+            <div class="section-block__header">
+              <div class="section-block__grip" cdkDragHandle title="Arrastrar sección">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                  <path d="M7 2a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zM7 14a2 2 0 100 4 2 2 0 000-4zM13 2a2 2 0 100 4 2 2 0 000-4zM13 8a2 2 0 100 4 2 2 0 000-4zM13 14a2 2 0 100 4 2 2 0 000-4z"/>
+                </svg>
               </div>
-
-              <!-- Info: solo nombre -->
-              <div class="product-row__body">
-                <h3 class="product-row__name">{{ item.name }}</h3>
+              <span class="section-block__name">{{ section.name }}</span>
+              <span class="section-block__count">{{ section.items?.length ?? 0 }}</span>
+              <div class="section-block__actions">
+                <button class="btn-icon btn-icon--sm" (click)="openCreate(section.id)" title="Agregar producto aquí">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+                <button class="btn-icon btn-icon--sm" (click)="openEditSection(section)" title="Editar sección">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-icon--sm btn-icon--danger" (click)="onDeleteSection(section)" title="Eliminar sección">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                </button>
               </div>
-
-              <!-- Acciones + meta info debajo -->
-              <div class="product-row__actions">
-                <div class="product-row__meta">
-                  <span class="status-badge" [class.status-badge--active]="item.active" [class.status-badge--inactive]="!item.active">
-                    <span class="status-badge__dot"></span>
-                    {{ item.active ? 'Activo' : 'Inactivo' }}
-                  </span>
-                  @if (item.description) {
-                    <p class="product-row__desc">{{ item.description }}</p>
-                  }
-                  <span class="product-row__price">
-                    {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
-                  </span>
-                </div>
-                <div class="product-row__btns">
-                  <!-- Editar -->
-                  <button class="btn-icon" (click)="openEdit(item)" title="Editar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
-                  </button>
-                  <!-- Activar / Desactivar -->
-                  <button class="btn-icon" (click)="onToggleActive(item)"
-                    [title]="item.active ? 'Desactivar' : 'Activar'">
-                    @if (item.active) {
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
-                      </svg>
-                    } @else {
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                      </svg>
-                    }
-                  </button>
-                  <!-- Eliminar -->
-                  <button class="btn-icon btn-icon--danger" (click)="onDelete(item)" title="Eliminar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
             </div>
 
+            <!-- Drop placeholder mientras se arrastra la sección -->
+            <div class="section-block__drag-placeholder" *cdkDragPlaceholder></div>
+
+            <!-- Lista de productos dentro de la sección -->
+            <div
+              cdkDropList
+              cdkDropListLockAxis="y"
+              [id]="'section-' + section.id"
+              [cdkDropListData]="section.items ?? []"
+              [cdkDropListConnectedTo]="sectionDropListIds()"
+              (cdkDropListDropped)="dropProduct($event, section.id)"
+              class="section-block__items"
+              [class.section-block__items--empty]="!(section.items?.length)"
+            >
+              @if (!section.items?.length) {
+                <div class="section-empty-hint">Arrastra productos aquí o
+                  <button class="link-btn" (click)="openCreate(section.id)">agrega uno nuevo</button>
+                </div>
+              }
+
+              @for (item of section.items ?? []; track item.id) {
+                <div cdkDrag [cdkDragData]="item" class="product-row" [class.product-row--inactive]="!item.active">
+                  <div class="product-row__grip" cdkDragHandle title="Reordenar">
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                      <path d="M7 2a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zM7 14a2 2 0 100 4 2 2 0 000-4zM13 2a2 2 0 100 4 2 2 0 000-4zM13 8a2 2 0 100 4 2 2 0 000-4zM13 14a2 2 0 100 4 2 2 0 000-4z"/>
+                    </svg>
+                  </div>
+                  <ng-container *ngTemplateOutlet="productRowContent; context: { item }"></ng-container>
+                </div>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!-- ── Productos sin sección ──────────────────────────────────────────── -->
+      <div class="free-items-section">
+        <div class="free-items-section__header">
+          <span class="free-items-section__label">Sin sección</span>
+          <span class="section-block__count">{{ freeItems().length }}</span>
+          <button class="btn-icon btn-icon--sm" (click)="openCreate(null)" title="Agregar producto sin sección">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div
+          cdkDropList
+          cdkDropListLockAxis="y"
+          id="free-items"
+          [cdkDropListData]="freeItems()"
+          [cdkDropListConnectedTo]="sectionDropListIds()"
+          (cdkDropListDropped)="dropProduct($event, null)"
+          class="section-block__items"
+          [class.section-block__items--empty]="!freeItems().length"
+        >
+          @if (!freeItems().length) {
+            <div class="section-empty-hint">Arrastra productos aquí</div>
+          }
+
+          @for (item of freeItems(); track item.id) {
+            <div cdkDrag [cdkDragData]="item" class="product-row" [class.product-row--inactive]="!item.active">
+              <div class="product-row__grip" cdkDragHandle title="Reordenar">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                  <path d="M7 2a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zM7 14a2 2 0 100 4 2 2 0 000-4zM13 2a2 2 0 100 4 2 2 0 000-4zM13 8a2 2 0 100 4 2 2 0 000-4zM13 14a2 2 0 100 4 2 2 0 000-4z"/>
+                </svg>
+              </div>
+              <ng-container *ngTemplateOutlet="productRowContent; context: { item }"></ng-container>
+            </div>
           }
         </div>
+      </div>
+
     }
   }
 </div>
 
-<!-- Modal formulario -->
+<!-- ── Template reutilizable: contenido de fila de producto ──────────────── -->
+<ng-template #productRowContent let-item="item">
+  <!-- Imagen -->
+  <div class="product-row__image">
+    @if (item.image_url) {
+      <img [src]="item.image_url" [alt]="item.name" loading="lazy" />
+    } @else {
+      <div class="product-row__no-image">Sin imagen</div>
+    }
+  </div>
+
+  <!-- Cuerpo -->
+  <div class="product-row__body">
+    <h3 class="product-row__name">{{ item.name }}</h3>
+    <div class="product-row__meta">
+      <span class="status-badge" [class.status-badge--active]="item.active" [class.status-badge--inactive]="!item.active">
+        <span class="status-badge__dot"></span>
+        {{ item.active ? 'Activo' : 'Inactivo' }}
+      </span>
+      @if (item.description) {
+        <p class="product-row__desc">{{ item.description }}</p>
+      }
+      <span class="product-row__price">
+        {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="product-row__actions">
+    <button class="btn-icon" (click)="openEdit(item)" title="Editar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+    <button class="btn-icon" (click)="onToggleActive(item)" [title]="item.active ? 'Desactivar' : 'Activar'">
+      @if (item.active) {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      }
+    </button>
+    <button class="btn-icon btn-icon--danger" (click)="onDelete(item)" title="Eliminar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+      </svg>
+    </button>
+  </div>
+</ng-template>
+
+<!-- ── Modal: formulario de producto ─────────────────────────────────────── -->
 @if (showForm()) {
   <div class="modal-overlay" (click)="closeForm()">
     <div class="modal" (click)="$event.stopPropagation()">
@@ -134,7 +253,7 @@
         <div class="field-group">
           <label class="field-label">Descripción</label>
           <textarea formControlName="description" class="field-input field-input--textarea"
-            rows="2" placeholder="Ingredientes, detalles del producto..."></textarea>
+            rows="2" placeholder="Ingredientes, detalles..."></textarea>
         </div>
 
         <!-- Precio -->
@@ -146,6 +265,17 @@
           @if (price.invalid && price.touched) {
             <span class="field-error">Ingresa un precio válido</span>
           }
+        </div>
+
+        <!-- Sección -->
+        <div class="field-group">
+          <label class="field-label">Sección</label>
+          <select formControlName="section_id" class="field-input">
+            <option [ngValue]="null">Sin sección</option>
+            @for (section of sections(); track section.id) {
+              <option [ngValue]="section.id">{{ section.name }}</option>
+            }
+          </select>
         </div>
 
         <!-- Activo -->
@@ -167,6 +297,47 @@
         </div>
 
       </form>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: formulario de sección ──────────────────────────────────────── -->
+@if (showSectionForm()) {
+  <div class="modal-overlay" (click)="closeSectionForm()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2 class="modal-title">{{ editingSection() ? 'Editar sección' : 'Nueva sección' }}</h2>
+        <button class="modal-close" (click)="closeSectionForm()">✕</button>
+      </div>
+
+      <div class="modal-form">
+        <div class="field-group">
+          <label class="field-label">Nombre de la sección <span class="required">*</span></label>
+          <input
+            type="text"
+            class="field-input"
+            [class.field-input--error]="sectionError()"
+            placeholder="Ej: Entradas, Bebidas, Platos fuertes..."
+            [value]="sectionNameInput()"
+            (input)="sectionNameInput.set($any($event.target).value)"
+            (keydown.enter)="onSectionSubmit()"
+            autofocus
+          />
+          @if (sectionError()) {
+            <span class="field-error">{{ sectionError() }}</span>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeSectionForm()">Cancelar</button>
+          <button type="button" class="btn-primary" [disabled]="sectionSaving()" (click)="onSectionSubmit()">
+            @if (sectionSaving()) { <span class="btn-spinner"></span> Guardando... }
+            @else { {{ editingSection() ? 'Guardar cambios' : 'Crear sección' }} }
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 }
