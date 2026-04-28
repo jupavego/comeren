@@ -24,19 +24,17 @@ import { BusinessHours, isBusinessOpen } from '../../../features/directory/model
       font-family: 'Poppins', sans-serif;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.25);
       white-space: nowrap;
       line-height: 1;
 
-      // Cerrado — rojo translúcido
-      background: rgba(220, 38, 38, 0.68);
+      // Cerrado — rojo sólido (sin backdrop-filter para no forzar capa de compositing)
+      background: rgba(185, 28, 28, 0.90);
       color: #fff;
 
-      // Abierto — verde translúcido
+      // Abierto — verde sólido
       &--open {
-        background: rgba(22, 163, 74, 0.72);
+        background: rgba(15, 118, 54, 0.90);
         color: #fff;
       }
     }

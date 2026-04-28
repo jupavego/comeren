@@ -40,10 +40,8 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    // Pre-promociona la imagen a capa GPU antes del hover — evita el jank
-    // del primer frame cuando el browser tiene que promoverla en caliente
-    will-change: transform;
-    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
 }

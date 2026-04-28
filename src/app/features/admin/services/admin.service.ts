@@ -12,6 +12,7 @@ export interface AdminStats {
   pendingAccounts: number;
   approvedAccounts: number;
   totalProducts: number;
+  pendingProducts: number;
   totalOrders: number;
 }
 
@@ -52,7 +53,7 @@ export class AdminService {
       return {
         totalUsers: 0, totalBusinesses: 0, totalClients: 0,
         totalAccounts: 0, pendingAccounts: 0, approvedAccounts: 0,
-        totalProducts: 0, totalOrders: 0,
+        totalProducts: 0, pendingProducts: 0, totalOrders: 0,
       };
     }
 

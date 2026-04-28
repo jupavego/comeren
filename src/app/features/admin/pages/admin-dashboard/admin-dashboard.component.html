@@ -48,6 +48,10 @@
           <span class="stat-card__value">{{ s.totalProducts }}</span>
           <span class="stat-card__label">Productos publicados</span>
         </div>
+        <div class="stat-card stat-card--warning">
+          <span class="stat-card__value">{{ s.pendingProducts }}</span>
+          <span class="stat-card__label">Productos pendientes</span>
+        </div>
         <div class="stat-card stat-card--whatsapp">
           <span class="stat-card__value">{{ s.totalOrders }}</span>
           <span class="stat-card__label">Pedidos por WhatsApp</span>
@@ -75,7 +79,10 @@
           <div class="admin-action-card__content">
             <span class="admin-action-card__label">Catálogo de productos</span>
             <span class="admin-action-card__desc">
-              {{ s.totalProducts }} producto{{ s.totalProducts !== 1 ? 's' : '' }} registrados
+              {{ s.totalProducts }} registrados
+              @if (s.pendingProducts > 0) {
+                · <strong>{{ s.pendingProducts }} pendiente{{ s.pendingProducts !== 1 ? 's' : '' }}</strong>
+              }
             </span>
           </div>
           <span class="admin-action-card__arrow">→</span>

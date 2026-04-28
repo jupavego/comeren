@@ -141,9 +141,10 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   readonly albumPhotos = computed(() => this.account()?.album_urls ?? []);
 
   // ── Estilos de producto precalculados — se computan UNA sola vez al cargar account ──
-  readonly productStyles = computed<ProductStyle[]>(() => {
+  // Indexados por item.id para funcionar con render por secciones (no por $index).
+  readonly productStyles = computed<Record<string, ProductStyle>>(() => {
     const account = this.account();
-    if (!account) return [];
+    if (!account) return {};
 
     const items  = account.catalog_items ?? [];
     const colors = account.brand_colors  ?? [];
@@ -161,7 +162,8 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
       }
     }
 
-    return items.map((_, i) => {
+    const result: Record<string, ProductStyle> = {};
+    items.forEach((item, i) => {
       const hex = colors.length ? colors[i % colors.length] : null;
       const rgb = hex ? this.hexToRgb(hex) : null;
 
@@ -196,9 +198,18 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
           `rgb(${rgb.r},${rgb.g},${rgb.b})`,
       } : null;
 
-      return { textColor, mantleStyle, descBandStyle };
+      result[item.id] = { textColor, mantleStyle, descBandStyle };
     });
+    return result;
   });
+
+  /** true cuando la burbuja está en la mitad izquierda del viewport */
+  readonly bubbleOnLeft = computed(() => this.bubblePos().x < window.innerWidth / 2);
+
+  /** Items sin sección — usados en la vista pública cuando hay secciones activas */
+  readonly unsectionedItems = computed(() =>
+    (this.account()?.catalog_items ?? []).filter(i => !i.section_id)
+  );
 
   private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -219,7 +230,13 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     const saved = sessionStorage.getItem('cart_bubble_pos');
     const defaultPos = { x: window.innerWidth - 80, y: window.innerHeight - 100 };
     try {
-      this.bubblePos.set(saved ? JSON.parse(saved) : defaultPos);
+      const raw = saved ? JSON.parse(saved) : defaultPos;
+      // Clampear siempre al viewport actual — la posición guardada puede venir
+      // de una sesión con tamaño de pantalla distinto (desktop → mobile o viceversa).
+      this.bubblePos.set({
+        x: Math.max(8, Math.min(window.innerWidth  - 68, raw.x)),
+        y: Math.max(8, Math.min(window.innerHeight - 68, raw.y)),
+      });
     } catch {
       this.bubblePos.set(defaultPos);
     }

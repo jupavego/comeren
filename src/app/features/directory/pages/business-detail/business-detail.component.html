@@ -174,22 +174,68 @@
             <h2 class="detail-section__title">Nuestros productos</h2>
           </div>
 
-          <div class="products-grid">
-            @for (item of a.catalog_items; track item.id) {
-              <div class="product-entry">
-                <app-product-card
-                  [item]="item"
-                  [style]="productStyles()[$index]"
-                  [avgRating]="productAvgRatings()[item.id]"
-                  [accountId]="a.id"
-                  (lightboxOpen)="lightboxUrl.set($event)"
-                  (ratingOpen)="ratingPopupItem.set($event)"
-                  (cartConflict)="conflictItem.set($event)"
-                />
+          @if (a.catalog_sections && a.catalog_sections.length > 0) {
+            <!-- Vista con secciones -->
+            @for (section of a.catalog_sections; track section.id) {
+              @if (section.items && section.items.length > 0) {
+                <div class="products-section">
+                  <h3 class="products-section__name">{{ section.name }}</h3>
+                  <div class="products-grid">
+                    @for (item of section.items; track item.id) {
+                      <div class="product-entry">
+                        <app-product-card
+                          [item]="item"
+                          [style]="productStyles()[item.id]"
+                          [avgRating]="productAvgRatings()[item.id]"
+                          [accountId]="a.id"
+                          (lightboxOpen)="lightboxUrl.set($event)"
+                          (ratingOpen)="ratingPopupItem.set($event)"
+                          (cartConflict)="conflictItem.set($event)"
+                        />
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            }
+            <!-- Productos sin sección -->
+            @if (unsectionedItems().length > 0) {
+              <div class="products-section">
+                <div class="products-grid">
+                  @for (item of unsectionedItems(); track item.id) {
+                    <div class="product-entry">
+                      <app-product-card
+                        [item]="item"
+                        [style]="productStyles()[item.id]"
+                        [avgRating]="productAvgRatings()[item.id]"
+                        [accountId]="a.id"
+                        (lightboxOpen)="lightboxUrl.set($event)"
+                        (ratingOpen)="ratingPopupItem.set($event)"
+                        (cartConflict)="conflictItem.set($event)"
+                      />
+                    </div>
+                  }
+                </div>
               </div>
             }
-          </div>
-
+          } @else {
+            <!-- Vista plana (negocios sin secciones) -->
+            <div class="products-grid">
+              @for (item of a.catalog_items; track item.id) {
+                <div class="product-entry">
+                  <app-product-card
+                    [item]="item"
+                    [style]="productStyles()[item.id]"
+                    [avgRating]="productAvgRatings()[item.id]"
+                    [accountId]="a.id"
+                    (lightboxOpen)="lightboxUrl.set($event)"
+                    (ratingOpen)="ratingPopupItem.set($event)"
+                    (cartConflict)="conflictItem.set($event)"
+                  />
+                </div>
+              }
+            </div>
+          }
 
         </section>
       }
@@ -303,10 +349,11 @@
     }
 
     <!-- Burbuja flotante — aparece cuando el botón hero sale del viewport -->
-    @if (heroWaHidden() && a.whatsapp && a.catalog_items?.length) {
+    @if (heroWaHidden() && !showOrder() && a.whatsapp && a.catalog_items?.length) {
       <button
         class="cart-bubble"
         [class.cart-bubble--has-items]="cart.hasItems()"
+        [class.cart-bubble--left]="bubbleOnLeft()"
         type="button"
         aria-label="Ver pedido"
         [style.left.px]="bubblePos().x"

@@ -56,11 +56,12 @@ export class CatalogService {
     const { data, error } = await this.supabase
       .from('catalog_items')
       .insert({
-        account_id: accountId,
+        account_id:      accountId,
         ...formData,
-        active:    formData.active    ?? true,
-        section_id: formData.section_id ?? null,
-        position:   formData.position   ?? 0,
+        active:          formData.active    ?? true,
+        section_id:      formData.section_id ?? null,
+        position:        formData.position   ?? 0,
+        approval_status: 'approved',
       })
       .select()
       .single();
@@ -105,7 +106,7 @@ export class CatalogService {
   async reorderItems(accountId: string, items: ReorderItemPayload[]): Promise<{ success: boolean; error?: string }> {
     const { error } = await this.supabase.rpc('reorder_catalog_items', {
       p_account_id: accountId,
-      p_items:      JSON.stringify(items),
+      p_items:      items as unknown as Record<string, unknown>,
     });
 
     if (error) return { success: false, error: error.message };
@@ -174,7 +175,7 @@ export class CatalogService {
   async reorderSections(accountId: string, sections: ReorderSectionPayload[]): Promise<{ success: boolean; error?: string }> {
     const { error } = await this.supabase.rpc('reorder_catalog_sections', {
       p_account_id: accountId,
-      p_items:      JSON.stringify(sections),
+      p_items:      sections as unknown as Record<string, unknown>,
     });
 
     if (error) return { success: false, error: error.message };

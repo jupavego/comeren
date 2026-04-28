@@ -653,7 +653,7 @@
   &__title {
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: 1.2rem;
+    font-size: 2.4rem;
   }
 }
 
@@ -689,6 +689,58 @@
   scroll-margin-top: 90px;
 }
 
+// ── Agrupación por sección ────────────────────────────────────────────────────
+.products-section {
+  & + & { margin-top: 2.5rem; }
+
+  // Dot gradiente + texto + línea fade — todo con pseudo-elements
+  &__name {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin: 0 0 1.25rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.1rem, 4vw, 1.785rem);
+    font-weight: 800;
+    color: var(--color-brand-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: normal;
+    word-break: break-word;
+
+    // Dot violet → orange con glow — anclado a la primera línea
+    &::before {
+      content: '';
+      flex-shrink: 0;
+      align-self: center;
+      margin-top: 0.15em;   // compensa el line-height del texto uppercase
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,
+        var(--color-brand-primary) 0%,
+        var(--color-warm-primary) 100%
+      );
+      box-shadow: 0 2px 8px rgba(var(--color-brand-primary-rgb), 0.45);
+    }
+
+    // Línea fade que rellena el ancho restante
+    &::after {
+      content: '';
+      flex: 1;
+      align-self: center;
+      height: 2px;
+      min-width: 1.5rem;
+      border-radius: 1px;
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-brand-primary-rgb), 0.28) 0%,
+        transparent 100%
+      );
+    }
+  }
+}
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -719,6 +771,7 @@
   height: 60px;
   border-radius: 50%;
   border: none;
+  overflow: visible;
   background: linear-gradient(135deg, var(--color-whatsapp) 0%, var(--color-whatsapp-dark) 100%);
   box-shadow:
     0 6px 24px rgba(var(--color-whatsapp-rgb), .45),
@@ -769,10 +822,11 @@
     animation: badge-pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  // Callout que aparece al mostrar la burbuja y desaparece solo
+  // Callout que aparece al mostrar la burbuja y desaparece solo.
+  // Por defecto sale a la IZQUIERDA (burbuja en zona derecha del viewport).
+  // Con .cart-bubble--left sale a la DERECHA.
   &__callout {
     position: absolute;
-    right: calc(100% + 12px);
     top: 50%;
     transform: translateY(-50%);
     white-space: nowrap;
@@ -785,19 +839,37 @@
     border-radius: var(--radius-full);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
     pointer-events: none;
-    // Cola triangular apuntando a la burbuja
+    animation: callout-life 3.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+
+    // Posición y cola por defecto — callout a la izquierda
+    right: calc(100% + 12px);
+    left: auto;
+
     &::after {
       content: '';
       position: absolute;
-      right: -6px;
       top: 50%;
       transform: translateY(-50%);
       border: 6px solid transparent;
+      // Cola apunta hacia la derecha (hacia la burbuja)
+      right: -6px;
+      left: auto;
       border-right: none;
       border-left-color: #fff;
     }
-    // Aparece, se mantiene 2.5s y desaparece — no repite
-    animation: callout-life 3.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  // Burbuja en zona izquierda → callout sale a la derecha
+  &--left &__callout {
+    left: calc(100% + 12px);
+    right: auto;
+
+    &::after {
+      left: -6px;
+      right: auto;
+      border-left: none;
+      border-right-color: #fff;
+    }
   }
 }
 
