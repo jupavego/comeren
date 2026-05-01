@@ -13,6 +13,7 @@ import { DirectoryService } from '../../services/directory.service';
 import { DirectoryStateService } from '../../services/directory-state.service';
 import { CarouselComponent, CarouselSlide } from '../../components/carousel/carousel.component';
 import { DirectoryListComponent } from '../../components/directory-list/directory-list.component';
+import { DirectoryMapComponent } from '../../components/directory-map/directory-map.component';
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
 import { HomeConfigService, HomeConfig, HomeFeatured, DEFAULT_HOME_CONFIG } from '../../../../features/admin/services/home-config.service';
 
@@ -21,7 +22,7 @@ const PAGE_SIZE = 12;
 @Component({
   selector: 'app-directory-home',
   standalone: true,
-  imports: [CommonModule, CarouselComponent, DirectoryListComponent, SectionHeaderComponent],
+  imports: [CommonModule, CarouselComponent, DirectoryListComponent, DirectoryMapComponent, SectionHeaderComponent],
   templateUrl: './directory-home.component.html',
   styleUrl: './directory-home.component.scss',
 })
@@ -30,7 +31,8 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
   private homeConfigService = inject(HomeConfigService);
   readonly state            = inject(DirectoryStateService);
 
-  accounts    = signal<Account[]>([]);
+  accounts        = signal<Account[]>([]);
+  mappedAccounts  = signal<Account[]>([]);
   loading     = signal(true);
   loadingMore = signal(false);
   hasMore     = signal(false);
@@ -70,11 +72,14 @@ export class DirectoryHomeComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    const [, config, featuredDB] = await Promise.all([
+    const [, config, featuredDB, mapped] = await Promise.all([
       this.loadPage(true),
       this.homeConfigService.getConfig(),
       this.homeConfigService.getFeaturedWithDetails(),
+      this.directoryService.getAllWithCoordinates(),
     ]);
+
+    this.mappedAccounts.set(mapped);
 
     // Si hay negocios configurados en BD, usarlos; si no, cargar los 4 más recientes
     if (featuredDB.length > 0) {

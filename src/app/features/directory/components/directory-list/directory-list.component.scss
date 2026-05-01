@@ -8,6 +8,26 @@
 // Asegura que la imagen sea el contenedor del badge
 .business-card__image {
   position: relative;
+
+  // Fondo blureado: misma imagen escalada para cubrir sin huecos
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--biz-img);
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) brightness(0.6) saturate(1.2);
+    transform: scale(1.15); // elimina franjas transparentes del blur en los bordes
+    z-index: 0;
+  }
+
+  // Imagen principal completa y sin recorte encima del fondo
+  img {
+    position: relative;
+    z-index: 1;
+    object-fit: contain;
+  }
 }
 
 // Posición del badge — esquina superior izquierda

@@ -39,32 +39,35 @@
     </button>
   </div>
 
-  <!-- Catálogo (oculto tras envío) -->
-  <div class="wa-order__catalog" [class.wa-order__catalog--hidden]="sent()">
-    @for (item of catalog(); track item.id) {
-      <div class="wa-order__row">
-        <div class="wa-order__row-info">
-          @if (item.image_url) {
-            <img class="wa-order__row-img" [src]="item.image_url" [alt]="item.name" loading="lazy" />
-          }
-          <div>
-            <p class="wa-order__row-name">{{ item.name }}</p>
-            <p class="wa-order__row-price">
-              {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
-            </p>
+  <!-- Cuerpo: dos columnas en desktop, una en mobile -->
+  <div class="wa-order__body" [class.wa-order__body--hidden]="sent()">
+
+    <!-- Columna izquierda: catálogo scrollable -->
+    <div class="wa-order__catalog">
+      @for (item of catalog(); track item.id) {
+        <div class="wa-order__row">
+          <div class="wa-order__row-info">
+            @if (item.image_url) {
+              <img class="wa-order__row-img" [src]="item.image_url" [alt]="item.name" loading="lazy" />
+            }
+            <div>
+              <p class="wa-order__row-name">{{ item.name }}</p>
+              <p class="wa-order__row-price">
+                {{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}
+              </p>
+            </div>
+          </div>
+          <div class="wa-order__counter">
+            <button class="wa-order__counter-btn" (click)="remove(item)" [disabled]="qty(item.id) === 0">−</button>
+            <span class="wa-order__counter-qty">{{ qty(item.id) }}</span>
+            <button class="wa-order__counter-btn" (click)="add(item)">+</button>
           </div>
         </div>
-        <div class="wa-order__counter">
-          <button class="wa-order__counter-btn" (click)="remove(item)" [disabled]="qty(item.id) === 0">−</button>
-          <span class="wa-order__counter-qty">{{ qty(item.id) }}</span>
-          <button class="wa-order__counter-btn" (click)="add(item)">+</button>
-        </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
 
-  <!-- Resumen + datos + enviar (oculto tras envío) -->
-  <div class="wa-order__footer" [class.wa-order__footer--hidden]="sent()">
+  <!-- Columna derecha: resumen + datos + enviar -->
+  <div class="wa-order__footer">
     @if (hasItems()) {
       <div class="wa-order__summary">
         @for (line of orderLines(); track line.item.id) {
@@ -142,5 +145,7 @@
       Enviar pedido por WhatsApp
     </button>
   </div>
+
+  </div><!-- /.wa-order__body -->
 
 </aside>

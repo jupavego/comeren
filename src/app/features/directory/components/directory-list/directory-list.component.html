@@ -10,7 +10,8 @@
     } @else {
       @for (account of accounts; track account.id) {
         <a [routerLink]="['/negocio', account.id]" class="business-card">
-          <div class="business-card__image">
+          <div class="business-card__image"
+               [style.--biz-img]="'url(' + (account.logo_url || 'assets/images/placeholder.jpg') + ')'">
             <img
               [src]="account.logo_url || 'assets/images/placeholder.jpg'"
               [alt]="account.name"

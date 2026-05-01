@@ -200,6 +200,24 @@ export class DirectoryService {
     return data as Account[];
   }
 
+  // Obtiene todos los negocios aprobados que tienen coordenadas para el mapa
+  async getAllWithCoordinates(): Promise<Account[]> {
+    const { data, error } = await this.supabase
+      .from('accounts')
+      .select('id, name, logo_url, category, address, zone, latitude, longitude')
+      .eq('active', true)
+      .eq('status', 'approved')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching mapped accounts:', error.message);
+      return [];
+    }
+    return data as Account[];
+  }
+
   // Obtiene los primeros N negocios para el carrusel destacado
   async getFeatured(limit = 4): Promise<Account[]> {
     const { data, error } = await this.supabase

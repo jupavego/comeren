@@ -30,7 +30,25 @@
       "Bash(grep \"#[0-9a-fA-F]\\\\{3,6\\\\}\")",
       "Bash(grep -oP \"#[0-9a-fA-F]{3,6}\")",
       "Bash(grep -rEoh \":\\\\s*#[0-9a-fA-F]{3,6}\" src/app src/styles --include=\"*.scss\")",
-      "Bash(grep -oE \"#[0-9a-fA-F]{3,6}\")"
+      "Bash(grep -oE \"#[0-9a-fA-F]{3,6}\")",
+      "Bash(git merge security --no-ff -m ' *)",
+      "Bash(git push *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git merge *)",
+      "Bash(supabase --version)",
+      "Bash(winget install *)",
+      "Bash(cp design-tokens.html hero-proposal.html hero-v2.html \"../insumos/\")",
+      "Bash(git rm *)",
+      "Bash(npm audit *)",
+      "Bash(npm list *)",
+      "Bash(npm run *)",
+      "Bash(git log *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('Angular:', p.dependencies['@angular/core']\\)\")",
+      "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\shared\\\\components\\\\business-status-badge\" /b)",
+      "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\features\\\\directory\\\\components\\\\product-card\" /b)"
     ]
   }
 }

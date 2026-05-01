@@ -139,19 +139,13 @@
 .dashboard-metrics {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-.metrics-row {
-  display: flex;
-  flex-direction: column;
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
-
-  &--orders {
-    flex-direction: row;
-    gap: 0.75rem;
-
-    .metric-card { flex: 1; }
-  }
 }
 
 .dashboard-actions-col {
@@ -160,9 +154,14 @@
 }
 
 .dashboard-actions {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
+
+  .action-card {
+    padding: 0.875rem 1rem;
+    gap: 0.75rem;
+  }
 }
 
 // ── Tarjeta métrica ───────────────────────────────────────────────────────────
@@ -370,6 +369,26 @@
 
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include respond-to($bp-sm) {
+  .metrics-grid,
+  .dashboard-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-actions .action-card {
+    padding: 1rem 1.25rem;
     gap: 1rem;
   }
 }

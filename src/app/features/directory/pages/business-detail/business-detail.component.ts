@@ -65,10 +65,11 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.shimmerObserver.observe(btn);
   }
 
-  // Reemplaza el onScroll listener: cero querySelector por evento de scroll.
+  // Observa el hero completo — más robusto en mobile donde la grilla apila
+  // verticalmente y .biz-hero__panel-actions puede estar fuera del viewport inicial.
   private setupActionsObserver(): void {
     this.actionsObserver?.disconnect();
-    const el = document.querySelector<HTMLElement>('.biz-hero__panel-actions');
+    const el = document.querySelector<HTMLElement>('.biz-hero');
     if (!el) return;
     this.actionsObserver = new IntersectionObserver(
       ([entry]) => this.zone.run(() => this.heroWaHidden.set(!entry.isIntersecting)),
@@ -77,6 +78,16 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.actionsObserver.observe(el);
   }
 
+  // Tap — abre el panel de pedidos. Separado del drag para que (click) sea
+  // el canal fiable en mobile (pointerup puede cancelarse por scroll inertia).
+  onBubbleClick(): void {
+    if (!this.dragMoved) {
+      this.authGate.requireAuth(() => this.showOrder.set(true));
+    }
+    this.dragMoved = false;
+  }
+
+  // Drag — mueve la burbuja. No gestiona el tap (lo hace onBubbleClick).
   onBubblePointerDown(e: PointerEvent): void {
     const startX   = e.clientX;
     const startY   = e.clientY;
@@ -86,26 +97,30 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     const move = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) this.dragMoved = true;
-      this.zone.run(() => this.bubblePos.set({
-        x: Math.max(8, Math.min(window.innerWidth  - 68, startPos.x + dx)),
-        y: Math.max(8, Math.min(window.innerHeight - 68, startPos.y + dy)),
-      }));
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) this.dragMoved = true;
+      if (this.dragMoved) {
+        this.zone.run(() => this.bubblePos.set({
+          x: Math.max(8, Math.min(window.innerWidth  - 68, startPos.x + dx)),
+          y: Math.max(8, Math.min(window.innerHeight - 68, startPos.y + dy)),
+        }));
+      }
     };
 
-    const up = () => {
-      this.zone.run(() => {
-        if (!this.dragMoved) this.authGate.requireAuth(() => this.showOrder.set(true));
-        else sessionStorage.setItem('cart_bubble_pos', JSON.stringify(this.bubblePos()));
-        this.dragMoved = false;
-      });
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
+    const cleanup = () => {
+      if (this.dragMoved) {
+        this.zone.run(() =>
+          sessionStorage.setItem('cart_bubble_pos', JSON.stringify(this.bubblePos()))
+        );
+      }
+      document.removeEventListener('pointermove',  move);
+      document.removeEventListener('pointerup',    cleanup);
+      document.removeEventListener('pointercancel', cleanup);
     };
 
     this.zone.runOutsideAngular(() => {
-      document.addEventListener('pointermove', move);
-      document.addEventListener('pointerup', up);
+      document.addEventListener('pointermove',   move);
+      document.addEventListener('pointerup',     cleanup);
+      document.addEventListener('pointercancel', cleanup);
     });
   }
 

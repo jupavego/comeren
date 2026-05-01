@@ -30,4 +30,25 @@
     </div>
   </section>
 
+  @if (mappedAccounts().length > 0) {
+    <section class="home-map-showcase">
+      <div class="home-map-showcase__shell">
+        <div class="home-map-showcase__header">
+          <app-section-header
+            eyebrow="Dónde encontrarnos"
+            title="Negocios de Girardota en el mapa"
+          />
+          <p class="home-map-showcase__hint">
+            Pasa el cursor sobre un marcador para ver la información del negocio.
+          </p>
+        </div>
+        @defer (on viewport; prefetch on idle) {
+          <app-directory-map [accounts]="mappedAccounts()" />
+        } @placeholder {
+          <div class="home-map-placeholder"></div>
+        }
+      </div>
+    </section>
+  }
+
 }
