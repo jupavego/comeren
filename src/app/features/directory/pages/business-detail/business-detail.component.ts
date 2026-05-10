@@ -308,9 +308,12 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.authGate.requireAuth(() => this.ratingPopupItem.set(item), 'rating');
   }
 
-  // Delega al browser: off-main-thread, respeta scroll-margin-top del CSS
   scrollToProducts(): void {
     document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  scrollToSection(sectionId: string): void {
+    document.getElementById('section-' + sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   openWhatsapp(phone: string): void {

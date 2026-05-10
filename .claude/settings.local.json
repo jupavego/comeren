@@ -48,7 +48,11 @@
       "Bash(git log *)",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('Angular:', p.dependencies['@angular/core']\\)\")",
       "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\shared\\\\components\\\\business-status-badge\" /b)",
-      "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\features\\\\directory\\\\components\\\\product-card\" /b)"
+      "Bash(dir \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\features\\\\directory\\\\components\\\\product-card\" /b)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"startup brutalist premium minimal bold typography email\" --design-system -p \"Come en Girardota\" -f markdown)",
+      "Bash(py .claude/skills/ui-ux-pro-max/scripts/search.py \"startup brutalist premium minimal bold typography email\" --design-system -p \"Come en Girardota\" -f markdown)",
+      "PowerShell($path = \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\supabase\\\\migrations\"; if \\(Test-Path $path\\) { \\(Get-Item $path\\).PSIsContainer; Get-ChildItem $path | Measure-Object; Get-ChildItem $path | Select-Object -First 20 | ForEach-Object { $_.FullName } } else { \"Not found\" })",
+      "PowerShell(\\(Get-ChildItem \"D:\\\\JP\\\\WEB SERVICES\\\\directorio-girardota v2\\\\src\\\\app\\\\layouts\" -Recurse | Measure-Object\\).Count)"
     ]
   }
 }
