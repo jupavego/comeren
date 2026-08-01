@@ -4,4 +4,5 @@ export const environment = {
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxja3lidmdzeWl0enVveWVibm9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNzAwMTEsImV4cCI6MjA5MDc0NjAxMX0.yJgrxVaH4BbVfDRqu0UcZmifyHUu1VCOcXeq1smEvGY',
   sentryDsn: '',          // vacío en desarrollo — Sentry solo activo en producción
   turnstileSiteKey: '',   // clave pública de Cloudflare Turnstile para desarrollo/staging
+  googleMapsApiKey: 'AIzaSyDbJTm65fipASI_Q93Y_qo3DGIqKhbIoco',   // clave de Maps JavaScript API — restringida a localhost:* en Google Cloud Console
 };

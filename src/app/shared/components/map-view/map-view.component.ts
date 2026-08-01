@@ -1,17 +1,27 @@
-import {
-  Component,
-  AfterViewInit,
-  OnDestroy,
-  input,
-} from '@angular/core';
-import * as L from 'leaflet';
+import { Component, computed, inject, input, signal } from '@angular/core';
+import { GoogleMap, MapMarker } from '@angular/google-maps';
+import { GoogleMapsLoaderService } from '../../../core/services/google-maps-loader.service';
 
 @Component({
   selector: 'app-map-view',
   standalone: true,
+  imports: [GoogleMap, MapMarker],
   template: `
     <div class="map-view-wrap">
-      <div id="map-view-{{ mapId }}" class="map-view"></div>
+      @if (mapsReady()) {
+        <google-map
+          class="map-view"
+          height="320px"
+          width="100%"
+          [center]="center()"
+          [zoom]="16"
+          [options]="mapOptions"
+        >
+          <map-marker [position]="center()" [title]="businessName() || 'Negocio'" />
+        </google-map>
+      } @else {
+        <div class="map-view map-view--loading"></div>
+      }
       <a [href]="mapsUrl" target="_blank" rel="noopener noreferrer" class="map-gmaps-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -30,11 +40,14 @@ import * as L from 'leaflet';
       gap: 0.625rem;
     }
     .map-view {
+      display: block;
       height: 320px;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid var(--color-border-tertiary);
-      z-index: 0;
+    }
+    .map-view--loading {
+      background: var(--color-bg-secondary, #f1f0f8);
     }
     .map-gmaps-btn {
       display: inline-flex;
@@ -61,48 +74,29 @@ import * as L from 'leaflet';
     }
   `],
 })
-export class MapViewComponent implements AfterViewInit, OnDestroy {
+export class MapViewComponent {
   lat          = input.required<number>();
   lng          = input.required<number>();
   businessName = input<string>('');
 
-  // ID único por instancia para evitar colisión si hay varios mapas en la página
-  readonly mapId = Math.random().toString(36).slice(2, 8);
+  private readonly loader = inject(GoogleMapsLoaderService);
+
+  readonly mapsReady = signal(false);
+
+  readonly mapOptions: google.maps.MapOptions = {
+    disableDefaultUI: false,
+    scrollwheel: false,
+    streetViewControl: false,
+    mapTypeControl: false,
+  };
+
+  readonly center = computed<google.maps.LatLngLiteral>(() => ({ lat: this.lat(), lng: this.lng() }));
 
   get mapsUrl(): string {
     return `https://www.google.com/maps?q=${this.lat()},${this.lng()}`;
   }
 
-  private map!: L.Map;
-
-  ngAfterViewInit(): void {
-    this.map = L.map(`map-view-${this.mapId}`, {
-      zoomControl: true,
-      scrollWheelZoom: false,
-    }).setView([this.lat(), this.lng()], 16);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(this.map);
-
-    const icon = L.icon({
-      iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize:    [25, 41],
-      iconAnchor:  [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize:  [41, 41],
-    });
-
-    L.marker([this.lat(), this.lng()], { icon })
-      .addTo(this.map)
-      .bindPopup(`📍 ${this.businessName() || 'Negocio'}`)
-      .openPopup();
-  }
-
-  ngOnDestroy(): void {
-    this.map?.remove();
+  constructor() {
+    this.loader.load().then(() => this.mapsReady.set(true));
   }
 }

@@ -1,36 +1,94 @@
 import {
   Component,
-  AfterViewInit,
-  OnDestroy,
-  input,
   ViewEncapsulation,
+  computed,
+  inject,
+  input,
+  signal,
 } from '@angular/core';
-import * as L from 'leaflet';
+import { RouterLink } from '@angular/router';
+import { GoogleMap, MapAdvancedMarker, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMapsLoaderService } from '../../../../core/services/google-maps-loader.service';
 import { Account } from '../../models/account.model';
 
-// ViewEncapsulation.None es necesario porque Leaflet inyecta popups y markers
-// directamente en el DOM, fuera del árbol de Angular, por lo que los estilos
-// con atributos de encapsulación (_ngcontent-*) no los alcanzarían.
+// ViewEncapsulation.None es necesario porque el contenido de los Advanced Markers
+// es un nodo DOM que Google Maps inserta fuera del árbol de Angular, por lo que
+// los estilos con atributos de encapsulación (_ngcontent-*) no los alcanzarían.
 @Component({
   selector: 'app-directory-map',
   standalone: true,
+  imports: [RouterLink, GoogleMap, MapAdvancedMarker, MapInfoWindow],
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="dir-map-container">
-      <div id="dir-map-{{ mapId }}" class="dir-map"></div>
+      @if (mapsReady()) {
+        <google-map
+          class="dir-map"
+          height="480px"
+          width="100%"
+          [center]="center()"
+          [zoom]="zoom()"
+          [mapId]="mapId"
+          [options]="mapOptions"
+        >
+          @for (m of markers(); track m.account.id) {
+            @let a = m.account;
+            <map-advanced-marker
+              #marker="mapAdvancedMarker"
+              [position]="{ lat: a.latitude!, lng: a.longitude! }"
+              [title]="a.name"
+              [content]="m.content"
+              [options]="markerOptions"
+              (markerInitialized)="wireHover($event, a.id, marker, info)"
+            />
+            <map-info-window #info="mapInfoWindow" [options]="infoWindowOptions">
+              <a
+                class="dmp-card"
+                [routerLink]="['/negocio', a.id]"
+                (mouseenter)="cancelClose(a.id)"
+                (mouseleave)="scheduleClose(a.id, info)"
+              >
+                @if (a.logo_url) {
+                  <img class="dmp-logo" [src]="a.logo_url" [alt]="a.name" />
+                } @else {
+                  <div class="dmp-logo-placeholder">{{ a.name.charAt(0).toUpperCase() }}</div>
+                }
+                <div class="dmp-body">
+                  @if (a.category) {
+                    <span class="dmp-cat">{{ a.category }}</span>
+                  }
+                  <div class="dmp-name">{{ a.name }}</div>
+                  @if (a.address) {
+                    <div class="dmp-addr">{{ a.address }}{{ a.zone ? ' · ' + a.zone : '' }}</div>
+                  }
+                  <span class="dmp-cta">
+                    Ver micrositio
+                    <svg viewBox="0 0 16 16" fill="none" stroke="#5c42df" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                      <path d="M3 8h10M9 4l4 4-4 4"/>
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            </map-info-window>
+          }
+        </google-map>
+      } @else {
+        <div class="dir-map dir-map--loading"></div>
+      }
     </div>
   `,
   styles: [`
     /* ── Contenedor del mapa ─────────────────────────────────────────────── */
     .dir-map-container {
       border-radius: 20px;
-      overflow: hidden;
       border: 1px solid #e5e3f0;
       box-shadow: 0 4px 32px rgba(92, 66, 223, 0.10), 0 1px 4px rgba(0,0,0,0.06);
     }
-    .dir-map { height: 480px; z-index: 0; }
+    .dir-map { display: block; height: 480px; border-radius: 20px; overflow: hidden; }
+    .dir-map--loading { background: #f1f0f8; }
 
-    /* ── Marcador personalizado ──────────────────────────────────────────── */
+    /* ── Marcador personalizado (Advanced Marker content) ───────────────── */
     .dir-mk { display: flex; flex-direction: column; align-items: center; }
 
     .dir-mk__circle {
@@ -64,21 +122,12 @@ import { Account } from '../../models/account.model';
       filter: drop-shadow(0 2px 2px rgba(92,66,223,0.35));
     }
 
-    /* ── Popup — wrapper de Leaflet ─────────────────────────────────────── */
-    .dir-map-popup .leaflet-popup-content-wrapper {
-      padding: 0;
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
-      border: 1px solid #ede9f8;
-      overflow: hidden;
-    }
-    .dir-map-popup .leaflet-popup-content {
-      margin: 0;
-      width: auto !important;
-    }
-    .dir-map-popup .leaflet-popup-tip-container { display: none; }
+    /* ── Info window — wrapper de Google Maps ───────────────────────────── */
+    .gm-style-iw-c { padding: 0 !important; border-radius: 16px !important; overflow: hidden !important; }
+    .gm-style-iw-d { overflow: hidden !important; }
+    .gm-style-iw-tc { display: none !important; }
 
-    /* ── Popup — contenido interno ──────────────────────────────────────── */
+    /* ── Info window — contenido interno ────────────────────────────────── */
     .dmp-card {
       display: flex;
       align-items: flex-start;
@@ -132,18 +181,11 @@ import { Account } from '../../models/account.model';
       color: #0f172a;
       line-height: 1.25;
       margin-bottom: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
     }
     .dmp-addr {
       font-size: 0.72rem;
       color: #64748b;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
+      line-height: 1.35;
       margin-bottom: 9px;
     }
     .dmp-cta {
@@ -157,109 +199,115 @@ import { Account } from '../../models/account.model';
     .dmp-cta svg { flex-shrink: 0; }
   `],
 })
-export class DirectoryMapComponent implements AfterViewInit, OnDestroy {
+export class DirectoryMapComponent {
   accounts = input.required<Account[]>();
 
-  readonly mapId = Math.random().toString(36).slice(2, 8);
-  private map!: L.Map;
+  private readonly loader = inject(GoogleMapsLoaderService);
 
-  ngAfterViewInit(): void {
-    const accs = this.accounts().filter(a => a.latitude != null && a.longitude != null);
+  readonly mapsReady = signal(false);
 
-    // Centro: promedio de coordenadas o Girardota por defecto
-    const center: [number, number] = accs.length
-      ? [
-          accs.reduce((s, a) => s + a.latitude!, 0) / accs.length,
-          accs.reduce((s, a) => s + a.longitude!, 0) / accs.length,
-        ]
-      : [6.3773, -75.4465];
+  /** Map ID de demostración de Google — reemplazar por uno propio (Cloud Console → Map Management) para personalizar estilos. */
+  readonly mapId = 'DEMO_MAP_ID';
 
-    const zoom = accs.length === 1 ? 16 : 15;
+  readonly mapOptions: google.maps.MapOptions = {
+    disableDefaultUI: false,
+    scrollwheel: false,
+    streetViewControl: false,
+    mapTypeControl: false,
+  };
 
-    this.map = L.map(`dir-map-${this.mapId}`, {
-      zoomControl: true,
-      scrollWheelZoom: false,
-    }).setView(center, zoom);
+  // Sin esto, AdvancedMarkerElement no dispara click/hover — los eventos pasan de largo hacia el mapa.
+  readonly markerOptions: google.maps.marker.AdvancedMarkerElementOptions = {
+    gmpClickable: true,
+  };
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(this.map);
+  readonly infoWindowOptions: google.maps.InfoWindowOptions = {
+    disableAutoPan: false,
+    headerDisabled: true,
+  };
 
-    for (const a of accs) {
-      const marker = L.marker([a.latitude!, a.longitude!], {
-        icon: this.buildIcon(a),
-      });
+  readonly accountsWithLocation = computed(() =>
+    this.accounts().filter(a => a.latitude != null && a.longitude != null)
+  );
 
-      marker
-        .bindPopup(this.buildPopupHtml(a), {
-          closeButton: false,
-          className: 'dir-map-popup',
-          offset: [0, -4],
-          autoPan: true,
-          maxWidth: 272,
-        })
-        .on('mouseover', () => marker.openPopup())
-        .addTo(this.map);
+  readonly center = computed<google.maps.LatLngLiteral>(() => {
+    const accs = this.accountsWithLocation();
+    if (!accs.length) return { lat: 6.3773, lng: -75.4465 };
+    return {
+      lat: accs.reduce((s, a) => s + a.latitude!, 0) / accs.length,
+      lng: accs.reduce((s, a) => s + a.longitude!, 0) / accs.length,
+    };
+  });
+
+  readonly zoom = computed(() => (this.accountsWithLocation().length === 1 ? 16 : 15));
+
+  readonly markers = computed(() =>
+    this.accountsWithLocation().map(account => ({
+      account,
+      content: this.buildMarkerContent(account),
+    }))
+  );
+
+  constructor() {
+    this.loader.load().then(() => this.mapsReady.set(true));
+  }
+
+  // Da tiempo a mover el mouse del marcador hacia la tarjeta sin que se cierre de golpe.
+  private readonly closeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+  // AdvancedMarkerElement no dispara mouseover/mouseout por el sistema de eventos de Google
+  // (solo mousemove, mousedown, click, etc.) — hay que engancharse directo al elemento real del DOM.
+  wireHover(
+    rawMarker: google.maps.marker.AdvancedMarkerElement,
+    accountId: string,
+    marker: MapAdvancedMarker,
+    info: MapInfoWindow
+  ): void {
+    rawMarker.addEventListener('mouseenter', () => {
+      this.cancelClose(accountId);
+      info.open(marker);
+    });
+    rawMarker.addEventListener('mouseleave', () => this.scheduleClose(accountId, info));
+  }
+
+  cancelClose(accountId: string): void {
+    const timer = this.closeTimers.get(accountId);
+    if (timer) {
+      clearTimeout(timer);
+      this.closeTimers.delete(accountId);
     }
   }
 
-  private buildIcon(a: Account): L.DivIcon {
-    const initial = a.name.charAt(0).toUpperCase();
-    const inner = a.logo_url
-      ? `<img src="${a.logo_url}" alt="" />`
-      : `<span>${initial}</span>`;
-
-    return L.divIcon({
-      html: `<div class="dir-mk">
-               <div class="dir-mk__circle">${inner}</div>
-               <div class="dir-mk__tail"></div>
-             </div>`,
-      className: '',
-      iconSize:   [46, 60],
-      iconAnchor: [23, 60],
-      popupAnchor: [0, -62],
-    });
+  scheduleClose(accountId: string, info: MapInfoWindow): void {
+    this.cancelClose(accountId);
+    this.closeTimers.set(
+      accountId,
+      setTimeout(() => info.close(), 250)
+    );
   }
 
-  private buildPopupHtml(a: Account): string {
-    const logo = a.logo_url
-      ? `<img class="dmp-logo" src="${a.logo_url}" alt="${this.esc(a.name)}" />`
-      : `<div class="dmp-logo-placeholder">${a.name.charAt(0).toUpperCase()}</div>`;
+  private buildMarkerContent(a: Account): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'dir-mk';
 
-    const cat  = a.category ? `<span class="dmp-cat">${this.esc(a.category)}</span>` : '';
-    const addr = a.address
-      ? `<div class="dmp-addr">${this.esc(a.address)}${a.zone ? ' · ' + this.esc(a.zone) : ''}</div>`
-      : '';
+    const circle = document.createElement('div');
+    circle.className = 'dir-mk__circle';
 
-    return `
-      <a class="dmp-card" href="/negocio/${a.id}">
-        ${logo}
-        <div class="dmp-body">
-          ${cat}
-          <div class="dmp-name">${this.esc(a.name)}</div>
-          ${addr}
-          <span class="dmp-cta">
-            Ver micrositio
-            <svg viewBox="0 0 16 16" fill="none" stroke="#5c42df" stroke-width="2.2"
-                 stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
-              <path d="M3 8h10M9 4l4 4-4 4"/>
-            </svg>
-          </span>
-        </div>
-      </a>`;
-  }
+    if (a.logo_url) {
+      const img = document.createElement('img');
+      img.src = a.logo_url;
+      img.alt = '';
+      circle.appendChild(img);
+    } else {
+      const span = document.createElement('span');
+      span.textContent = a.name.charAt(0).toUpperCase();
+      circle.appendChild(span);
+    }
 
-  /** Escapa caracteres HTML para evitar XSS en el contenido del popup. */
-  private esc(str: string): string {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+    const tail = document.createElement('div');
+    tail.className = 'dir-mk__tail';
 
-  ngOnDestroy(): void {
-    this.map?.remove();
+    wrap.append(circle, tail);
+    return wrap;
   }
 }

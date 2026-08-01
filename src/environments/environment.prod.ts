@@ -5,4 +5,6 @@ export const environment = {
   // COMPLETAR antes de deploy — obtener en sentry.io y Cloudflare Dashboard
   sentryDsn: 'REEMPLAZAR_CON_DSN_DE_SENTRY',
   turnstileSiteKey: '0x4AAAAAADD6vzBL6Ri4y8RQ',
+  // COMPLETAR antes de deploy — API key de Maps JavaScript API, restringida por HTTP referrer al dominio de producción
+  googleMapsApiKey: 'REEMPLAZAR_CON_GOOGLE_MAPS_API_KEY',
 };

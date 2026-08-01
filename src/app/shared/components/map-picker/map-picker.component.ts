@@ -1,25 +1,21 @@
 import {
   Component,
-  AfterViewInit,
-  OnDestroy,
   OnChanges,
   SimpleChanges,
+  computed,
+  inject,
   input,
   output,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import * as L from 'leaflet';
-
-// Fix para los íconos de Leaflet en bundlers (Webpack/esbuild)
-const iconUrl     = 'assets/marker-icon.png';
-const iconRetinaUrl = 'assets/marker-icon-2x.png';
-const shadowUrl   = 'assets/marker-shadow.png';
+import { GoogleMap, MapMarker } from '@angular/google-maps';
+import { GoogleMapsLoaderService } from '../../../core/services/google-maps-loader.service';
 
 @Component({
   selector: 'app-map-picker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GoogleMap, MapMarker],
   template: `
     <div class="map-picker">
       <p class="map-picker__hint">
@@ -28,7 +24,25 @@ const shadowUrl   = 'assets/marker-shadow.png';
         </svg>
         Arrastra el marcador o haz clic en el mapa para posicionar tu negocio
       </p>
-      <div id="map-picker-container" class="map-picker__map"></div>
+      @if (mapsReady()) {
+        <google-map
+          class="map-picker__map"
+          height="320px"
+          width="100%"
+          [center]="center()"
+          [zoom]="DEFAULT_ZOOM"
+          [options]="mapOptions"
+          (mapClick)="onMapClick($event)"
+        >
+          <map-marker
+            [position]="center()"
+            [options]="markerOptions"
+            (mapDragend)="onMarkerDragend($event)"
+          />
+        </google-map>
+      } @else {
+        <div class="map-picker__map map-picker__map--loading"></div>
+      }
       @if (lat() && lng()) {
         <p class="map-picker__coords">
           📍 {{ lat()!.toFixed(6) }}, {{ lng()!.toFixed(6) }}
@@ -52,11 +66,15 @@ const shadowUrl   = 'assets/marker-shadow.png';
       }
 
       &__map {
+        display: block;
         height: 320px;
         border-radius: 12px;
         overflow: hidden;
         border: 1px solid var(--color-border-tertiary);
-        z-index: 0;
+
+        &--loading {
+          background: var(--color-bg-secondary, #f1f0f8);
+        }
       }
 
       &__coords {
@@ -67,7 +85,7 @@ const shadowUrl   = 'assets/marker-shadow.png';
     }
   `],
 })
-export class MapPickerComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class MapPickerComponent implements OnChanges {
   /** Latitud inicial (si ya tiene ubicación guardada) */
   initialLat = input<number | null>(null);
   /** Longitud inicial */
@@ -76,83 +94,68 @@ export class MapPickerComponent implements AfterViewInit, OnDestroy, OnChanges {
   /** Emite cada vez que el usuario mueve el marcador */
   locationChange = output<{ lat: number; lng: number }>();
 
-  lat = signal<number | null>(null);
-  lng = signal<number | null>(null);
+  private readonly loader = inject(GoogleMapsLoaderService);
 
-  private map!: L.Map;
-  private marker!: L.Marker;
+  readonly mapsReady = signal(false);
 
   // Centro por defecto: Girardota, Antioquia
   private readonly DEFAULT_LAT = 6.3773;
   private readonly DEFAULT_LNG = -75.4465;
-  private readonly DEFAULT_ZOOM = 15;
+  readonly DEFAULT_ZOOM = 15;
 
-  ngAfterViewInit(): void {
-    this.initMap();
+  lat = signal<number | null>(null);
+  lng = signal<number | null>(null);
+
+  readonly center = computed<google.maps.LatLngLiteral>(() => ({
+    lat: this.lat() ?? this.initialLat() ?? this.DEFAULT_LAT,
+    lng: this.lng() ?? this.initialLng() ?? this.DEFAULT_LNG,
+  }));
+
+  readonly mapOptions: google.maps.MapOptions = {
+    disableDefaultUI: false,
+    streetViewControl: false,
+    mapTypeControl: false,
+  };
+
+  readonly markerOptions: google.maps.MarkerOptions = {
+    draggable: true,
+  };
+
+  constructor() {
+    this.loader.load().then(() => this.mapsReady.set(true));
+
+    if (this.initialLat() && this.initialLng()) {
+      this.lat.set(this.initialLat());
+      this.lng.set(this.initialLng());
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ((changes['initialLat'] || changes['initialLng']) && this.map) {
-      const lat = this.initialLat() ?? this.DEFAULT_LAT;
-      const lng = this.initialLng() ?? this.DEFAULT_LNG;
-      this.marker.setLatLng([lat, lng]);
-      this.map.setView([lat, lng], this.DEFAULT_ZOOM);
+    if (changes['initialLat'] || changes['initialLng']) {
+      const lat = this.initialLat();
+      const lng = this.initialLng();
+      if (lat != null && lng != null) {
+        this.lat.set(lat);
+        this.lng.set(lng);
+      }
     }
   }
 
-  ngOnDestroy(): void {
-    this.map?.remove();
+  onMarkerDragend(event: google.maps.MapMouseEvent): void {
+    const pos = event.latLng;
+    if (!pos) return;
+    this.setPosition(pos.lat(), pos.lng());
   }
 
-  private initMap(): void {
-    const lat = this.initialLat() ?? this.DEFAULT_LAT;
-    const lng = this.initialLng() ?? this.DEFAULT_LNG;
+  onMapClick(event: google.maps.MapMouseEvent): void {
+    const pos = event.latLng;
+    if (!pos) return;
+    this.setPosition(pos.lat(), pos.lng());
+  }
 
-    this.map = L.map('map-picker-container', { zoomControl: true }).setView(
-      [lat, lng],
-      this.DEFAULT_ZOOM
-    );
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(this.map);
-
-    const icon = L.icon({
-      iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize:    [25, 41],
-      iconAnchor:  [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize:  [41, 41],
-    });
-
-    this.marker = L.marker([lat, lng], { draggable: true, icon })
-      .addTo(this.map)
-      .bindPopup('📍 Tu negocio')
-      .openPopup();
-
-    // Guardar posición inicial si ya tiene coordenadas
-    if (this.initialLat() && this.initialLng()) {
-      this.lat.set(lat);
-      this.lng.set(lng);
-    }
-
-    // Drag del marcador
-    this.marker.on('dragend', () => {
-      const pos = this.marker.getLatLng();
-      this.lat.set(pos.lat);
-      this.lng.set(pos.lng);
-      this.locationChange.emit({ lat: pos.lat, lng: pos.lng });
-    });
-
-    // Clic en el mapa mueve el marcador
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.marker.setLatLng(e.latlng);
-      this.lat.set(e.latlng.lat);
-      this.lng.set(e.latlng.lng);
-      this.locationChange.emit({ lat: e.latlng.lat, lng: e.latlng.lng });
-    });
+  private setPosition(lat: number, lng: number): void {
+    this.lat.set(lat);
+    this.lng.set(lng);
+    this.locationChange.emit({ lat, lng });
   }
 }
