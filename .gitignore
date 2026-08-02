@@ -47,3 +47,7 @@ Thumbs.db
 .env.*
 !.env.example
 src/environments/environment.prod.ts
+
+# Material de marca/campaña — vive fuera del repo (ver comeen-brand-campaign/
+# en la carpeta padre), este repositorio solo aloja el aplicativo web.
+/brand-campaign
