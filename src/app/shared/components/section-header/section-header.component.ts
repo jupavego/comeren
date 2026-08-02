@@ -8,15 +8,31 @@ import { Component, input } from '@angular/core';
  *     title="Negocios para descubrir"
  *     subtitle="Texto opcional debajo del título"
  *     align="left"          <!-- left | center | right — default: left -->
+ *     tint="orange"         <!-- orange | violet — default: violet -->
  *   />
  */
 @Component({
   selector: 'app-section-header',
   standalone: true,
   template: `
-    <div class="section-header section-header--{{ align() }}">
-      <div class="section-header__hex section-header__hex--1" aria-hidden="true"></div>
-      <div class="section-header__hex section-header__hex--2" aria-hidden="true"></div>
+    <div class="section-header section-header--{{ align() }} section-header--tint-{{ tint() }}">
+      <div class="section-header__honeycomb" aria-hidden="true">
+        <span class="section-header__hex" style="top:-20px;left:366px;opacity:.42"></span>
+        <span class="section-header__hex" style="top:60px;left:366px;opacity:.31"></span>
+        <span class="section-header__hex" style="top:140px;left:366px;opacity:.21"></span>
+        <span class="section-header__hex" style="top:20px;left:295px;opacity:.34"></span>
+        <span class="section-header__hex" style="top:100px;left:295px;opacity:.25"></span>
+        <span class="section-header__hex" style="top:180px;left:295px;opacity:.17"></span>
+        <span class="section-header__hex" style="top:-20px;left:224px;opacity:.25"></span>
+        <span class="section-header__hex" style="top:60px;left:224px;opacity:.20"></span>
+        <span class="section-header__hex" style="top:140px;left:224px;opacity:.13"></span>
+        <span class="section-header__hex" style="top:20px;left:153px;opacity:.17"></span>
+        <span class="section-header__hex" style="top:100px;left:153px;opacity:.13"></span>
+        <span class="section-header__hex" style="top:180px;left:153px;opacity:.08"></span>
+        <span class="section-header__hex" style="top:-20px;left:82px;opacity:.10"></span>
+        <span class="section-header__hex" style="top:60px;left:82px;opacity:.07"></span>
+        <span class="section-header__hex" style="top:140px;left:82px;opacity:.06"></span>
+      </div>
       @if (eyebrow()) {
         <p class="section-header__eyebrow">{{ eyebrow() }}</p>
       }
@@ -31,61 +47,88 @@ import { Component, input } from '@angular/core';
       position: relative;
       overflow: hidden;
       margin-bottom: 2rem;
-      padding: 1.5rem 1.75rem;
+      padding: 1.75rem 2rem;
       border-radius: 20px;
-      background: #fff;
-      border: 1px solid var(--color-border-tertiary, #ede9e2);
-      box-shadow: 0 4px 20px rgba(30, 20, 60, 0.06);
-      // Franja de degradado cálido, muy sutil, difuminada hacia el centro —
-      // misma idea que la plantilla de exploración, aquí mucho más discreta.
-      background-image: linear-gradient(120deg,
-        rgba(249, 115, 22, 0) 55%,
-        rgba(249, 115, 22, .05) 78%,
-        rgba(249, 115, 22, .10) 100%
-      );
+      border: 1px solid rgba(255, 255, 255, .7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
 
       &--center { text-align: center; }
       &--right  { text-align: right; }
       &--left   { text-align: left; }
 
+      // ── Tinte naranja ──────────────────────────────────────────────────────
+      &--tint-orange {
+        background: rgba(255, 247, 237, .6);
+        box-shadow: 0 8px 26px rgba(224, 103, 43, .16);
+        background-image: linear-gradient(135deg,
+          rgba(249, 115, 22, .16) 0%,
+          rgba(249, 115, 22, .04) 45%,
+          rgba(249, 115, 22, .12) 100%
+        );
+
+        .section-header__eyebrow { color: #ea6c0a; }
+        .section-header__hex     { background: #f97316; }
+      }
+
+      // ── Tinte violeta (por defecto) ───────────────────────────────────────
+      &--tint-violet {
+        background: rgba(237, 233, 255, .6);
+        box-shadow: 0 8px 26px rgba(94, 73, 214, .16);
+        background-image: linear-gradient(135deg,
+          rgba(94, 73, 214, .16) 0%,
+          rgba(94, 73, 214, .04) 45%,
+          rgba(94, 73, 214, .12) 100%
+        );
+
+        .section-header__eyebrow { color: var(--color-brand-primary, #5e49d6); }
+        .section-header__hex     { background: var(--color-brand-primary, #5e49d6); }
+      }
+
+      // ── Panal hexagonal — esquina superior derecha, se difumina hacia el centro ──
+      &__honeycomb {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 460px;
+        height: 260px;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
       &__hex {
         position: absolute;
-        width: 90px;
-        height: 78px;
+        width: 94px;
+        height: 80px;
         clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-        pointer-events: none;
-      }
-      &__hex--1 {
-        top: -22px; right: -18px;
-        background: rgba(249, 115, 22, .10);
-      }
-      &__hex--2 {
-        top: 30px; right: 46px;
-        width: 46px; height: 40px;
-        background: rgba(94, 73, 214, .07);
       }
 
       &__eyebrow {
         position: relative;
+        z-index: 1;
         font-size: 0.8125rem;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: var(--color-brand-primary, #5e49d6);
         margin: 0 0 0.5rem;
       }
 
       &__title {
         position: relative;
+        z-index: 1;
+        font-family: var(--font-heading);
         font-size: clamp(1.5rem, 3vw, 2.25rem);
         font-weight: 700;
         color: var(--color-text-primary, #2c241d);
         margin: 0 0 0.5rem;
         line-height: 1.2;
+        max-width: 640px;
       }
 
       &__subtitle {
         position: relative;
+        z-index: 1;
         font-size: 1rem;
         color: var(--color-text-secondary, #6b5e54);
         margin: 0;
@@ -94,6 +137,7 @@ import { Component, input } from '@angular/core';
       }
 
       &--center &__subtitle { margin-inline: auto; }
+      &--center &__honeycomb { display: none; }
     }
   `],
 })
@@ -102,4 +146,5 @@ export class SectionHeaderComponent {
   title    = input.required<string>();
   subtitle = input<string>('');
   align    = input<'left' | 'center' | 'right'>('left');
+  tint     = input<'orange' | 'violet'>('violet');
 }
