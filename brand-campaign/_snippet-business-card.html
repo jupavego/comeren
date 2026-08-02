@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Come en Girardota — Plantilla de negocio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Manrope:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-h:'Poppins',sans-serif;
+    --font-b:'Manrope',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-b);background:#fbf5ec;padding:40px;}
+
+  .pg-shell{max-width:440px;margin:0 auto;}
+  .pg-frame{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 18px 44px rgba(30,20,60,.28);
+    background:linear-gradient(120deg,#241a2e 0%,#6b3d2b 32%,#c2540f 68%,#f97316 100%);
+  }
+  .pg-cap{text-align:center;font-size:.76rem;font-weight:700;color:#6b6478;margin-top:10px;}
+
+  .pg-mark{
+    position:absolute;top:14px;left:14px;width:26px;height:26px;border-radius:50%;
+    background:rgba(255,255,255,.92);
+    display:flex;align-items:center;justify-content:center;font-size:.75rem;
+    z-index:2;box-shadow:0 4px 10px rgba(0,0,0,.3);
+  }
+
+  .pg-band{position:absolute;display:flex;flex-direction:column;gap:3px;z-index:2;}
+  .pg-band strong{font-family:var(--font-h);font-weight:800;text-transform:uppercase;letter-spacing:.02em;color:#fff;}
+  .pg-band span{font-weight:600;color:rgba(255,255,255,.92);line-height:1.32;}
+
+  /* franja superior derecha — se difumina hacia el centro */
+  .pg-band--focus{
+    top:0;right:0;width:56%;
+    padding:16px 18px 20px 24px;
+    text-align:right;align-items:flex-end;
+    background:linear-gradient(to left, rgba(234,108,10,.95) 0%, rgba(249,115,22,.7) 50%, rgba(249,115,22,0) 100%);
+  }
+  .pg-band--focus strong{font-size:.9rem;}
+  .pg-band--focus span{font-size:.68rem;max-width:150px;}
+
+  /* franja izquierda — se difumina hacia el centro */
+  .pg-band--text{
+    left:0;top:26%;width:58%;
+    padding:14px 24px 14px 18px;
+    background:linear-gradient(to right, rgba(61,43,191,.95) 0%, rgba(94,73,214,.7) 50%, rgba(94,73,214,0) 100%);
+  }
+  .pg-band--text strong{font-size:.78rem;}
+  .pg-band--text span{font-size:.68rem;max-width:150px;}
+
+  /* franja inferior — ancho completo */
+  .pg-band--context{
+    left:0;right:0;bottom:0;
+    padding:18px 20px 16px;
+    background:linear-gradient(100deg, rgba(20,10,40,.25) 0%, rgba(61,43,191,.82) 45%, rgba(224,103,43,.82) 100%);
+  }
+  .pg-band--context strong{font-size:.82rem;}
+  .pg-band--context span{font-size:.7rem;}
+</style>
+</head>
+<body>
+
+<div class="pg-shell">
+  <div class="pg-frame" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Comida_en_un_restaurante.jpg/1920px-Comida_en_un_restaurante.jpg');background-size:cover;background-position:center 42%;">
+    <div class="pg-mark" aria-hidden="true">🍴</div>
+
+    <div class="pg-band pg-band--focus">
+      <strong style="text-transform:none;">La Fonda de Girardota</strong>
+    </div>
+
+    <div class="pg-band pg-band--text">
+      <strong style="text-transform:none;">📍 Cra 45 #12-30, Girardota</strong>
+      <span>El sancocho de los domingos que no te puedes perder</span>
+    </div>
+
+    <div class="pg-band pg-band--context">
+      <strong>🍴 Restaurante</strong>
+      <span>🔗 Conoce el menú y ordena en el sitio</span>
+    </div>
+  </div>
+  <p class="pg-cap">Ejemplo aplicado · La Fonda de Girardota (texto de muestra, negocio ficticio)</p>
+</div>
+
+</body>
+</html>
