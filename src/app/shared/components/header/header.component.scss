@@ -21,12 +21,9 @@
 // La sombra va aquí (box-shadow) para no interferir con backdrop-filter.
 .topbar__glass {
   border-radius: var(--radius-xl);
-  background: linear-gradient(90deg,
-    #5c42df                0%,
-    rgba(var(--color-brand-primary-rgb), .80) 25%,
-    rgba(var(--color-brand-primary-rgb), .45) 62%,
-    rgba(249, 115, 22, .53) 100%
-  );
+  // Solo desenfoque — sin gradiente de color que tape la imagen de fondo real.
+  // El tinte es plano y neutro, apenas el necesario para que el texto blanco lea bien.
+  background: rgba(20, 14, 40, .30);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid rgba(255, 255, 255, .20);
@@ -320,12 +317,7 @@
   top: calc(100% - 3px);
   width: 100%;
   // Mismo patrón que topbar__glass — continuación visual de la píldora
-  background: linear-gradient(90deg,
-    #5c42df                0%,
-    rgba(var(--color-brand-primary-rgb), .80) 25%,
-    rgba(var(--color-brand-primary-rgb), .45) 62%,
-    rgba(249, 115, 22, .53) 100%
-  );
+  background: rgba(20, 14, 40, .30);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid rgba(255, 255, 255, .20);

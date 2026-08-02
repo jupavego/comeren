@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone, OnInit, OnDestroy, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy, HostListener, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { Account, CatalogItem } from '../../models/account.model';
@@ -31,7 +31,6 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   authGate = inject(AuthGateService);
 
   private shimmerObserver?: IntersectionObserver;
-  private actionsObserver?: IntersectionObserver;
   private dragMoved = false;
 
   constructor() {
@@ -65,17 +64,25 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
     this.shimmerObserver.observe(btn);
   }
 
-  // Observa el hero completo — más robusto en mobile donde la grilla apila
-  // verticalmente y .biz-hero__panel-actions puede estar fuera del viewport inicial.
+  // Recalcula en cada scroll si el hero ya salió del viewport — no usa
+  // IntersectionObserver porque en mobile, cuando la barra de direcciones del
+  // navegador se oculta/aparece, el alto del viewport cambia dinámicamente y
+  // el observer puede quedar en un estado "atascado" (la burbuja aparece una
+  // vez y no vuelve a mostrarse aunque se siga bajando). getBoundingClientRect
+  // se mide fresco en cada scroll, así que no arrastra estado viejo.
   private setupActionsObserver(): void {
-    this.actionsObserver?.disconnect();
     const el = document.querySelector<HTMLElement>('.biz-hero');
     if (!el) return;
-    this.actionsObserver = new IntersectionObserver(
-      ([entry]) => this.zone.run(() => this.heroWaHidden.set(!entry.isIntersecting)),
-      { threshold: 0 }
-    );
-    this.actionsObserver.observe(el);
+    this.heroEl = el;
+    this.onWindowScroll();
+  }
+
+  private heroEl?: HTMLElement;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (!this.heroEl) return;
+    this.heroWaHidden.set(this.heroEl.getBoundingClientRect().bottom < 0);
   }
 
   // Tap — abre el panel de pedidos. Separado del drag para que (click) sea
@@ -108,9 +115,19 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
     const cleanup = () => {
       if (this.dragMoved) {
-        this.zone.run(() =>
-          sessionStorage.setItem('cart_bubble_pos', JSON.stringify(this.bubblePos()))
-        );
+        this.zone.run(() => {
+          // Snap a la pared más cercana — misma física que las burbujas de chat.
+          const current  = this.bubblePos();
+          const snappedX = current.x + 30 < window.innerWidth / 2
+            ? 8
+            : window.innerWidth - 68;
+
+          this.isSnapping.set(true);
+          this.bubblePos.set({ x: snappedX, y: current.y });
+          sessionStorage.setItem('cart_bubble_pos', JSON.stringify({ x: snappedX, y: current.y }));
+
+          setTimeout(() => this.isSnapping.set(false), 420);
+        });
       }
       document.removeEventListener('pointermove',  move);
       document.removeEventListener('pointerup',    cleanup);
@@ -126,7 +143,6 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.shimmerObserver?.disconnect();
-    this.actionsObserver?.disconnect();
   }
 
   account       = signal<Account | null>(null);
@@ -135,6 +151,7 @@ export class BusinessDetailComponent implements OnInit, OnDestroy {
   showOrder     = signal(false);
   heroWaHidden  = signal(false);
   bubblePos     = signal({ x: 0, y: 0 });
+  isSnapping    = signal(false);
 
   ratingPopupItem   = signal<CatalogItem | null>(null);
   productAvgRatings = signal<Record<string, number>>({});

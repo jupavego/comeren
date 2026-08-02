@@ -3,14 +3,33 @@
 :host { display: block; }
 
 .footer {
-  background: linear-gradient(135deg, #1e1570 0%, #2a2096 50%, #3126a8 100%);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(155deg,
+    #5c42df 0%,
+    #5e49d6 40%,
+    rgba(94, 73, 214, .75) 70%,
+    rgba(224, 103, 43, .7) 100%
+  );
   color: rgba(255,255,255,0.8);
   font-family: var(--font-body);
-  border-top: 3px solid #e25232;
 }
+
+// ── Orbes decorativos — mismo tratamiento que el tablero de exploración ────────
+.footer__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.footer__orb--1 { width: 340px; height: 340px; right: -110px; bottom: -80px; background: rgba(255,255,255,.08); }
+.footer__orb--2 { width: 220px; height: 220px; left: -70px; top: 20%; background: rgba(224,103,43,.18); }
+.footer__orb--3 { width: 130px; height: 130px; right: 10%; top: 12%; background: rgba(255,255,255,.06); }
 
 // ── Grid 3 columnas (patrón óptica: 1.2fr 0.8fr 0.8fr) ───────────────────────
 .footer__inner {
+  position: relative; // pinta encima de los orbes (ver .footer__orb)
   max-width: 1280px;
   margin: 0 auto;
   padding: 3.5rem clamp(1rem, 3vw, 2.5rem) 2.5rem;
@@ -22,28 +41,36 @@
 
 // ── Columna marca ─────────────────────────────────────────────────────────────
 .footer__eyebrow {
+  display: inline-flex;
+  align-items: center;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: #cfc3f3;
-  margin: 0 0 0.6rem;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,.75);
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 99px;
+  padding: 6px 12px;
+  margin: 0 0 1rem;
 }
 
 .footer__logo {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   color: #ffffff;
   margin: 0 0 0.9rem;
 }
 
 .footer__tagline {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   line-height: 1.7;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.78);
   margin: 0;
-  max-width: 280px;
+  max-width: 320px;
 }
 
 
@@ -78,6 +105,7 @@
 
 // ── Franja inferior (patrón óptica: row en desktop, column en móvil) ──────────
 .footer__bottom {
+  position: relative; // pinta encima de los orbes (ver .footer__orb)
   border-top: 1px solid rgba(255,255,255,0.1);
   max-width: 1280px;
   margin: 0 auto;

@@ -439,8 +439,11 @@
   @include respond-to($bp-sm) {
     margin-top: -64px;
 
+    // Altura reducida (no 72svh como en desktop): en pantallas angostas esa
+    // proporción arma un contenedor muy vertical y object-fit:cover termina
+    // recortando casi todo el ancho de la foto para llenarlo.
     &__cover {
-      height: calc(72svh + 64px);  // misma proporción que desktop (~72% viewport visible)
+      height: calc(48svh + 64px);
       background-position: center top;
     }
 
@@ -451,7 +454,7 @@
 
     // Namebar: +20px más arriba que desktop para separarse del panel en móvil
     &__namebar {
-      top: calc(72svh + 64px - 85px);
+      top: calc(48svh + 64px - 85px);
       padding: 0 18px;
     }
 
@@ -497,11 +500,11 @@
 
   @include respond-to($bp-xs) {
     &__cover {
-      height: calc(70svh + 64px);
+      height: calc(46svh + 64px);
     }
 
     &__namebar {
-      top: calc(70svh + 64px - 80px);
+      top: calc(46svh + 64px - 80px);
       padding: 0 14px;
     }
 
@@ -759,6 +762,12 @@
 // ── Burbuja flotante ──────────────────────────────────────────────────────────
 .cart-bubble {
   position: fixed;
+  left: 0;
+  top: 0;
+  // Posición real la da [style.transform]="translate3d(x,y,0)" — transform en
+  // vez de left/top para que el arrastre y el snap corran en la GPU (compositor)
+  // y no disparen recálculo de layout en cada frame.
+  will-change: transform;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -786,6 +795,12 @@
   }
 
   &:active { cursor: grabbing; }
+
+  // Animación de resorte al soltar — la misma física de "snap a la pared"
+  // que usan las burbujas de chat (Messenger, WhatsApp).
+  &--snapping {
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 
   &--has-items {
     box-shadow:
@@ -865,9 +880,11 @@
   }
 }
 
+// Usa la propiedad `scale` (independiente de `transform`) para no pisar el
+// translate3d() de posicionamiento que va en `transform` vía [style.transform].
 @keyframes bubble-in {
-  from { opacity: 0; transform: scale(0.3); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; scale: 0.3; }
+  to   { opacity: 1; scale: 1; }
 }
 
 @keyframes callout-life {

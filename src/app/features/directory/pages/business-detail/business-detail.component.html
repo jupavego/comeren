@@ -249,6 +249,7 @@
               [lat]="a.latitude"
               [lng]="a.longitude"
               [businessName]="a.name"
+              [logoUrl]="a.logo_url"
             />
           } @placeholder {
             <div class="section-placeholder section-placeholder--map"></div>
@@ -346,16 +347,17 @@
       />
     }
 
-    <!-- Burbuja flotante — aparece cuando el botón hero sale del viewport -->
-    @if (heroWaHidden() && !showOrder() && a.whatsapp && a.catalog_items?.length) {
+    <!-- Burbuja flotante — aparece cuando el botón hero sale del viewport,
+         y se queda visible sin importar el scroll mientras haya productos en el carrito -->
+    @if ((heroWaHidden() || cart.hasItems()) && !showOrder() && a.whatsapp && a.catalog_items?.length) {
       <button
         class="cart-bubble"
         [class.cart-bubble--has-items]="cart.hasItems()"
         [class.cart-bubble--left]="bubbleOnLeft()"
+        [class.cart-bubble--snapping]="isSnapping()"
         type="button"
         aria-label="Ver pedido"
-        [style.left.px]="bubblePos().x"
-        [style.top.px]="bubblePos().y"
+        [style.transform]="'translate3d(' + bubblePos().x + 'px,' + bubblePos().y + 'px,0)'"
         (pointerdown)="onBubblePointerDown($event)"
         (click)="onBubbleClick()">
         <span class="cart-bubble__callout" aria-hidden="true">¡Haz tu pedido!</span>

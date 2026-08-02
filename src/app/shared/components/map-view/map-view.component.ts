@@ -1,11 +1,15 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { GoogleMap, MapMarker } from '@angular/google-maps';
+import { Component, ViewEncapsulation, computed, inject, input, signal } from '@angular/core';
+import { GoogleMap, MapAdvancedMarker } from '@angular/google-maps';
 import { GoogleMapsLoaderService } from '../../../core/services/google-maps-loader.service';
 
+// ViewEncapsulation.None es necesario porque el contenido del Advanced Marker
+// es un nodo DOM que Google Maps inserta fuera del árbol de Angular, por lo que
+// los estilos con atributos de encapsulación (_ngcontent-*) no los alcanzarían.
 @Component({
   selector: 'app-map-view',
   standalone: true,
-  imports: [GoogleMap, MapMarker],
+  imports: [GoogleMap, MapAdvancedMarker],
+  encapsulation: ViewEncapsulation.None,
   template: `
     <div class="map-view-wrap">
       @if (mapsReady()) {
@@ -15,9 +19,15 @@ import { GoogleMapsLoaderService } from '../../../core/services/google-maps-load
           width="100%"
           [center]="center()"
           [zoom]="16"
+          [mapId]="mapId"
           [options]="mapOptions"
         >
-          <map-marker [position]="center()" [title]="businessName() || 'Negocio'" />
+          <map-advanced-marker
+            [position]="center()"
+            [title]="businessName() || 'Negocio'"
+            [content]="markerContent()"
+            [options]="markerOptions"
+          />
         </google-map>
       } @else {
         <div class="map-view map-view--loading"></div>
@@ -72,25 +82,88 @@ import { GoogleMapsLoaderService } from '../../../core/services/google-maps-load
 
       svg { flex-shrink: 0; stroke: #1a73e8; }
     }
+
+    /* ── Marcador circular — mismo look que el mapa comunitario del home ── */
+    .mv-mk { display: flex; flex-direction: column; align-items: center; }
+
+    .mv-mk__circle {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: #5c42df;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 14px rgba(92, 66, 223, 0.45);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mv-mk__circle img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .mv-mk__circle span {
+      font-size: 1.2rem; font-weight: 800; color: #fff;
+      line-height: 1;
+    }
+    .mv-mk__tail {
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 11px solid #5c42df;
+      margin-top: -2px;
+      filter: drop-shadow(0 2px 2px rgba(92,66,223,0.35));
+    }
   `],
 })
 export class MapViewComponent {
   lat          = input.required<number>();
   lng          = input.required<number>();
   businessName = input<string>('');
+  logoUrl      = input<string | null>(null);
 
   private readonly loader = inject(GoogleMapsLoaderService);
 
   readonly mapsReady = signal(false);
 
+  /** Map ID de demostración de Google, requerido para usar Advanced Markers. */
+  readonly mapId = 'DEMO_MAP_ID';
+
   readonly mapOptions: google.maps.MapOptions = {
     disableDefaultUI: false,
+    zoomControl: true,
     scrollwheel: false,
     streetViewControl: false,
     mapTypeControl: false,
   };
 
+  readonly markerOptions: google.maps.marker.AdvancedMarkerElementOptions = {
+    gmpClickable: false,
+  };
+
   readonly center = computed<google.maps.LatLngLiteral>(() => ({ lat: this.lat(), lng: this.lng() }));
+
+  readonly markerContent = computed<HTMLElement>(() => {
+    const wrap = document.createElement('div');
+    wrap.className = 'mv-mk';
+
+    const circle = document.createElement('div');
+    circle.className = 'mv-mk__circle';
+
+    const logo = this.logoUrl();
+    if (logo) {
+      const img = document.createElement('img');
+      img.src = logo;
+      img.alt = '';
+      circle.appendChild(img);
+    } else {
+      const span = document.createElement('span');
+      span.textContent = (this.businessName() || 'N').charAt(0).toUpperCase();
+      circle.appendChild(span);
+    }
+
+    const tail = document.createElement('div');
+    tail.className = 'mv-mk__tail';
+
+    wrap.append(circle, tail);
+    return wrap;
+  });
 
   get mapsUrl(): string {
     return `https://www.google.com/maps?q=${this.lat()},${this.lng()}`;

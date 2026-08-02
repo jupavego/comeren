@@ -337,7 +337,11 @@
 // ── Responsive ────────────────────────────────────────────────────────────────
 @include respond-to($bp-sm) {
   .product-card {
-    min-height: 329px;
+    // En 1 columna la tarjeta queda casi a todo el ancho de pantalla; con la
+    // misma altura de desktop la zona de imagen (alto total - 160px del texto)
+    // queda muy ancha y baja, y object-fit:cover recorta fuerte arriba/abajo.
+    // Más alto le da más aire vertical a la foto sin tocar los bloques de texto.
+    min-height: 390px;
     border-radius: var(--radius-lg);
   }
 
