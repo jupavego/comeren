@@ -18,6 +18,7 @@
           eyebrow="Directorio local"
           title="Negocios para descubrir en Girardota"
           tint="orange"
+          [categoryPill]="state.category() !== 'Todos' ? state.category() : ''"
         />
       </div>
 
