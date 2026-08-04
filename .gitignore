@@ -51,3 +51,6 @@ src/environments/environment.prod.ts
 # Material de marca/campaña — vive fuera del repo (ver comeen-brand-campaign/
 # en la carpeta padre), este repositorio solo aloja el aplicativo web.
 /brand-campaign
+
+# Worktrees de Claude Code — repos git anidados, no deben trackearse como gitlinks
+/.claude/worktrees/
