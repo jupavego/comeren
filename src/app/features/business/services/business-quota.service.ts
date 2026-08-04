@@ -14,6 +14,7 @@ export interface BusinessUsage {
 export interface UpgradeRequestResult {
   success: boolean;
   error?: string;
+  rateLimited?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,7 +42,19 @@ export class BusinessQuotaService {
       body: { accountId, message },
     });
 
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      // FunctionsHttpError expone el Response original en .context — así
+      // distinguimos el 429 (rate-limit: 1 solicitud/24h) de un fallo real.
+      const status = (error as any).context?.status;
+      if (status === 429) {
+        return {
+          success: false,
+          rateLimited: true,
+          error: 'Ya enviaste una solicitud en las últimas 24 horas. Te contactaremos pronto.',
+        };
+      }
+      return { success: false, error: error.message };
+    }
     if (data && data.success === false) return { success: false, error: data.error };
     return { success: true };
   }

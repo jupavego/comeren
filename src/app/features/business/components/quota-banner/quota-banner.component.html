@@ -30,6 +30,10 @@
           <p class="quota-banner__msg quota-banner__msg--ok">
             Solicitud enviada. Te contactaremos pronto.
           </p>
+        } @else if (sendResult() === 'rate-limited') {
+          <p class="quota-banner__msg quota-banner__msg--ok">
+            {{ sendErrorText() }}
+          </p>
         } @else {
           <textarea
             class="quota-banner__textarea"

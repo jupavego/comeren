@@ -15,12 +15,13 @@ export class QuotaBannerComponent implements OnChanges {
 
   private quotaService = inject(BusinessQuotaService);
 
-  usage        = signal<BusinessUsage | null>(null);
-  dismissed    = signal(false);
-  formOpen     = signal(false);
-  message      = signal('');
-  sending      = signal(false);
-  sendResult   = signal<'success' | 'error' | null>(null);
+  usage         = signal<BusinessUsage | null>(null);
+  dismissed     = signal(false);
+  formOpen      = signal(false);
+  message       = signal('');
+  sending       = signal(false);
+  sendResult    = signal<'success' | 'error' | 'rate-limited' | null>(null);
+  sendErrorText = signal('');
 
   get usagePercent(): number {
     const u = this.usage();
@@ -58,7 +59,13 @@ export class QuotaBannerComponent implements OnChanges {
     const result = await this.quotaService.requestUpgrade(this.accountId, this.message());
 
     this.sending.set(false);
-    this.sendResult.set(result.success ? 'success' : 'error');
-    if (result.success) this.message.set('');
+    this.sendErrorText.set(result.error ?? '');
+
+    if (result.success) {
+      this.sendResult.set('success');
+      this.message.set('');
+    } else {
+      this.sendResult.set(result.rateLimited ? 'rate-limited' : 'error');
+    }
   }
 }
