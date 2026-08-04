@@ -58,3 +58,7 @@ src/environments/environment.prod.ts
 # Permisos locales de Claude Code — se acumulan con trabajo de otros proyectos
 # hechos desde esta misma carpeta, no deben compartirse vía el repo.
 /.claude/settings.local.json
+
+# Lock de tareas programadas — estado efímero (sessionId/pid/timestamp) por
+# máquina, se reescribe en cada sesión, no debe versionarse.
+/.claude/scheduled_tasks.lock
