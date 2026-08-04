@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, computed, inject, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AdminService } from '../../services/admin.service';
+import { AdminService, BusinessUsageRow } from '../../services/admin.service';
 import { Account, AccountStatus } from '../../../../features/directory/models/account.model';
 
 @Component({
@@ -17,6 +17,7 @@ export class AccountsListComponent implements OnInit {
   private adminService = inject(AdminService);
 
   accounts     = signal<Account[]>([]);
+  usageByAccountId = signal<Map<string, BusinessUsageRow>>(new Map());
   loading      = signal(true);
   searchText   = signal('');
   statusFilter = signal<AccountStatus | 'all'>('all');
@@ -37,8 +38,17 @@ export class AccountsListComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    this.accounts.set(await this.adminService.getAccounts());
+    const [accounts, usage] = await Promise.all([
+      this.adminService.getAccounts(),
+      this.adminService.getAllBusinessUsage(),
+    ]);
+    this.accounts.set(accounts);
+    this.usageByAccountId.set(new Map(usage.map(u => [u.account_id, u])));
     this.loading.set(false);
+  }
+
+  usageFor(accountId: string): BusinessUsageRow | undefined {
+    return this.usageByAccountId().get(accountId);
   }
 
   async updateStatus(account: Account, status: AccountStatus): Promise<void> {

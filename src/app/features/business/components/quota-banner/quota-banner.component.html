@@ -1,0 +1,59 @@
+@if (show) {
+  <div class="quota-banner" [class.quota-banner--blocking]="isBlocking" role="status">
+    <div class="quota-banner__row">
+      <p class="quota-banner__text">
+        @if (isBlocking) {
+          Alcanzaste el límite de tu plan gratuito
+          ({{ usage()?.storagePercent }}% de espacio, {{ usage()?.productCount }}/{{ usage()?.productLimit }} productos).
+          Actualiza tu plan para seguir subiendo fotos y productos.
+        } @else {
+          Estás usando el {{ usagePercent }}% de tu cuota gratuita
+          ({{ usage()?.productCount }}/{{ usage()?.productLimit }} productos). Considera optimizar imágenes o actualizar tu plan.
+        }
+      </p>
+
+      <div class="quota-banner__actions">
+        <button class="quota-banner__btn quota-banner__btn--primary" (click)="toggleForm()">
+          Actualizar plan
+        </button>
+        @if (!isBlocking) {
+          <button class="quota-banner__btn quota-banner__btn--ghost" (click)="dismiss()">
+            Descartar
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (formOpen()) {
+      <div class="quota-banner__form">
+        @if (sendResult() === 'success') {
+          <p class="quota-banner__msg quota-banner__msg--ok">
+            Solicitud enviada. Te contactaremos pronto.
+          </p>
+        } @else {
+          <textarea
+            class="quota-banner__textarea"
+            rows="3"
+            placeholder="Cuéntanos qué necesitas (opcional)"
+            [ngModel]="message()"
+            (ngModelChange)="message.set($event)"
+          ></textarea>
+
+          @if (sendResult() === 'error') {
+            <p class="quota-banner__msg quota-banner__msg--error">
+              No se pudo enviar la solicitud. Intenta de nuevo en unos minutos.
+            </p>
+          }
+
+          <button
+            class="quota-banner__btn quota-banner__btn--primary"
+            [disabled]="sending()"
+            (click)="submitRequest()"
+          >
+            {{ sending() ? 'Enviando...' : 'Enviar solicitud' }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

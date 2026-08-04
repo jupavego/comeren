@@ -119,6 +119,7 @@ export interface Account {
   schedule_json: BusinessHours | null;
   active: boolean;
   status: AccountStatus;
+  plan_tier?: string;
   created_at: string;
 
   // Personalización visual

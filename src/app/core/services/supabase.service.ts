@@ -35,6 +35,10 @@ export class SupabaseService {
     return this.client.storage;
   }
 
+  get functions() {
+    return this.client.functions;
+  }
+
   rpc(fn: string, params?: Record<string, unknown>) {
     return this.client.rpc(fn, params);
   }

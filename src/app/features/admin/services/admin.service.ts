@@ -16,6 +16,19 @@ export interface AdminStats {
   totalOrders: number;
 }
 
+export interface BusinessUsageRow {
+  account_id: string;
+  business_name: string;
+  plan_tier: string;
+  storage_used_bytes: number;
+  storage_limit_bytes: number;
+  storage_percent: number;
+  product_count: number;
+  product_limit: number;
+  product_percent: number;
+  has_pending_upgrade_req: boolean;
+}
+
 export interface AdminCatalogItem extends CatalogItem {
   account_name?: string;
   account_category?: string;
@@ -58,6 +71,17 @@ export class AdminService {
     }
 
     return data as AdminStats;
+  }
+
+  // Cuota de storage/catálogo de todos los negocios — get_all_business_usage()
+  // en 020_plan_upgrade_requests.sql. Solo admin puede llamarla.
+  async getAllBusinessUsage(): Promise<BusinessUsageRow[]> {
+    const { data, error } = await this.supabase.rpc('get_all_business_usage');
+    if (error) {
+      console.error('Error fetching business usage:', error.message);
+      return [];
+    }
+    return data as BusinessUsageRow[];
   }
 
   // ── Users ──────────────────────────────────────────────────────────────────

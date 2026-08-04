@@ -7,11 +7,12 @@ import { Account, CatalogItem } from '../../../directory/models/account.model';
 import { ReviewService } from '../../../directory/services/review.service';
 import { ProductRatingRow } from '../../../directory/models/review.model';
 import { OrderService, OrderStats } from '../../../directory/services/order.service';
+import { QuotaBannerComponent } from '../../components/quota-banner/quota-banner.component';
 
 @Component({
   selector: 'app-business-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, QuotaBannerComponent],
   templateUrl: './business-dashboard.component.html',
   styleUrl: './business-dashboard.component.scss',
   encapsulation: ViewEncapsulation.None,
