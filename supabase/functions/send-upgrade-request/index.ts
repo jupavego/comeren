@@ -86,7 +86,7 @@ serve(async (req) => {
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (resendKey && recipients.length > 0) {
-      await fetch('https://api.resend.com/emails', {
+      const resendResp = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${resendKey}`,
@@ -103,8 +103,17 @@ serve(async (req) => {
           `,
         }),
       });
-      // No se bloquea la respuesta al usuario si el correo falla —
-      // la solicitud ya quedó guardada y visible en el dashboard admin.
+
+      // No se bloquea la respuesta al usuario si el correo falla — la
+      // solicitud ya quedó guardada y visible en el dashboard admin — pero
+      // sí queda logueado para poder diagnosticarlo (antes fallaba en
+      // silencio, p.ej. cuando el remitente sandbox de Resend solo puede
+      // entregar al correo con el que se registró la cuenta).
+      if (!resendResp.ok) {
+        console.error('Resend error:', resendResp.status, await resendResp.text());
+      }
+    } else if (!resendKey) {
+      console.error('RESEND_API_KEY no configurado — no se envió correo');
     }
 
     return new Response(
