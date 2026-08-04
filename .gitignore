@@ -67,6 +67,10 @@ src/environments/environment.prod.ts
 __pycache__/
 *.pyc
 
+# Estado local del Supabase CLI (supabase link) — project-ref, versiones,
+# URL del pooler. Se regenera con `supabase link`, no debe versionarse.
+/supabase/.temp/
+
 # Skills y plugins de Claude Code — herramientas locales del asistente,
 # no son parte del proyecto ni deben compartirse vía el repo.
 /.claude/skills/
