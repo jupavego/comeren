@@ -54,3 +54,7 @@ src/environments/environment.prod.ts
 
 # Worktrees de Claude Code — repos git anidados, no deben trackearse como gitlinks
 /.claude/worktrees/
+
+# Permisos locales de Claude Code — se acumulan con trabajo de otros proyectos
+# hechos desde esta misma carpeta, no deben compartirse vía el repo.
+/.claude/settings.local.json
