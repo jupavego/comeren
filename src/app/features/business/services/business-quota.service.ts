@@ -3,6 +3,8 @@ import { SupabaseService } from '../../../core/services/supabase.service';
 
 export interface BusinessUsage {
   planTier: string;
+  planExpiresAt: string | null;
+  planExpired: boolean;
   storageUsedBytes: number;
   storageLimitBytes: number;
   storagePercent: number;

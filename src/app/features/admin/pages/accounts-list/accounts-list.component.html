@@ -74,6 +74,11 @@
                     <span class="quota-cell__label">
                       {{ u.storage_percent }}% · {{ u.product_count }}/{{ u.product_limit }} prod.
                     </span>
+                    @if (u.plan_tier !== 'free') {
+                      <span class="quota-cell__plan">
+                        {{ u.plan_tier }} · vence {{ u.plan_expires_at | date:'dd/MM/yyyy' }}
+                      </span>
+                    }
                     @if (u.has_pending_upgrade_req) {
                       <span class="badge badge--warning">Solicitud pendiente</span>
                     }
@@ -106,9 +111,41 @@
                       (click)="updateStatus(account, 'suspended')"
                     >Suspender</button>
                   }
+                  <button class="btn-action" (click)="openGrantForm(account.id)">
+                    Ampliar plan
+                  </button>
                 </div>
               </td>
             </tr>
+            @if (grantFormForAccountId() === account.id) {
+              <tr>
+                <td colspan="7">
+                  <div class="grant-form">
+                    <select
+                      class="filter-select"
+                      [value]="grantPackage()"
+                      (change)="grantPackage.set($any($event.target).value)"
+                    >
+                      @for (pkg of packages; track pkg.value) {
+                        <option [value]="pkg.value">{{ pkg.label }}</option>
+                      }
+                    </select>
+                    <input
+                      type="date"
+                      class="filter-input"
+                      [value]="grantDate()"
+                      (input)="grantDate.set($any($event.target).value)"
+                    />
+                    <button
+                      class="btn-action btn-action--approve"
+                      [disabled]="!grantDate() || grantSaving()"
+                      (click)="submitGrant(account.id)"
+                    >{{ grantSaving() ? 'Guardando...' : 'Confirmar' }}</button>
+                    <button class="btn-action" (click)="closeGrantForm()">Cancelar</button>
+                  </div>
+                </td>
+              </tr>
+            }
           } @empty {
             <tr>
               <td colspan="7" class="admin-table__empty">No se encontraron negocios</td>

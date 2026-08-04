@@ -20,6 +20,8 @@ export interface BusinessUsageRow {
   account_id: string;
   business_name: string;
   plan_tier: string;
+  plan_expires_at: string | null;
+  plan_expired: boolean;
   storage_used_bytes: number;
   storage_limit_bytes: number;
   storage_percent: number;
@@ -28,6 +30,14 @@ export interface BusinessUsageRow {
   product_percent: number;
   has_pending_upgrade_req: boolean;
 }
+
+// Paquetes de ampliación disponibles — deben existir como filas en
+// plan_limits (023_plan_packages_and_expiry.sql).
+export const PLAN_PACKAGES = [
+  { value: 'basico',     label: 'Básico (25 MB / 50 productos)' },
+  { value: 'intermedio', label: 'Intermedio (60 MB / 100 productos)' },
+  { value: 'premium',    label: 'Premium (150 MB / 300 productos)' },
+] as const;
 
 export interface AdminCatalogItem extends CatalogItem {
   account_name?: string;
@@ -82,6 +92,27 @@ export class AdminService {
       return [];
     }
     return data as BusinessUsageRow[];
+  }
+
+  // Otorga un paquete de ampliación con fecha de vencimiento obligatoria.
+  // La RLS de accounts ya permite al admin actualizar cualquier columna
+  // (accounts_update_owner en 20240002_rls_policies.sql).
+  async grantPlanPackage(
+    accountId: string,
+    planTier: string,
+    expiresAt: string
+  ): Promise<boolean> {
+    const { error } = await this.supabase
+      .from('accounts')
+      .update({
+        plan_tier: planTier,
+        plan_expires_at: expiresAt,
+        last_expiry_warning_days: null, // reinicia el ciclo de avisos
+      })
+      .eq('id', accountId);
+
+    if (error) console.error('Error granting plan package:', error.message);
+    return !error;
   }
 
   // ── Users ──────────────────────────────────────────────────────────────────

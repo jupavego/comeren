@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, computed, inject, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AdminService, BusinessUsageRow } from '../../services/admin.service';
+import { AdminService, BusinessUsageRow, PLAN_PACKAGES } from '../../services/admin.service';
 import { Account, AccountStatus } from '../../../../features/directory/models/account.model';
 
 @Component({
@@ -22,6 +22,12 @@ export class AccountsListComponent implements OnInit {
   searchText   = signal('');
   statusFilter = signal<AccountStatus | 'all'>('all');
   processingId = signal<string | null>(null);
+
+  packages = PLAN_PACKAGES;
+  grantFormForAccountId = signal<string | null>(null);
+  grantPackage  = signal<string>(PLAN_PACKAGES[0].value);
+  grantDate     = signal('');
+  grantSaving   = signal(false);
 
   filtered = computed(() => {
     const text   = this.searchText().toLowerCase().trim();
@@ -49,6 +55,35 @@ export class AccountsListComponent implements OnInit {
 
   usageFor(accountId: string): BusinessUsageRow | undefined {
     return this.usageByAccountId().get(accountId);
+  }
+
+  openGrantForm(accountId: string): void {
+    this.grantFormForAccountId.set(accountId);
+    this.grantPackage.set(this.packages[0].value);
+    this.grantDate.set('');
+  }
+
+  closeGrantForm(): void {
+    this.grantFormForAccountId.set(null);
+  }
+
+  async submitGrant(accountId: string): Promise<void> {
+    if (!this.grantDate()) return;
+
+    this.grantSaving.set(true);
+    // El input date da "YYYY-MM-DD" — se interpreta como fin de ese día.
+    const expiresAtIso = new Date(`${this.grantDate()}T23:59:59`).toISOString();
+
+    const ok = await this.adminService.grantPlanPackage(
+      accountId, this.grantPackage(), expiresAtIso
+    );
+
+    if (ok) {
+      const usage = await this.adminService.getAllBusinessUsage();
+      this.usageByAccountId.set(new Map(usage.map(u => [u.account_id, u])));
+      this.grantFormForAccountId.set(null);
+    }
+    this.grantSaving.set(false);
   }
 
   async updateStatus(account: Account, status: AccountStatus): Promise<void> {

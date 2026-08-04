@@ -29,4 +29,22 @@
     color: var(--color-text-secondary, #5a4a3f);
     white-space: nowrap;
   }
+
+  &__plan {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-brand-primary, #c0510a);
+    text-transform: capitalize;
+    white-space: nowrap;
+  }
+}
+
+.grant-form {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: rgba(234, 108, 10, 0.06);
+  border-radius: var(--radius-md, 8px);
+  flex-wrap: wrap;
 }
