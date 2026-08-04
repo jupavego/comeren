@@ -66,3 +66,8 @@ src/environments/environment.prod.ts
 # Caché compilada de Python — artefacto de build, se regenera solo
 __pycache__/
 *.pyc
+
+# Skills y plugins de Claude Code — herramientas locales del asistente,
+# no son parte del proyecto ni deben compartirse vía el repo.
+/.claude/skills/
+/.claude/plugins/
