@@ -6,7 +6,6 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import * as Sentry from '@sentry/angular';
 import { catchError, throwError } from 'rxjs';
 import { SessionService } from '../services/session.service';
 
@@ -31,16 +30,16 @@ export const errorInterceptor: HttpInterceptorFn = (
           break;
 
         case 0:
-          // Sin conexión
-          console.error('Sin conexión al servidor');
+          // Sin conexión — esperado (usuario con mal señal), no se reporta
+          // a Sentry: console.warn no lo captura la integración de consola
+          // (solo escucha 'error'), evita ruido por algo fuera de nuestro control.
+          console.warn('Sin conexión al servidor');
           break;
 
         default:
-          // 5xx, 4xx inesperados — esto sí es un bug real, se reporta
+          // 5xx, 4xx inesperados — esto sí es un bug real. console.error ya
+          // se reporta solo a Sentry (captureConsoleIntegration en main.ts).
           console.error(`Error ${error.status}:`, error.message);
-          Sentry.captureException(error, {
-            extra: { url: req.url, method: req.method, status: error.status },
-          });
       }
 
       return throwError(() => error);

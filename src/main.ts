@@ -13,6 +13,12 @@ if (environment.sentryDsn) {
     // Sin performance tracing — solo errores. Mantiene el consumo bajo
     // el free tier de Sentry (5,000 errores/mes) sin gastarlo en trazas.
     tracesSampleRate: 0,
+    // console.error() no se reporta a Sentry por defecto — solo excepciones
+    // no capturadas y promesas rechazadas. Esto agrega errores internos de
+    // librerías de terceros (ej. Google Maps) que solo logueaban a consola.
+    integrations: [
+      Sentry.captureConsoleIntegration({ levels: ['error'] }),
+    ],
   });
 }
 
