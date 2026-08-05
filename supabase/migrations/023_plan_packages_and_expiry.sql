@@ -93,6 +93,11 @@ END;
 $$;
 
 -- ── 4. get_all_business_usage() — mismo criterio, para el admin ─
+-- Cambia la lista de columnas de salida respecto a 020_*.sql —
+-- Postgres no permite CREATE OR REPLACE en ese caso, hay que
+-- borrarla primero.
+DROP FUNCTION IF EXISTS public.get_all_business_usage();
+
 CREATE OR REPLACE FUNCTION public.get_all_business_usage()
 RETURNS TABLE(
   account_id              UUID,
