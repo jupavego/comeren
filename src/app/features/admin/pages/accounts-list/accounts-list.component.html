@@ -45,6 +45,7 @@
         </thead>
         <tbody>
           @for (account of filtered(); track account.id) {
+            @let u = usageFor(account.id);
             <tr>
               <td>
                 <div class="account-cell">
@@ -62,7 +63,7 @@
                 </span>
               </td>
               <td>
-                @if (usageFor(account.id); as u) {
+                @if (u) {
                   <div class="quota-cell">
                     <div class="quota-cell__bar">
                       <div
@@ -87,8 +88,8 @@
                 }
               </td>
               <td>
-                @if (usageFor(account.id)?.plan_expires_at; as expiresAt) {
-                  <span [class.text-danger]="usageFor(account.id)?.plan_expired">
+                @if (u?.plan_expires_at; as expiresAt) {
+                  <span [class.text-danger]="u?.plan_expired">
                     {{ expiresAt | date:'dd/MM/yyyy' }}
                   </span>
                 } @else {
