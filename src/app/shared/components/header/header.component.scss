@@ -21,9 +21,9 @@
 // La sombra va aquí (box-shadow) para no interferir con backdrop-filter.
 .topbar__glass {
   border-radius: var(--radius-xl);
-  // Mismo desenfoque de siempre, ahora con tinte naranja corporativo
-  // en vez del neutro — sigue dejando ver la imagen de fondo real.
-  background: rgba(234, 108, 10, .30);
+  // Mismo desenfoque de siempre, tinte naranja corporativo 10% más
+  // oscuro — sigue dejando ver la imagen de fondo real.
+  background: rgba(211, 97, 9, .30);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid rgba(255, 255, 255, .20);
@@ -316,8 +316,9 @@
   left: 0;
   top: calc(100% - 3px);
   width: 100%;
-  // Mismo patrón que topbar__glass — continuación visual de la píldora
-  background: rgba(234, 108, 10, .30);
+  // Mismo patrón que topbar__glass, pero 10% más oscuro para diferenciar
+  // el panel desplegado de la píldora superior
+  background: rgba(211, 97, 9, .30);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid rgba(255, 255, 255, .20);
