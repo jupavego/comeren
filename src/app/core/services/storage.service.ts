@@ -117,6 +117,15 @@ export class StorageService {
 
     if (error) return { success: false, error: error.message };
 
+    // Limpia versiones viejas del mismo nombre base con otra extensión
+    // (ej. logo.jpg de antes de que empezáramos a subir en WebP) — si
+    // no existen, remove() simplemente no encuentra nada y no falla.
+    // No bloquea la respuesta al usuario: la subida ya fue exitosa.
+    const staleExtensions = ['jpg', 'jpeg', 'png', 'webp'].filter(e => e !== outExt);
+    void this.supabase.storage
+      .from(bucket)
+      .remove(staleExtensions.map(e => `${userId}/${baseName}.${e}`));
+
     // Agregar cache-buster a la URL pública para que todos los componentes
     // que lean esta URL desde Supabase obtengan siempre la imagen más reciente
     const baseUrl = this.getPublicUrl(bucket, path);
