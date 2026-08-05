@@ -10,6 +10,13 @@
     border-color: rgba(220, 38, 38, 0.4);
   }
 
+  &--info {
+    background: var(--color-background-secondary, #f7f4ef);
+    border-color: var(--color-border-tertiary, #e4ddd8);
+
+    .quota-banner__text { color: var(--color-text-secondary, #5a4a3f); }
+  }
+
   &__row {
     display: flex;
     align-items: center;

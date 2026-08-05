@@ -1,3 +1,18 @@
+@if (usage(); as u) {
+  @if (u.planTier !== 'free' && u.planExpiresAt) {
+    <div class="quota-banner quota-banner--info" role="status">
+      <p class="quota-banner__text">
+        @if (u.planExpired) {
+          Tu plan <strong>{{ u.planTier }}</strong> venció el {{ u.planExpiresAt | date:'dd/MM/yyyy' }}.
+          Volviste al plan gratuito — contáctanos para renovarlo.
+        } @else {
+          Plan <strong>{{ u.planTier }}</strong> activo · vence el {{ u.planExpiresAt | date:'dd/MM/yyyy' }}
+        }
+      </p>
+    </div>
+  }
+}
+
 @if (show) {
   <div class="quota-banner" [class.quota-banner--blocking]="isBlocking" role="status">
     <div class="quota-banner__row">

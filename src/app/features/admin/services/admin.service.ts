@@ -31,13 +31,11 @@ export interface BusinessUsageRow {
   has_pending_upgrade_req: boolean;
 }
 
-// Paquetes de ampliación disponibles — deben existir como filas en
-// plan_limits (023_plan_packages_and_expiry.sql).
-export const PLAN_PACKAGES = [
-  { value: 'basico',     label: 'Básico (25 MB / 50 productos)' },
-  { value: 'intermedio', label: 'Intermedio (60 MB / 100 productos)' },
-  { value: 'premium',    label: 'Premium (150 MB / 300 productos)' },
-] as const;
+export interface PlanPackage {
+  plan_tier: string;
+  max_storage_bytes: number;
+  max_products: number;
+}
 
 export interface AdminCatalogItem extends CatalogItem {
   account_name?: string;
@@ -92,6 +90,23 @@ export class AdminService {
       return [];
     }
     return data as BusinessUsageRow[];
+  }
+
+  // Paquetes de ampliación disponibles — se traen en vivo de plan_limits
+  // (026_plan_limits_select_admin.sql) en vez de tenerlos hardcodeados,
+  // para que el selector nunca quede desactualizado si cambian los límites.
+  async getPlanPackages(): Promise<PlanPackage[]> {
+    const { data, error } = await this.supabase
+      .from('plan_limits')
+      .select('plan_tier, max_storage_bytes, max_products')
+      .neq('plan_tier', 'free')
+      .order('max_storage_bytes', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching plan packages:', error.message);
+      return [];
+    }
+    return data as PlanPackage[];
   }
 
   // Otorga un paquete de ampliación con fecha de vencimiento obligatoria.

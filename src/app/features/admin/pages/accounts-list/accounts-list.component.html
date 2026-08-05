@@ -134,8 +134,8 @@
                       [value]="grantPackage()"
                       (change)="grantPackage.set($any($event.target).value)"
                     >
-                      @for (pkg of packages; track pkg.value) {
-                        <option [value]="pkg.value">{{ pkg.label }}</option>
+                      @for (pkg of packages(); track pkg.plan_tier) {
+                        <option [value]="pkg.plan_tier">{{ packageLabel(pkg) }}</option>
                       }
                     </select>
                     <input
@@ -146,7 +146,7 @@
                     />
                     <button
                       class="btn-action btn-action--approve"
-                      [disabled]="!grantDate() || grantSaving()"
+                      [disabled]="!grantDate() || !grantPackage() || grantSaving()"
                       (click)="submitGrant(account.id)"
                     >{{ grantSaving() ? 'Guardando...' : 'Confirmar' }}</button>
                     <button class="btn-action" (click)="closeGrantForm()">Cancelar</button>

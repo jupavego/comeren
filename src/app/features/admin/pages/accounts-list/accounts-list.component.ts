@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, computed, inject, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AdminService, BusinessUsageRow, PLAN_PACKAGES } from '../../services/admin.service';
+import { AdminService, BusinessUsageRow, PlanPackage } from '../../services/admin.service';
 import { Account, AccountStatus } from '../../../../features/directory/models/account.model';
 
 @Component({
@@ -23,11 +23,17 @@ export class AccountsListComponent implements OnInit {
   statusFilter = signal<AccountStatus | 'all'>('all');
   processingId = signal<string | null>(null);
 
-  packages = PLAN_PACKAGES;
+  packages = signal<PlanPackage[]>([]);
   grantFormForAccountId = signal<string | null>(null);
-  grantPackage  = signal<string>(PLAN_PACKAGES[0].value);
+  grantPackage  = signal<string>('');
   grantDate     = signal('');
   grantSaving   = signal(false);
+
+  packageLabel(pkg: PlanPackage): string {
+    const mb   = Math.round(pkg.max_storage_bytes / 1024 / 1024);
+    const name = pkg.plan_tier.charAt(0).toUpperCase() + pkg.plan_tier.slice(1);
+    return `${name} (${mb} MB / ${pkg.max_products} productos)`;
+  }
 
   filtered = computed(() => {
     const text   = this.searchText().toLowerCase().trim();
@@ -44,12 +50,14 @@ export class AccountsListComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    const [accounts, usage] = await Promise.all([
+    const [accounts, usage, packages] = await Promise.all([
       this.adminService.getAccounts(),
       this.adminService.getAllBusinessUsage(),
+      this.adminService.getPlanPackages(),
     ]);
     this.accounts.set(accounts);
     this.usageByAccountId.set(new Map(usage.map(u => [u.account_id, u])));
+    this.packages.set(packages);
     this.loading.set(false);
   }
 
@@ -59,7 +67,7 @@ export class AccountsListComponent implements OnInit {
 
   openGrantForm(accountId: string): void {
     this.grantFormForAccountId.set(accountId);
-    this.grantPackage.set(this.packages[0].value);
+    this.grantPackage.set(this.packages()[0]?.plan_tier ?? '');
     this.grantDate.set('');
   }
 
