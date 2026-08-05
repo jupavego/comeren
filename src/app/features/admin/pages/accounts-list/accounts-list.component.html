@@ -38,6 +38,7 @@
             <th>Zona</th>
             <th>Estado</th>
             <th>Cuota</th>
+            <th>Vence</th>
             <th>Registrado</th>
             <th>Acciones</th>
           </tr>
@@ -75,14 +76,21 @@
                       {{ u.storage_percent }}% · {{ u.product_count }}/{{ u.product_limit }} prod.
                     </span>
                     @if (u.plan_tier !== 'free') {
-                      <span class="quota-cell__plan">
-                        {{ u.plan_tier }} · vence {{ u.plan_expires_at | date:'dd/MM/yyyy' }}
-                      </span>
+                      <span class="quota-cell__plan">{{ u.plan_tier }}</span>
                     }
                     @if (u.has_pending_upgrade_req) {
                       <span class="badge badge--warning">Solicitud pendiente</span>
                     }
                   </div>
+                } @else {
+                  <span>—</span>
+                }
+              </td>
+              <td>
+                @if (usageFor(account.id)?.plan_expires_at; as expiresAt) {
+                  <span [class.text-danger]="usageFor(account.id)?.plan_expired">
+                    {{ expiresAt | date:'dd/MM/yyyy' }}
+                  </span>
                 } @else {
                   <span>—</span>
                 }
@@ -119,7 +127,7 @@
             </tr>
             @if (grantFormForAccountId() === account.id) {
               <tr>
-                <td colspan="7">
+                <td colspan="8">
                   <div class="grant-form">
                     <select
                       class="filter-select"
@@ -148,7 +156,7 @@
             }
           } @empty {
             <tr>
-              <td colspan="7" class="admin-table__empty">No se encontraron negocios</td>
+              <td colspan="8" class="admin-table__empty">No se encontraron negocios</td>
             </tr>
           }
         </tbody>
