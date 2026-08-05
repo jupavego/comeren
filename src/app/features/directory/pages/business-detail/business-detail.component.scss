@@ -784,8 +784,21 @@
   z-index: var(--z-bubble);
   touch-action: none;
   color: #fff;
+  // Corre una sola vez, al montar el nodo por primera vez — el elemento ya
+  // no se destruye/recrea al cruzar el punto de scroll (ver --hidden abajo),
+  // así que esta animación nunca se reinicia a medio camino.
   animation: bubble-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transition: box-shadow var(--duration-normal), filter var(--duration-normal);
+  transition:
+    opacity var(--duration-normal), visibility var(--duration-normal),
+    box-shadow var(--duration-normal), filter var(--duration-normal);
+
+  // Oculta con opacidad en vez de quitar el nodo del DOM — mantiene la
+  // animación de entrada como algo que pasa una sola vez por sesión.
+  &--hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
 
   &:hover {
     filter: brightness(1.08);

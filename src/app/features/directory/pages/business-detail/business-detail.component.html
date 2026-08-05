@@ -348,10 +348,14 @@
     }
 
     <!-- Burbuja flotante — aparece cuando el botón hero sale del viewport,
-         y se queda visible sin importar el scroll mientras haya productos en el carrito -->
-    @if ((heroWaHidden() || cart.hasItems()) && !showOrder() && a.whatsapp && a.catalog_items?.length) {
+         y se queda visible sin importar el scroll mientras haya productos en el carrito.
+         Se mantiene siempre montada (solo se oculta con opacidad) para que la
+         animación de entrada corra una sola vez por sesión, no cada vez que
+         cruza el punto de scroll — evita que quede a medio animar. -->
+    @if (a.whatsapp && a.catalog_items?.length) {
       <button
         class="cart-bubble"
+        [class.cart-bubble--hidden]="!(heroWaHidden() || cart.hasItems()) || showOrder()"
         [class.cart-bubble--has-items]="cart.hasItems()"
         [class.cart-bubble--left]="bubbleOnLeft()"
         [class.cart-bubble--snapping]="isSnapping()"
