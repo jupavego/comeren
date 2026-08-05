@@ -12,6 +12,8 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createAdminClient } from '../_shared/supabase-admin.ts';
+import { sendEmail } from '../_shared/resend.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin':  '*',
@@ -20,7 +22,6 @@ const corsHeaders = {
 
 const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
-const SERVICE_ROLE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 function esc(v: unknown): string {
   if (v === null || v === undefined || v === '') return '—';
@@ -95,7 +96,7 @@ serve(async (req) => {
 
     // Cliente con service role — solo para datos que requieren privilegios:
     // correo real del dueño (auth.users), correos de admins, y cuota.
-    const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const adminClient = createAdminClient();
 
     const [{ data: userLookup }, { data: usage }, { data: adminEmails }] = await Promise.all([
       adminClient.auth.admin.getUserById(account.owner_id),
@@ -110,8 +111,7 @@ serve(async (req) => {
       ...(adminEmails ?? []),
     ].filter((e): e is string => !!e)));
 
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (resendKey && recipients.length > 0) {
+    if (recipients.length > 0) {
       const html = `
         <div style="font-family:sans-serif;font-size:14px;color:#2b1a0f;max-width:560px;">
           <h2 style="margin:0 0 4px;">Solicitud de actualización de plan</h2>
@@ -154,28 +154,14 @@ serve(async (req) => {
         </div>
       `;
 
-      const resendResp = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${resendKey}`,
-          'Content-Type':  'application/json',
-        },
-        body: JSON.stringify({
-          from:    Deno.env.get('RESEND_FROM') ?? 'onboarding@resend.dev',
-          to:      recipients,
-          subject: `Solicitud de upgrade de plan — ${account.name}`,
-          html,
-        }),
-      });
-
       // No se bloquea la respuesta al usuario si el correo falla — la
-      // solicitud ya quedó guardada y visible en el dashboard admin — pero
-      // sí queda logueado para poder diagnosticarlo.
-      if (!resendResp.ok) {
-        console.error('Resend error:', resendResp.status, await resendResp.text());
-      }
-    } else if (!resendKey) {
-      console.error('RESEND_API_KEY no configurado — no se envió correo');
+      // solicitud ya quedó guardada y visible en el dashboard admin —
+      // sendEmail solo loguea el detalle para poder diagnosticarlo.
+      await sendEmail({
+        to:      recipients,
+        subject: `Solicitud de upgrade de plan — ${account.name}`,
+        html,
+      });
     }
 
     return new Response(

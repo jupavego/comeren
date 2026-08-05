@@ -7,20 +7,15 @@
 // Deploy: supabase functions deploy send-expiry-warning
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const SUPABASE_URL     = Deno.env.get('SUPABASE_URL')!;
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+import { createAdminClient } from '../_shared/supabase-admin.ts';
+import { sendEmail } from '../_shared/resend.ts';
 
 serve(async (_req) => {
   try {
-    const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const adminClient = createAdminClient();
 
     const { data: accounts, error } = await adminClient.rpc('get_accounts_needing_expiry_warning');
     if (error) throw error;
-
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    const from       = Deno.env.get('RESEND_FROM') ?? 'onboarding@resend.dev';
 
     let sent = 0;
 
@@ -28,35 +23,22 @@ serve(async (_req) => {
       const { data: userLookup } = await adminClient.auth.admin.getUserById(acc.owner_id);
       const email = userLookup?.user?.email;
 
-      if (email && resendKey) {
+      if (email) {
         const days = acc.days_remaining;
-        const resp = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendKey}`,
-            'Content-Type':  'application/json',
-          },
-          body: JSON.stringify({
-            from,
-            to:      [email],
-            subject: `Tu plan ${acc.plan_tier} vence en ${days} día${days === 1 ? '' : 's'}`,
-            html: `
-              <p>Hola,</p>
-              <p>La ampliación de plan (<strong>${acc.plan_tier}</strong>) de
-              <strong>${acc.business_name}</strong> vence el
-              ${new Date(acc.plan_expires_at).toLocaleDateString('es-CO')}.</p>
-              <p>Si quieres renovarla y no perder tu capacidad ampliada, contáctanos
-              antes de esa fecha.</p>
-            `,
-          }),
+        const ok = await sendEmail({
+          to:      [email],
+          subject: `Tu plan ${acc.plan_tier} vence en ${days} día${days === 1 ? '' : 's'}`,
+          html: `
+            <p>Hola,</p>
+            <p>La ampliación de plan (<strong>${acc.plan_tier}</strong>) de
+            <strong>${acc.business_name}</strong> vence el
+            ${new Date(acc.plan_expires_at).toLocaleDateString('es-CO')}.</p>
+            <p>Si quieres renovarla y no perder tu capacidad ampliada, contáctanos
+            antes de esa fecha.</p>
+          `,
         });
-
-        if (resp.ok) {
-          sent++;
-        } else {
-          console.error('Resend error (expiry warning):', resp.status, await resp.text());
-        }
-      } else if (!email) {
+        if (ok) sent++;
+      } else {
         console.error(`Sin correo para owner_id ${acc.owner_id} (account ${acc.account_id})`);
       }
 
